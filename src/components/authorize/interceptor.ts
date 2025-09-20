@@ -23,6 +23,24 @@ import {
 } from '@loopback/authorization';
 import { ApplicationLogger, LoggerFactory } from '@/helpers';
 
+async function loadAuthorizers(ctx: Context) {
+  const authorizerFunctions: Authorizer[] = [];
+  const bindings = ctx.findByTag<Authorizer>(AuthorizationTags.AUTHORIZER);
+  const authorizers: (Authorizer | BindingAddress<Authorizer>)[] = bindings.map(b => b.key);
+
+  for (const keyOrFn of authorizers) {
+    if (typeof keyOrFn === 'function') {
+      authorizerFunctions.push(keyOrFn);
+      continue;
+    }
+
+    const fn = await ctx.get(keyOrFn);
+    authorizerFunctions.push(fn);
+  }
+
+  return authorizerFunctions;
+}
+
 @injectable(asGlobalInterceptor('authorization'))
 export class AuthorizateInterceptor implements Provider<Interceptor> {
   private options: AuthorizationOptions;
@@ -123,22 +141,4 @@ export class AuthorizateInterceptor implements Provider<Interceptor> {
 
     return next();
   }
-}
-
-async function loadAuthorizers(ctx: Context) {
-  const authorizerFunctions: Authorizer[] = [];
-  const bindings = ctx.findByTag<Authorizer>(AuthorizationTags.AUTHORIZER);
-  const authorizers: (Authorizer | BindingAddress<Authorizer>)[] = bindings.map(b => b.key);
-
-  for (const keyOrFn of authorizers) {
-    if (typeof keyOrFn === 'function') {
-      authorizerFunctions.push(keyOrFn);
-      continue;
-    }
-
-    const fn = await ctx.get(keyOrFn);
-    authorizerFunctions.push(fn);
-  }
-
-  return authorizerFunctions;
 }

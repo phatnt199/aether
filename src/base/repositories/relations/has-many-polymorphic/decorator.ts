@@ -13,7 +13,7 @@ import { ValueOptionalExcept } from '@/common';
 export function hasManyPolymorphic(
   definition: ValueOptionalExcept<IHasManyPolymorphicDefinition, 'target'>,
 ) {
-  return (decoratedTarget: Object, key: string) => {
+  return (decoratedTarget: Entity, key: string) => {
     const meta: IHasManyPolymorphicDefinition = {
       name: key,
       type: RelationType.hasMany,

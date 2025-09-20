@@ -20,6 +20,61 @@ import { IHasManyPolymorphicDefinition, TPolymorphic } from './types';
 import { WhereBuilder } from '../../base.repository';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
+const getPolymorphicFields = (opts: {
+  discriminator: string | { typeField: string; idField: string };
+}) => {
+  const { discriminator } = opts;
+
+  let typeField: string | null = null;
+  let idField: string | null = null;
+
+  switch (typeof discriminator) {
+    case 'string': {
+      typeField = `${discriminator}Type`;
+      idField = `${discriminator}Id`;
+      break;
+    }
+    case 'object': {
+      typeField = discriminator.typeField;
+      idField = discriminator.idField;
+      break;
+    }
+    default: {
+      throw getError({
+        statusCode: 500,
+        message: `[getFields] discriminator: ${typeof discriminator} | Invalid discriminator type!`,
+      });
+    }
+  }
+
+  return { typeField, idField };
+};
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
+/**
+ * @experimental
+ */
+export class DefaultHasManyPolymorphicRepository<
+  Target extends BaseEntity,
+  TargetId extends IdType,
+  TargetRepository extends EntityCrudRepository<Target, TargetId>,
+  SourceId,
+> extends DefaultHasManyRepository<Target, TargetId, TargetRepository> {
+  constructor(opts: {
+    targetRepositoryGetter: Getter<TargetRepository>;
+    polymorphic: TPolymorphic & { typeValue: string; idValue: SourceId };
+  }) {
+    const { targetRepositoryGetter, polymorphic } = opts;
+    const { typeField, idField } = getPolymorphicFields(polymorphic);
+
+    super(targetRepositoryGetter, {
+      [typeField]: polymorphic.typeValue,
+      [idField]: polymorphic.idValue,
+    } as DataObject<Target>);
+  }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
 /**
  * @experimental
  */
@@ -101,58 +156,3 @@ export const createHasManyPolymorphicRepositoryFactoryFor = <
   rs.inclusionResolver = createHasManyPolymorphicInclusionResolver(opts);
   return rs;
 };
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-const getPolymorphicFields = (opts: {
-  discriminator: string | { typeField: string; idField: string };
-}) => {
-  const { discriminator } = opts;
-
-  let typeField: string | null = null;
-  let idField: string | null = null;
-
-  switch (typeof discriminator) {
-    case 'string': {
-      typeField = `${discriminator}Type`;
-      idField = `${discriminator}Id`;
-      break;
-    }
-    case 'object': {
-      typeField = discriminator.typeField;
-      idField = discriminator.idField;
-      break;
-    }
-    default: {
-      throw getError({
-        statusCode: 500,
-        message: `[getFields] discriminator: ${typeof discriminator} | Invalid discriminator type!`,
-      });
-    }
-  }
-
-  return { typeField, idField };
-};
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-/**
- * @experimental
- */
-export class DefaultHasManyPolymorphicRepository<
-  Target extends BaseEntity,
-  TargetId extends IdType,
-  TargetRepository extends EntityCrudRepository<Target, TargetId>,
-  SourceId,
-> extends DefaultHasManyRepository<Target, TargetId, TargetRepository> {
-  constructor(opts: {
-    targetRepositoryGetter: Getter<TargetRepository>;
-    polymorphic: TPolymorphic & { typeValue: string; idValue: SourceId };
-  }) {
-    const { targetRepositoryGetter, polymorphic } = opts;
-    const { typeField, idField } = getPolymorphicFields(polymorphic);
-
-    super(targetRepositoryGetter, {
-      [typeField]: polymorphic.typeValue,
-      [idField]: polymorphic.idValue,
-    } as DataObject<Target>);
-  }
-}
