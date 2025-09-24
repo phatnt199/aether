@@ -12,7 +12,7 @@ import { ApplicationLogger, LoggerFactory } from '@/helpers';
 import { getExecutedPerformance, getRequestId, getRequestRemark } from '@/utilities';
 
 export class BaseApplicationSequence implements SequenceHandler {
-  private logger: ApplicationLogger;
+  protected logger: ApplicationLogger;
 
   constructor(
     @inject(SequenceActions.INVOKE_MIDDLEWARE)

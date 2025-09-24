@@ -52,10 +52,14 @@ export abstract class BaseApplication
   protected logger: ApplicationLogger;
   models: Set<string>;
 
-  constructor(opts: { serverOptions: ApplicationConfig; sequence?: Constructor<SequenceHandler> }) {
-    const { serverOptions, sequence } = opts;
+  constructor(opts: {
+    scope?: string;
+    sequence?: Constructor<SequenceHandler>;
+    serverOptions: ApplicationConfig;
+  }) {
+    const { scope = 'Application', serverOptions, sequence } = opts;
     super(serverOptions);
-    this.logger = LoggerFactory.getLogger(['Application']);
+    this.logger = LoggerFactory.getLogger([scope]);
 
     this.bind(AuthenticateKeys.ALWAYS_ALLOW_PATHS).to([]);
     this.bind(BindingKeys.APPLICATION_MIDDLEWARE_OPTIONS).to(MiddlewareSequence.defaultOptions);
@@ -65,50 +69,50 @@ export abstract class BaseApplication
     this.projectRoot = this.getProjectRoot();
     this.component(CrudRestComponent);
 
-    this.logger.info('------------------------------------------------------------------------');
     this.logger.info(
-      ' Starting application... | Name: %s | Env: %s',
+      '[initialize] ------------------------------------------------------------------------',
+    );
+    this.logger.info(
+      '[initialize] Starting application... | Name: %s | Env: %s',
       APP_ENV_APPLICATION_NAME,
       NODE_ENV,
     );
     this.logger.info(
-      ' AllowEmptyEnv: %s | Prefix: %s',
+      '[initialize] AllowEmptyEnv: %s | Prefix: %s',
       ALLOW_EMPTY_ENV_VALUE,
       APPLICATION_ENV_PREFIX,
     );
-    this.logger.info(' RunMode: %s', RUN_MODE);
-    this.logger.info(' Timezone: %s', APP_ENV_APPLICATION_TIMEZONE);
-    this.logger.info(' LogPath: %s', APP_ENV_LOGGER_FOLDER_PATH);
+    this.logger.info('[initialize] RunMode: %s', RUN_MODE);
+    this.logger.info('[initialize] Timezone: %s', APP_ENV_APPLICATION_TIMEZONE);
+    this.logger.info('[initialize] LogPath: %s', APP_ENV_LOGGER_FOLDER_PATH);
     this.logger.info(
-      ' Datasource | Migration: %s | Authorize: %s',
+      '[initialize] Datasource | Migration: %s | Authorize: %s',
       APP_ENV_DS_MIGRATION,
       APP_ENV_DS_AUTHORIZE,
     );
-    this.logger.info('------------------------------------------------------------------------');
+    this.logger.info(
+      '[initialize] ------------------------------------------------------------------------',
+    );
 
-    // Validate whole application environment args.
-    this.logger.info('[environments] Validating application environments...');
+    this.logger.info('[initialize] Validating application environments...');
     const envValidation = this.validateEnv();
     if (!envValidation.result) {
       throw getError({ message: envValidation?.message ?? 'Invalid application environment!' });
-    } else {
-      this.logger.info('[environments] All application environments are valid...');
     }
+    this.logger.info('[initialize] All application environments are valid...');
 
-    this.logger.info('[models] Declare application models...');
+    this.logger.info('[initialize] Declare application models...');
     this.models = new Set([]);
     this.models = this.declareModels();
 
-    // Middlewares
-    this.logger.info('[middlewares] Declare application middlewares...');
+    this.logger.info('[initialize] Declare application middlewares...');
     this.middleware(RequestBodyParserMiddleware);
     this.middleware(RequestSpyMiddleware);
 
-    // Do configure while modules for application.
-    this.logger.info('[preConfigure] Executing Pre-Configuration...');
+    this.logger.info('[initialize] Executing Pre-Configuration...');
     this.preConfigure();
 
-    this.logger.info('[postConfigure] Executing Post-Configuration...');
+    this.logger.info('[initialize] Executing Post-Configuration...');
     this.postConfigure();
   }
 

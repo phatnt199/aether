@@ -1,6 +1,6 @@
 import { BaseProvider } from '@/base/base.provider';
 import { getUID } from '@/utilities/parse.utility';
-import { injectable, Next, Provider, ValueOrPromise } from '@loopback/core';
+import { injectable, Next, ValueOrPromise } from '@loopback/core';
 import {
   asMiddleware,
   Middleware,
@@ -17,7 +17,7 @@ import set from 'lodash/set';
     group: RestMiddlewareGroups.FIND_ROUTE,
   }),
 )
-export class RequestSpyMiddleware extends BaseProvider implements Provider<Middleware> {
+export class RequestSpyMiddleware extends BaseProvider<Middleware> {
   constructor() {
     super({ scope: RequestSpyMiddleware.name });
   }

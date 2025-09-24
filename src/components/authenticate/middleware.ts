@@ -1,11 +1,11 @@
 import { BaseProvider } from '@/base/base.provider';
 import {
   AuthenticateFn,
-  AuthenticationBindings,
   AUTHENTICATION_STRATEGY_NOT_FOUND,
+  AuthenticationBindings,
   USER_PROFILE_NOT_FOUND,
 } from '@loopback/authentication';
-import { Getter, inject, injectable, Next, Provider, ValueOrPromise } from '@loopback/core';
+import { Getter, inject, injectable, Next, ValueOrPromise } from '@loopback/core';
 import {
   asMiddleware,
   Middleware,
@@ -23,7 +23,7 @@ import { AuthenticateKeys } from './common';
     upstreamGroups: [RestMiddlewareGroups.CORS],
   }),
 )
-export class AuthenticationMiddleware extends BaseProvider implements Provider<Middleware> {
+export class AuthenticationMiddleware extends BaseProvider<Middleware> {
   constructor(
     @inject(AuthenticationBindings.AUTH_ACTION)
     private authenticateFn: AuthenticateFn,
