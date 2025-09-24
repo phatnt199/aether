@@ -9,6 +9,7 @@ export interface IRedisHelperProps {
   name: string;
   host: string;
   port: string | number;
+  username?: string;
   password: string;
   database?: number;
   autoConnect?: boolean;

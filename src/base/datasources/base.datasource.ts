@@ -1,8 +1,9 @@
 import { ApplicationLogger, LoggerFactory } from '@/helpers';
 import { Connector, JugglerDataSource } from '@loopback/repository';
 import { IDataSourceOptions } from './types';
+import { ValueOrPromise } from '@/common';
 
-export class BaseDataSource<
+export abstract class BaseDataSource<
   S extends IDataSourceOptions = IDataSourceOptions,
   C extends Connector = Connector,
 > extends JugglerDataSource {
@@ -19,4 +20,6 @@ export class BaseDataSource<
 
     this.logger = LoggerFactory.getLogger([scope]);
   }
+
+  abstract getConnectionString(): ValueOrPromise<string>;
 }

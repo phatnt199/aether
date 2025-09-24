@@ -3,6 +3,7 @@ import { inject } from '@loopback/core';
 import { Options } from '@loopback/repository';
 import { RedisConnector } from './connector';
 import { IRedisConnector, IRedisOptions } from './types';
+import { ValueOrPromise } from '@/common';
 
 const options: IRedisOptions = {
   connector: 'redis',
@@ -37,5 +38,19 @@ export class RedisDataSource extends BaseDataSource<IRedisOptions> {
     extra?: Options,
   ): Promise<R> {
     return this.getConnector().execute<R>(command, parameters, extra);
+  }
+
+  override getConnectionString(): ValueOrPromise<string> {
+    const {
+      connector = 'redis',
+      username = '',
+      host = '0.0.0.0',
+      port = 6379,
+      password,
+      database = 0,
+    } = this.settings as IRedisOptions;
+
+    const protocol = connector.toLowerCase();
+    return `${protocol}://${username}:${password}@${host}:${port}/${database}`;
   }
 }
