@@ -3,7 +3,7 @@ import { Connector, JugglerDataSource } from '@loopback/repository';
 import { IDataSourceOptions } from './types';
 import { ValueOrPromise } from '@/common';
 
-export abstract class BaseDataSource<
+export class BaseDataSource<
   S extends IDataSourceOptions = IDataSourceOptions,
   C extends Connector = Connector,
 > extends JugglerDataSource {
@@ -21,5 +21,10 @@ export abstract class BaseDataSource<
     this.logger = LoggerFactory.getLogger([scope]);
   }
 
-  abstract getConnectionString(): ValueOrPromise<string>;
+  getConnectionString(): ValueOrPromise<string> {
+    const { connector, host, port, user, password, database } = this.settings;
+
+    const protocol = connector.toLowerCase();
+    return `${protocol}://${user}:${password}@${host}:${port}/${database}`;
+  }
 }

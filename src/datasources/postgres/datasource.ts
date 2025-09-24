@@ -4,7 +4,6 @@ import { inject } from '@loopback/core';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import { IPostgresOptions } from './types';
-import { ValueOrPromise } from '@/common';
 
 const databaseConfigs: IPostgresOptions = {
   connector: 'postgresql',
@@ -51,12 +50,5 @@ export class PostgresDataSource extends BaseDataSource {
 
     super({ settings: dsConfig, scope: PostgresDataSource.name });
     this.logger.info('Postgres DataSource Settings: %j', dsConfig);
-  }
-
-  override getConnectionString(): ValueOrPromise<string> {
-    const { connector, host, port, user, password, database } = this.settings as IPostgresOptions;
-
-    const protocol = connector.toLowerCase();
-    return `${protocol}://${user}:${password}@${host}:${port}/${database}`;
   }
 }

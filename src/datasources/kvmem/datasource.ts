@@ -1,5 +1,6 @@
 import { BaseDataSource, IDataSourceOptions } from '@/base/datasources';
 import { ValueOrPromise } from '@/common';
+import { getError } from '@/utilities';
 import { inject } from '@loopback/core';
 
 const kvmemOptions: IDataSourceOptions = {
@@ -20,9 +21,6 @@ export class KvMemDataSource extends BaseDataSource<IDataSourceOptions> {
   }
 
   override getConnectionString(): ValueOrPromise<string> {
-    const { connector = '', name } = this.settings as IDataSourceOptions;
-
-    const protocol = connector.toLowerCase();
-    return `${protocol}://${name}`;
+    throw getError({ message: '[getConnectionString] KVMem Datasource has no connection string!' });
   }
 }
