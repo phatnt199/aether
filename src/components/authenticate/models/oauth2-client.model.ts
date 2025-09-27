@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/base.model';
+import { BaseTzEntity } from '@/base/models';
 import { NumberIdType } from '@/common';
 import { model, property } from '@loopback/repository';
 

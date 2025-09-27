@@ -41,49 +41,9 @@
       "default": "./dist/base/loopback/@lb/rest/index.js",
       "types": "./dist/base/loopback/@lb/rest/index.d.ts"
     },
-    "./@loopback/authentication": {
-      "default": "./dist/base/loopback/authentication/index.js",
-      "types": "./dist/base/loopback/authentication/index.d.ts"
-    },
-    "./@loopback/authorization": {
-      "default": "./dist/base/loopback/authorization/index.js",
-      "types": "./dist/base/loopback/authorization/index.d.ts"
-    },
-    "./@loopback/boot": {
-      "default": "./dist/base/loopback/boot/index.js",
-      "types": "./dist/base/loopback/boot/index.d.ts"
-    },
-    "./@loopback/core": {
-      "default": "./dist/base/loopback/core/index.js",
-      "types": "./dist/base/loopback/core/index.d.ts"
-    },
-    "./@loopback/http-server": {
-      "default": "./dist/base/loopback/http-server/index.js",
-      "types": "./dist/base/loopback/http-server/index.d.ts"
-    },
-    "./@loopback/metadata": {
-      "default": "./dist/base/loopback/metadata/index.js",
-      "types": "./dist/base/loopback/metadata/index.d.ts"
-    },
-    "./@loopback/repository": {
-      "default": "./dist/base/loopback/repository/index.js",
-      "types": "./dist/base/loopback/repository/index.d.ts"
-    },
-    "./@loopback/rest": {
-      "default": "./dist/base/loopback/rest/index.js",
-      "types": "./dist/base/loopback/rest/index.d.ts"
-    },
-    "./@loopback/security": {
-      "default": "./dist/base/loopback/security/index.js",
-      "types": "./dist/base/loopback/security/index.d.ts"
-    },
-    "./@loopback/service-proxy": {
-      "default": "./dist/base/loopback/service-proxy/index.js",
-      "types": "./dist/base/loopback/service-proxy/index.d.ts"
-    },
-    "./@loopback/filter": {
-      "default": "./dist/base/loopback/filter/index.js",
-      "types": "./dist/base/loopback/filter/index.d.ts"
+    "./@lb/repo": {
+      "default": "./dist/base/loopback/@lb/repository/index.js",
+      "types": "./dist/base/loopback/@lb/repository/index.d.ts"
     },
     "./package.json": "./package.json"
   },

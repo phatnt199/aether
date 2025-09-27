@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/base.model';
+import { BaseTzEntity } from '@/base/models';
 import { AnyObject, ITzRepository, OAuth2TokenStatuses, TInjectionGetter } from '@/common';
 import { ApplicationLogger, LoggerFactory } from '@/helpers';
 import { getError, int } from '@/utilities';

@@ -1,9 +1,9 @@
-import { EntityClassType, EntityRelationType, IdType } from '@/common/types';
+import { EntityClassType, EntityRelationType, IdType, TDBAction } from '@/common/types';
 import { QueryBuilderHelper } from '@/helpers';
 import { buildBatchUpdateQuery, getError } from '@/utilities';
-import { Count, DataObject, juggler, Options, Where } from '@loopback/repository';
+import { Count, DataObject, juggler, Where } from '@loopback/repository';
 
-import { BaseTzEntity, BaseUserAuditTzEntity } from '../base.model';
+import { BaseTzEntity, BaseUserAuditTzEntity } from './../models';
 import { AbstractTzRepository } from './base.repository';
 
 import get from 'lodash/get';
@@ -18,7 +18,7 @@ export abstract class TzCrudRepository<
   }
 
   // ----------------------------------------------------------------------------------------------------
-  existsWith(where?: Where<E>, options?: Options): Promise<boolean> {
+  existsWith(where?: Where<E>, options?: TDBAction): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.findOne({ where }, options)
         .then(rs => {
@@ -31,7 +31,7 @@ export abstract class TzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   override create(
     data: DataObject<E>,
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<E> {
     let enriched = this.mixTimestamp(data, {
       newInstance: true,
@@ -48,7 +48,7 @@ export abstract class TzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   override createAll(
     datum: DataObject<E>[],
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<E[]> {
     const enriched = datum.map(data => {
       const tmp = this.mixTimestamp(data, {
@@ -69,7 +69,7 @@ export abstract class TzCrudRepository<
    */
   createWithReturn(
     data: DataObject<E>,
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<E> {
     return this.create(data, options);
   }
@@ -78,7 +78,7 @@ export abstract class TzCrudRepository<
   override updateById(
     id: IdType,
     data: DataObject<E>,
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<void> {
     let enriched = this.mixTimestamp(data, {
       newInstance: false,
@@ -96,7 +96,7 @@ export abstract class TzCrudRepository<
   updateWithReturn(
     id: IdType,
     data: DataObject<E>,
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<E> {
     return new Promise((resolve, reject) => {
       this.updateById(id, data, options)
@@ -115,7 +115,7 @@ export abstract class TzCrudRepository<
   override updateAll(
     data: DataObject<E>,
     where?: Where<E>,
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<Count> {
     let enriched = this.mixTimestamp(data, {
       newInstance: false,
@@ -133,7 +133,7 @@ export abstract class TzCrudRepository<
   async upsertWith(
     data: DataObject<E>,
     where: Where<E>,
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<E | null> {
     const isExisted = await this.existsWith(where, options);
     if (isExisted) {
@@ -150,7 +150,7 @@ export abstract class TzCrudRepository<
   override replaceById(
     id: IdType,
     data: DataObject<E>,
-    options?: Options & { authorId?: IdType; ignoreModified?: boolean },
+    options?: TDBAction & { authorId?: IdType; ignoreModified?: boolean },
   ): Promise<void> {
     let enriched = this.mixTimestamp(data, {
       newInstance: false,
@@ -167,7 +167,7 @@ export abstract class TzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   private _softDelete(
     where: Where<E>,
-    options?: Options & {
+    options?: TDBAction & {
       databaseSchema?: string;
       connectorType?: string;
       softDeleteField?: string;
@@ -242,7 +242,7 @@ export abstract class TzCrudRepository<
 
   softDelete(
     where: Where<E>,
-    options?: Options & {
+    options?: TDBAction & {
       databaseSchema?: string;
       connectorType?: string;
       softDeleteField?: string;
@@ -276,7 +276,7 @@ export abstract class TzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   mixTimestamp(
     entity: DataObject<E>,
-    options: Options & { newInstance?: boolean; ignoreModified?: boolean } = {
+    options: TDBAction & { newInstance?: boolean; ignoreModified?: boolean } = {
       newInstance: false,
       ignoreModified: false,
     },
@@ -311,7 +311,7 @@ export abstract class TzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   _deleteWithReturn(
     where: Where<E>,
-    options?: Options,
+    options?: TDBAction,
   ): Promise<{ count: Count; data: (E & R)[] }> {
     return new Promise((resolve, reject) => {
       this.find({ where })
@@ -324,7 +324,10 @@ export abstract class TzCrudRepository<
     });
   }
 
-  deleteWithReturn(where: Where<E>, options?: Options): Promise<{ count: Count; data: (E & R)[] }> {
+  deleteWithReturn(
+    where: Where<E>,
+    options?: TDBAction,
+  ): Promise<{ count: Count; data: (E & R)[] }> {
     return new Promise((resolve, reject) => {
       this._deleteWithReturn(where, options)
         .then(rs => {
@@ -355,7 +358,7 @@ export abstract class TzCrudRepository<
     setKeys: (keyof E | { sourceKey: keyof E; targetKey: keyof E })[];
     whereKeys: (keyof E | { sourceKey: keyof E; targetKey: keyof E })[];
     whereRaws?: string[];
-    options?: Options;
+    options?: TDBAction;
   }) {
     const { data, keys, setKeys, whereKeys, whereRaws = [], options } = opts;
 

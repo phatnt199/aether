@@ -1,16 +1,24 @@
 import { AbstractTzRepository } from '@/base';
-import { BaseEntity, BaseIdEntity, BaseTzEntity } from '@/base/base.model';
-import { Binding, BindingFromClassOptions, BindingKey, ControllerClass } from '@loopback/core';
+import { BaseEntity, BaseIdEntity, BaseTzEntity } from '@/base/models';
+import {
+  Binding,
+  BindingFromClassOptions,
+  BindingKey,
+  Constructor,
+  ControllerClass,
+} from '@loopback/core';
 import {
   Count,
   DataObject,
   Entity,
   Filter,
+  JugglerDataSource,
   Options,
   Repository,
+  Transaction,
   Where,
 } from '@loopback/repository';
-import { RequestContext } from '@loopback/rest';
+import { RequestContext, SequenceHandler } from '@loopback/rest';
 import { IncomingHttpHeaders } from 'node:http';
 import { ParsedUrlQuery } from 'node:querystring';
 
@@ -86,10 +94,12 @@ export type TObjectFromFieldMappings<
 export interface IApplication {
   models: Set<string>;
 
+  initialize(opts: { sequence?: Constructor<SequenceHandler> }): ValueOrPromise<void>;
+
   staticConfigure(): void;
   getProjectRoot(): string;
-  preConfigure(): void;
-  postConfigure(): void;
+  preConfigure(): ValueOrPromise<void>;
+  postConfigure(): ValueOrPromise<void>;
 
   grpcController<T>(
     ctor: ControllerClass<T>,
@@ -100,6 +110,7 @@ export interface IApplication {
   getServerPort(): number;
   getServerAddress(): string;
 
+  getDatasourceSync<T extends JugglerDataSource>(dsName: string): T;
   getRepositorySync<T extends IRepository>(c: ClassType<T>): T;
   getServiceSync<T extends IService>(c: ClassType<T>): T;
 
@@ -139,22 +150,23 @@ export interface IDangerFilter extends Omit<Filter, 'order'> {
 }
 
 export interface IRepository {}
+export type TDBAction = Options & { transaction?: Transaction };
 
 export interface IPersistableRepository<E extends BaseIdEntity> extends IRepository {
-  findOne(filter?: Filter<E>, options?: Options): Promise<E | null>;
+  findOne(filter?: Filter<E>, options?: TDBAction): Promise<E | null>;
 
-  existsWith(where?: Where<any>, options?: Options): Promise<boolean>;
+  existsWith(where?: Where<any>, options?: TDBAction): Promise<boolean>;
 
-  create(data: DataObject<E>, options?: Options): Promise<E>;
-  createAll(datum: DataObject<E>[], options?: Options): Promise<E[]>;
-  createWithReturn(data: DataObject<E>, options?: Options): Promise<E>;
+  create(data: DataObject<E>, options?: TDBAction): Promise<E>;
+  createAll(datum: DataObject<E>[], options?: TDBAction): Promise<E[]>;
+  createWithReturn(data: DataObject<E>, options?: TDBAction): Promise<E>;
 
-  updateById(id: IdType, data: DataObject<E>, options?: Options): Promise<void>;
-  updateWithReturn(id: IdType, data: DataObject<E>, options?: Options): Promise<E>;
-  updateAll(data: DataObject<E>, where?: Where<any>, options?: Options): Promise<Count>;
+  updateById(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<void>;
+  updateWithReturn(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<E>;
+  updateAll(data: DataObject<E>, where?: Where<any>, options?: TDBAction): Promise<Count>;
 
-  upsertWith(data: DataObject<E>, where: Where<any>): Promise<E | null>;
-  replaceById(id: IdType, data: DataObject<E>, options?: Options): Promise<void>;
+  upsertWith(data: DataObject<E>, where: Where<any>, options?: TDBAction): Promise<E | null>;
+  replaceById(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<void>;
 }
 
 export interface ITzRepository<E extends BaseTzEntity> extends IPersistableRepository<E> {

@@ -25,9 +25,10 @@ import {
 import { BaseIdEntity, BaseTzEntity, AbstractTzRepository } from './../';
 import { EntityRelationType, IController, IdType } from '@/common/types';
 import { App } from '@/common';
-import { applyLimit, getIdSchema } from './common';
+import { applyLimit } from './common';
 import { SecurityBindings } from '@loopback/security';
 import { IJWTTokenPayload } from '@/components/authenticate/common/types';
+import { getIdSchema } from '@/utilities/model.utility';
 
 // --------------------------------------------------------------------------------------------------------------
 export interface ICrudControllerOptions<E extends BaseIdEntity> {

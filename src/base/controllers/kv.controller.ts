@@ -5,8 +5,8 @@ import { DataObject } from '@loopback/repository';
 import { del, get, getModelSchemaRef, param, post, requestBody } from '@loopback/rest';
 import { CrudRestControllerOptions } from '@loopback/rest-crud';
 
-import { BaseKVEntity } from '../base.model';
 import { AbstractKVRepository } from '../repositories';
+import { BaseKVEntity } from './../models';
 
 // --------------------------------------------------------------------------------------------------------------
 export interface IKVControllerOptions<E extends BaseKVEntity> {

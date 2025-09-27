@@ -1,6 +1,6 @@
-import { BaseIdEntity } from '@/base/base.model';
-import { getIdType } from '@/base/controllers/common';
+import { BaseIdEntity } from '@/base/models/base.model';
 import { IdType } from '@/common';
+import { getIdType } from '@/utilities/model.utility';
 import { MixinTarget } from '@loopback/core';
 import { model, property } from '@loopback/repository';
 

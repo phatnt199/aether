@@ -1,4 +1,4 @@
-import { BaseIdEntity } from '@/base/base.model';
+import { BaseIdEntity } from '@/base/models';
 import { App, EntityRelations, IController, ICrudController } from '@/common';
 import {
   inject,

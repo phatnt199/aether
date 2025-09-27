@@ -5,6 +5,7 @@ import {
   IEnvironmentValidationResult,
   IRepository,
   IService,
+  ValueOrPromise,
 } from '@/common/types';
 import { GrpcTags } from '@/components';
 import { AuthenticateKeys } from '@/components/authenticate/common';
@@ -20,14 +21,19 @@ import {
   Constructor,
   ControllerClass,
 } from '@loopback/core';
-import { Repository, RepositoryMixin, RepositoryTags } from '@loopback/repository';
+import {
+  JugglerDataSource,
+  Repository,
+  RepositoryMixin,
+  RepositoryTags,
+} from '@loopback/repository';
 import { MiddlewareSequence, RestApplication, SequenceHandler } from '@loopback/rest';
 import { CrudRestComponent } from '@loopback/rest-crud';
 import { ServiceMixin } from '@loopback/service-proxy';
 
-import { BaseDataSource } from '../datasources';
-import { BaseEntity } from '../base.model';
 import { BaseApplicationSequence } from '../base.sequence';
+import { BaseDataSource } from '../datasources';
+import { BaseEntity } from './../models';
 
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -59,16 +65,20 @@ export abstract class BaseApplication
   }) {
     const { scope = 'Application', serverOptions, sequence } = opts;
     super(serverOptions);
+
     this.logger = LoggerFactory.getLogger([scope]);
+    this.initialize({ sequence });
+  }
 
-    this.bind(AuthenticateKeys.ALWAYS_ALLOW_PATHS).to([]);
-    this.bind(BindingKeys.APPLICATION_MIDDLEWARE_OPTIONS).to(MiddlewareSequence.defaultOptions);
-    this.sequence(sequence ?? BaseApplicationSequence);
+  abstract staticConfigure(): void;
+  abstract getProjectRoot(): string;
+  abstract validateEnv(): IEnvironmentValidationResult;
+  abstract declareModels(): Set<string>;
 
-    this.staticConfigure();
-    this.projectRoot = this.getProjectRoot();
-    this.component(CrudRestComponent);
+  abstract preConfigure(): void;
+  abstract postConfigure(): void;
 
+  initialize(opts: { sequence?: Constructor<SequenceHandler> }): ValueOrPromise<void> {
     this.logger.info(
       '[initialize] ------------------------------------------------------------------------',
     );
@@ -94,6 +104,16 @@ export abstract class BaseApplication
       '[initialize] ------------------------------------------------------------------------',
     );
 
+    const { sequence } = opts;
+
+    this.bind(AuthenticateKeys.ALWAYS_ALLOW_PATHS).to([]);
+    this.bind(BindingKeys.APPLICATION_MIDDLEWARE_OPTIONS).to(MiddlewareSequence.defaultOptions);
+    this.sequence(sequence ?? BaseApplicationSequence);
+
+    this.staticConfigure();
+    this.projectRoot = this.getProjectRoot();
+    this.component(CrudRestComponent);
+
     this.logger.info('[initialize] Validating application environments...');
     const envValidation = this.validateEnv();
     if (!envValidation.result) {
@@ -116,14 +136,6 @@ export abstract class BaseApplication
     this.postConfigure();
   }
 
-  abstract staticConfigure(): void;
-  abstract getProjectRoot(): string;
-  abstract validateEnv(): IEnvironmentValidationResult;
-  abstract declareModels(): Set<string>;
-
-  abstract preConfigure(): void;
-  abstract postConfigure(): void;
-
   getServerHost() {
     return applicationEnvironment.get<string>(EnvironmentKeys.APP_ENV_SERVER_HOST);
   }
@@ -134,6 +146,10 @@ export abstract class BaseApplication
 
   getServerAddress() {
     return `${this.getServerHost()}:${this.getServerPort()}`;
+  }
+
+  getDatasourceSync<D extends JugglerDataSource>(dsName: string): D {
+    return this.getSync<D>(`datasources.${dsName}`);
   }
 
   getRepositorySync<R extends IRepository>(c: ClassType<R>): R {
@@ -167,7 +183,7 @@ export abstract class BaseApplication
     return Promise.all(valids.map(b => this.get<Repository<BaseEntity>>(b.key)));
   }
 
-  classifyModelsByDs(opts: { reps: Array<Repository<BaseEntity>> }) {
+  classifyModelsByDatasource(opts: { reps: Array<Repository<BaseEntity>> }) {
     const { reps } = opts;
     const modelByDs: Record<string, Array<string>> = {};
 
@@ -201,11 +217,8 @@ export abstract class BaseApplication
     const { existingSchema, ignoreModels = [], migrateModels } = opts;
 
     this.logger.info('[migrateModels] Loading legacy migratable models...!');
-    const reps = await this.getMigrateModels({
-      ignoreModels,
-      migrateModels,
-    });
-    const classified = this.classifyModelsByDs({ reps });
+    const reps = await this.getMigrateModels({ ignoreModels, migrateModels });
+    const classified = this.classifyModelsByDatasource({ reps });
 
     const operation = existingSchema === 'drop' ? 'automigrate' : 'autoupdate';
 
@@ -227,6 +240,7 @@ export abstract class BaseApplication
       }
 
       await ds[operation](classified?.[b.key]);
+
       this.logger.info(
         '[migrateModels] DONE | Migrating datasource %s | Took: %d(ms)',
         b.key,

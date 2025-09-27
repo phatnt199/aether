@@ -1,27 +1,32 @@
-import { EntityClassType, EntityRelationType, IdType, ITzRepository } from '@/common/types';
+import {
+  EntityClassType,
+  EntityRelationType,
+  IdType,
+  ITzRepository,
+  TDBAction,
+} from '@/common/types';
 import { ApplicationLogger, LoggerFactory } from '@/helpers';
 import { getError } from '@/utilities';
 import {
+  DefaultCrudRepository as _DefaultCrudRepository,
   AnyObject,
   WhereBuilder as BaseWhereBuilder,
   Command,
   Count,
   DataObject,
-  DefaultCrudRepository as _DefaultCrudRepository,
   DefaultKeyValueRepository,
+  EntityCrudRepository,
+  Getter,
+  HasManyRepositoryFactory,
   IsolationLevel,
   juggler,
   NamedParameters,
-  Options,
   PositionalParameters,
   Transaction,
   TransactionalEntityRepository,
   Where,
-  HasManyRepositoryFactory,
-  Getter,
-  EntityCrudRepository,
 } from '@loopback/repository';
-import { BaseEntity, BaseKVEntity, BaseTzEntity } from '../base.model';
+import { BaseEntity, BaseKVEntity, BaseTzEntity } from './../models';
 
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
@@ -96,7 +101,7 @@ export abstract class AbstractTzRepository<
     this.logger = LoggerFactory.getLogger([scope ?? '']);
   }
 
-  beginTransaction(options?: IsolationLevel | Options): Promise<Transaction> {
+  beginTransaction(options?: IsolationLevel | AnyObject): Promise<Transaction> {
     return new Promise((resolve, reject) => {
       this.dataSource
         .beginTransaction(options ?? {})
@@ -110,7 +115,7 @@ export abstract class AbstractTzRepository<
   executeSql<T>(
     command: Command,
     parameters: NamedParameters | PositionalParameters,
-    options?: Options,
+    options?: TDBAction,
   ): Promise<T> {
     return this.execute(command, parameters, options) as Promise<T>;
   }
@@ -138,10 +143,10 @@ export abstract class AbstractTzRepository<
     options?: { newInstance: boolean; authorId: IdType },
   ): DataObject<E>;
 
-  abstract existsWith(where?: Where<E>, options?: any): Promise<boolean>;
-  abstract createWithReturn(data: DataObject<E>, options?: any): Promise<E>;
-  abstract updateWithReturn(id: IdType, data: DataObject<E>, options?: any): Promise<E>;
-  abstract upsertWith(data: DataObject<E>, where: Where<E>, options?: any): Promise<E | null>;
+  abstract existsWith(where?: Where<E>, options?: TDBAction): Promise<boolean>;
+  abstract createWithReturn(data: DataObject<E>, options?: TDBAction): Promise<E>;
+  abstract updateWithReturn(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<E>;
+  abstract upsertWith(data: DataObject<E>, where: Where<E>, options?: TDBAction): Promise<E | null>;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -169,7 +174,7 @@ export abstract class ViewRepository<
     super(entityClass, dataSource);
   }
 
-  existsWith(where?: Where<E>, options?: Options): Promise<boolean> {
+  existsWith(where?: Where<E>, options?: TDBAction): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.findOne({ where }, options)
         .then(rs => {
@@ -179,70 +184,74 @@ export abstract class ViewRepository<
     });
   }
 
-  override create(_data: DataObject<E>, _options?: Options): Promise<E> {
+  override create(_data: DataObject<E>, _options?: TDBAction): Promise<E> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override createAll(_datum: DataObject<E>[], _options?: Options): Promise<E[]> {
+  override createAll(_datum: DataObject<E>[], _options?: TDBAction): Promise<E[]> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override save(_entity: E, _options?: Options): Promise<E> {
+  override save(_entity: E, _options?: TDBAction): Promise<E> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override update(_entity: E, _options?: Options): Promise<void> {
+  override update(_entity: E, _options?: TDBAction): Promise<void> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override delete(_entity: E, _options?: Options): Promise<void> {
+  override delete(_entity: E, _options?: TDBAction): Promise<void> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override updateAll(_data: DataObject<E>, _where?: Where<E>, _options?: Options): Promise<Count> {
+  override updateAll(
+    _data: DataObject<E>,
+    _where?: Where<E>,
+    _options?: TDBAction,
+  ): Promise<Count> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override updateById(_id: IdType, _data: DataObject<E>, _options?: Options): Promise<void> {
+  override updateById(_id: IdType, _data: DataObject<E>, _options?: TDBAction): Promise<void> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override replaceById(_id: IdType, _data: DataObject<E>, _options?: Options): Promise<void> {
+  override replaceById(_id: IdType, _data: DataObject<E>, _options?: TDBAction): Promise<void> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override deleteAll(_where?: Where<E>, _options?: Options): Promise<Count> {
+  override deleteAll(_where?: Where<E>, _options?: TDBAction): Promise<Count> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
     });
   }
 
-  override deleteById(_id: IdType, _options?: Options): Promise<void> {
+  override deleteById(_id: IdType, _options?: TDBAction): Promise<void> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',

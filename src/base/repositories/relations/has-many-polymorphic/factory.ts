@@ -1,5 +1,5 @@
-import { BaseEntity } from '@/base/base.model';
-import { IdType } from '@/common';
+import { BaseEntity } from '@/base/models';
+import { AnyObject, IdType } from '@/common';
 import { getError } from '@/utilities';
 import { Getter } from '@loopback/core';
 import {
@@ -12,12 +12,11 @@ import {
   HasManyRepositoryFactory,
   InclusionFilter,
   InclusionResolver,
-  Options,
   StringKeyOf,
 } from '@loopback/repository';
 import get from 'lodash/get';
-import { IHasManyPolymorphicDefinition, TPolymorphic } from './types';
 import { WhereBuilder } from '../../base.repository';
+import { IHasManyPolymorphicDefinition, TPolymorphic } from './types';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 const getPolymorphicFields = (opts: {
@@ -92,7 +91,7 @@ export const createHasManyPolymorphicInclusionResolver = <
   return async (
     entities: Entity[],
     inclusion: InclusionFilter,
-    options?: Options,
+    options?: AnyObject,
   ): Promise<((Target & TargetRelations)[] | undefined)[]> => {
     if (!entities.length) {
       return [];

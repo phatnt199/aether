@@ -1,24 +1,26 @@
 import {
+  AnyObject,
   AnyType,
   EntityClassType,
   EntityRelationType,
   IdType,
+  TDBAction,
   TRelationType,
 } from '@/common/types';
 import { BindingScope, injectable } from '@loopback/core';
-import { DataObject, Getter, Inclusion, juggler, Options, Where } from '@loopback/repository';
+import { DataObject, Getter, Inclusion, juggler, Where } from '@loopback/repository';
 
 import {
   BaseObjectSearchTzEntity,
   BaseSearchableTzEntity,
   BaseTextSearchTzEntity,
   BaseTzEntity,
-} from '../base.model';
+} from './../models';
 import { TzCrudRepository } from './tz-crud.repository';
 
+import { buildBatchUpdateQuery, executePromiseWithLimit, getTableDefinition } from '@/utilities';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { buildBatchUpdateQuery, executePromiseWithLimit, getTableDefinition } from '@/utilities';
 
 @injectable({ scope: BindingScope.SINGLETON })
 export abstract class SearchableTzCrudRepository<
@@ -47,7 +49,7 @@ export abstract class SearchableTzCrudRepository<
     relation: string;
     relationRepository: TzCrudRepository<RM>;
     entities: RM[];
-    options?: Options;
+    options?: AnyObject;
   }): Promise<void>;
 
   // ----------------------------------------------------------------------------------------------------
@@ -87,7 +89,7 @@ export abstract class SearchableTzCrudRepository<
     relationType: TRelationType;
     entities: RM[];
     relationRepository: TzCrudRepository<RM>;
-    options?: Options;
+    options?: AnyObject;
   }) {
     const { relationName, relationType, entities, relationRepository, options } = opts;
 
@@ -174,7 +176,7 @@ export abstract class SearchableTzCrudRepository<
   private async renderSearchable(
     field: 'textSearch' | 'objectSearch',
     data: DataObject<E>,
-    options?: Options & { where?: Where; ignoreMixSearchFields?: boolean },
+    options?: AnyObject & { where?: Where; ignoreMixSearchFields?: boolean },
   ) {
     const where = get(options, 'where');
     const isSearchable = get(this.modelClass.definition.properties, field, null) !== null;
@@ -226,7 +228,7 @@ export abstract class SearchableTzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   mixSearchFields(
     data: DataObject<E>,
-    options?: Options & { where?: Where; ignoreMixSearchFields?: boolean },
+    options?: AnyObject & { where?: Where; ignoreMixSearchFields?: boolean },
   ): Promise<DataObject<E>> {
     return new Promise((resolve, reject) => {
       const ignoreMixSearchFields = get(options, 'ignoreMixSearchFields');
@@ -257,7 +259,7 @@ export abstract class SearchableTzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   override create(
     data: DataObject<E>,
-    options?: Options & { ignoreMixSearchFields?: boolean },
+    options?: TDBAction & { ignoreMixSearchFields?: boolean },
   ): Promise<E> {
     const tmp = this.mixUserAudit(data, { newInstance: true, authorId: options?.authorId });
 
@@ -273,7 +275,7 @@ export abstract class SearchableTzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   override createAll(
     data: DataObject<E>[],
-    options?: Options & { ignoreMixSearchFields?: boolean },
+    options?: TDBAction & { ignoreMixSearchFields?: boolean },
   ): Promise<E[]> {
     return new Promise((resolve, reject) => {
       Promise.all(
@@ -294,9 +296,7 @@ export abstract class SearchableTzCrudRepository<
   override updateById(
     id: IdType,
     data: DataObject<E>,
-    options?: Options & {
-      ignoreMixSearchFields?: boolean;
-    },
+    options?: TDBAction & { ignoreMixSearchFields?: boolean },
   ): Promise<void> {
     const tmp = this.mixUserAudit(data, { newInstance: false, authorId: options?.authorId });
 
@@ -313,9 +313,7 @@ export abstract class SearchableTzCrudRepository<
   override replaceById(
     id: IdType,
     data: DataObject<E>,
-    options?: Options & {
-      ignoreMixSearchFields?: boolean;
-    },
+    options?: TDBAction & { ignoreMixSearchFields?: boolean },
   ): Promise<void> {
     const tmp = this.mixUserAudit(data, { newInstance: false, authorId: options?.authorId });
 
@@ -329,7 +327,7 @@ export abstract class SearchableTzCrudRepository<
   }
 
   // ----------------------------------------------------------------------------------------------------
-  private _syncSearchFields(entities: (E & R)[], options?: Options & { pagingLimit?: number }) {
+  private _syncSearchFields(entities: (E & R)[], options?: AnyObject & { pagingLimit?: number }) {
     const { table, columns } = getTableDefinition<E>({ model: this.entityClass });
 
     const data = entities.map(e => {
@@ -370,7 +368,7 @@ export abstract class SearchableTzCrudRepository<
   // ----------------------------------------------------------------------------------------------------
   async syncSearchFields(
     where?: Where<E>,
-    options?: Options & { pagingLimit?: number },
+    options?: AnyObject & { pagingLimit?: number },
   ): Promise<void> {
     const t = performance.now();
 

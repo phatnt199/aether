@@ -3,10 +3,8 @@ import { TzCrudRepository } from '@/base/repositories';
 import { EntityClassType } from '@/common';
 import { getError } from '@/utilities';
 import { inject } from '@loopback/core';
-
-import { Migration } from '../models';
-
 import isEmpty from 'lodash/isEmpty';
+import { Migration } from '../models';
 
 const DS_MIGRATION = process.env.APP_ENV_APPLICATION_DS_MIGRATION;
 

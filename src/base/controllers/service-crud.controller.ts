@@ -22,7 +22,8 @@ import { EntityRelationType, IController, ICrudService, IdType } from '@/common/
 import { IJWTTokenPayload } from '@/components/authenticate/common/types';
 import { SecurityBindings } from '@loopback/security';
 import { BaseIdEntity, BaseTzEntity } from './../';
-import { applyLimit, getIdSchema } from './common';
+import { applyLimit } from './common';
+import { getIdSchema } from '@/utilities/model.utility';
 
 // --------------------------------------------------------------------------------------------------------------
 export interface IServiceCrudControllerOptions<E extends BaseIdEntity> {

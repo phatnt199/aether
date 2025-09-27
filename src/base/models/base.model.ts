@@ -6,6 +6,7 @@ import {
   TextSearchMixin,
   TzMixin,
   UserAuditMixin,
+  VectorMixin,
 } from '@/mixins';
 import { Entity, property } from '@loopback/repository';
 
@@ -66,3 +67,27 @@ export class BaseSoftDeleteTzEntity extends SoftDeleteModelMixin(BaseTzEntity) {
 
 // ---------------------------------------------------------------------
 export class BaseDuplicatableTzEntity extends DuplicatableMixin(BaseTzEntity) {}
+
+// ---------------------------------------------------------------------
+export class BaseBigIdEntity extends BaseEntity {
+  @property({
+    type: 'number',
+    id: true,
+    postgresql: { columnName: 'id', dataType: 'BIGSERIAL' },
+  })
+  id: number;
+}
+
+// ---------------------------------------------------------------------
+export class BaseBigIdTzEntity extends TzMixin(BaseBigIdEntity) {}
+
+// ---------------------------------------------------------------------
+export class BaseVectorEntity extends VectorMixin(BaseBigIdTzEntity, {
+  uuid: {
+    columnName: 'uuid',
+  },
+  embedding: {
+    columnName: 'embedding',
+    vectorSize: 768 * 2,
+  },
+}) {}

@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/base.model';
+import { BaseTzEntity } from '@/base/models';
 import { AnyObject, RoleStatuses, UserStatuses, UserTypes } from '@/common';
 import { PrincipalMixin } from '@/mixins';
 import { property } from '@loopback/repository';

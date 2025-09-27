@@ -1,4 +1,4 @@
-import { BaseEntity } from '@/base/base.model';
+import { BaseEntity } from '@/base/models';
 import { IdType, StringIdType } from '@/common';
 import { model, property } from '@loopback/repository';
 
