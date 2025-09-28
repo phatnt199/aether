@@ -65,8 +65,8 @@ jobs:
           echo "Cleaning up release folder"
           pnpm --filter "{packages/$MODULE}" run clean 
 
-          echo "Compiling..."
-          pnpm run rebuild
+          echo "Compiling $MODULE"
+          pnpm --filter "{packages/$MODULE}" run rebuild:$BUILD_MODE
 
       - name: Push latest version to repository
         run: |

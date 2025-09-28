@@ -70,7 +70,7 @@
   },
   "dependencies": {
     "@mastra/core": "^0.18.0",
-    "@minimaltech/node-infra": "workspace:*",
+    "@minimaltech/node-infra": "^0.5.8-19",
     "ai": "^5.0.56",
     "dayjs": "catalog:common",
     "lodash": "catalog:common",
