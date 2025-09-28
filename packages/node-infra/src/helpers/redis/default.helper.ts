@@ -1,38 +1,9 @@
 import { BaseHelper } from '@/base/base.helper';
-import { getError, int } from '@/utilities';
-import { Cluster, ClusterOptions, Redis } from 'ioredis';
+import { getError } from '@/utilities';
+import { Cluster, Redis } from 'ioredis';
 import isEmpty from 'lodash/isEmpty';
 import zlib from 'node:zlib';
-
-// -----------------------------------------------------------------------------------------------
-export interface IRedisHelperProps {
-  name: string;
-  host: string;
-  port: string | number;
-  user?: string;
-  password: string;
-  database?: number;
-  autoConnect?: boolean;
-  maxRetry?: number;
-}
-
-export interface IRedisClusterHelperProps {
-  name: string;
-  nodes: Array<Pick<IRedisHelperProps, 'host' | 'port'> & { password?: string }>;
-  clusterOptions?: ClusterOptions;
-}
-
-export interface IRedisHelperCallbacks {
-  onInitialized?: (opts: { name: string; helper: DefaultRedisHelper }) => void;
-  onConnected?: (opts: { name: string; helper: DefaultRedisHelper }) => void;
-  onReady?: (opts: { name: string; helper: DefaultRedisHelper }) => void;
-  onError?: (opts: { name: string; helper: DefaultRedisHelper; error: any }) => void;
-}
-
-export interface IRedisHelperOptions extends IRedisHelperProps, IRedisHelperCallbacks {}
-export interface IRedisClusterHelperOptions
-  extends IRedisClusterHelperProps,
-    IRedisHelperCallbacks {}
+import { IRedisHelperCallbacks } from './types';
 
 // -----------------------------------------------------------------------------------------------
 export class DefaultRedisHelper extends BaseHelper {
@@ -412,75 +383,5 @@ export class DefaultRedisHelper extends BaseHelper {
         topic,
       );
     });
-  }
-}
-
-// -----------------------------------------------------------------------------------------------
-export class RedisHelper extends DefaultRedisHelper {
-  constructor(opts: IRedisHelperOptions) {
-    const {
-      name,
-      host,
-      port,
-      password,
-
-      // Optional
-      database = 0,
-      autoConnect = true,
-      maxRetry = 0,
-    } = opts;
-
-    super({
-      ...opts,
-      scope: RedisHelper.name,
-      identifier: name,
-      client: new Redis({
-        name,
-        host,
-        port: int(port),
-        password,
-        db: database,
-        lazyConnect: !autoConnect,
-        showFriendlyErrorStack: true,
-        retryStrategy: (attemptCounter: number) => {
-          if (maxRetry > -1 && attemptCounter > maxRetry) {
-            return undefined;
-          }
-
-          const strategy = Math.max(Math.min(attemptCounter * 2000, 5000), 1000);
-          return strategy;
-        },
-        maxRetriesPerRequest: null,
-      }),
-    });
-  }
-
-  override getClient() {
-    return this.client as Redis;
-  }
-}
-
-// -----------------------------------------------------------------------------------------------
-export class RedisClusterHelper extends DefaultRedisHelper {
-  constructor(opts: IRedisClusterHelperOptions) {
-    super({
-      ...opts,
-      scope: RedisClusterHelper.name,
-      identifier: opts.name,
-      client: new Cluster(
-        opts.nodes.map(node => {
-          return {
-            host: node.host,
-            port: int(node.port),
-            password: node.password,
-          };
-        }),
-        opts.clusterOptions,
-      ),
-    });
-  }
-
-  override getClient() {
-    return this.client as Cluster;
   }
 }
