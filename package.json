@@ -7,6 +7,8 @@
     "build": "pnpm --filter {packages/*} run build",
     "rebuild": "pnpm run clean && pnpm run build",
     "rebuild:common": "pnpm --filter {packages/common} run rebuild",
+    "rebuild:node-infra": "pnpm --filter {packages/node-infra} run rebuild",
+    "rebuild:agent-infra": "pnpm --filter {packages/agent-infra} run rebuild",
     "postinstall": "pnpm run rebuild:common"
   },
   "author": "Phat Nguyen <tanphat199@gmail.com>",
