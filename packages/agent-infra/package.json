@@ -22,10 +22,6 @@
       "default": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./ai": {
-      "default": "./dist/base/mastra/@ai/index.js",
-      "types": "./dist/base/mastra/@ai/index.d.ts"
-    },
     "./package.json": "./package.json"
   },
   "engines": {
@@ -73,12 +69,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@mastra/core": "^0.18.0",
-    "@minimaltech/node-infra": "^0.5.8-19",
-    "ai": "^5.0.56",
     "dayjs": "catalog:common",
-    "lodash": "catalog:common",
-    "zod": "3.25.76"
+    "lodash": "catalog:common"
   },
   "devDependencies": {
     "@loopback/build": "catalog:build",
@@ -92,5 +84,20 @@
     "tsc-alias": "catalog:develop",
     "tsconfig-paths": "catalog:develop",
     "typescript": "catalog:develop"
+  },
+  "devDependencies": {
+    "@ai-sdk/google": "^2.0.17",
+    "@ai-sdk/provider": "^2.0.0",
+    "@mastra/core": "^0.18.0",
+    "@mastra/fastembed": "^0.10.5",
+    "@mastra/libsql": "^0.14.2",
+    "@mastra/mcp": "^0.13.0",
+    "@mastra/memory": "^0.15.2",
+    "@mastra/pg": "^0.16.0",
+    "@mastra/rag": "^1.2.6",
+    "@mastra/core": "^0.18.0",
+    "@minimaltech/node-infra": "^0.5.8-19",
+    "ai": "^5.0.56",
+    "zod": "3.25.76"
   }
 }

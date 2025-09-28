@@ -13,17 +13,17 @@ export interface IAgentTool {
 export abstract class AbstractAgentTool extends BaseHelper implements IAgentTool {
   registry: TAgentToolRegistry;
 
+  constructor(opts: { scope: string }) {
+    super(opts);
+    this.registry = this.buildTools();
+  }
+
   abstract getTools(): TAgentToolRegistry;
 
   protected abstract buildTools(): TAgentToolRegistry;
 }
 
 export abstract class BaseAgentTool extends AbstractAgentTool {
-  constructor(opts: { scope: string }) {
-    super(opts);
-    this.registry = this.buildTools();
-  }
-
   getTools(): TAgentToolRegistry {
     return this.registry;
   }
