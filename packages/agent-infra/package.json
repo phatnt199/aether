@@ -69,6 +69,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@minimaltech/node-infra": "workspace:*",
     "dayjs": "catalog:common",
     "lodash": "catalog:common"
   },
@@ -85,18 +86,13 @@
     "tsconfig-paths": "catalog:develop",
     "typescript": "catalog:develop"
   },
-  "devDependencies": {
-    "@ai-sdk/google": "^2.0.17",
-    "@ai-sdk/provider": "^2.0.0",
+  "peerDependencies": {
     "@mastra/core": "^0.18.0",
     "@mastra/fastembed": "^0.10.5",
-    "@mastra/libsql": "^0.14.2",
-    "@mastra/mcp": "^0.13.0",
     "@mastra/memory": "^0.15.2",
     "@mastra/pg": "^0.16.0",
     "@mastra/rag": "^1.2.6",
     "@mastra/core": "^0.18.0",
-    "@minimaltech/node-infra": "^0.5.8-19",
     "ai": "^5.0.56",
     "zod": "3.25.76"
   }

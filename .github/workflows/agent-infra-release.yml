@@ -1,0 +1,89 @@
+name: "[agent-infra] Dispatch NPM Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_mode:
+        type: choice
+        description: |
+          Build Mode 
+          (patch | minor | major | pre<patch | minor | major | release>)
+        options:
+          - patch
+          - minor
+          - major
+          - prepatch
+          - preminor
+          - premajor
+          - prerelease
+
+env:
+  MODULE: agent-infra 
+  BUILD_MODE: ${{ github.event.inputs.build_mode }}
+
+jobs:
+  build-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Setup Git
+        run: |
+          git config user.name "mt-ci gh-action"
+          git config user.email "mt-ci@gh-action.none"
+
+      - name: Verify build_mode
+        run: |
+          echo "mt-ci | Module: $MODULE | Build mode: $BUILD_MODE"
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm
+          pnpm install
+
+      - name: Linting application source
+        run: |
+          pnpm --filter "{packages/$MODULE}" run lint
+
+
+      - name: Building + Versioning application artifact
+        run: |
+          echo "Module: $MODULE | Build mode: $BUILD_MODE"
+
+          echo "Cleaning up release folder"
+          pnpm --filter "{packages/$MODULE}" run clean 
+
+          echo "Compiling $MODULE"
+          pnpm run rebuild:node-infra
+          pnpm --filter "{packages/$MODULE}" run rebuild:$BUILD_MODE
+
+      - name: Push latest version to repository
+        run: |
+          cd packages/$MODULE
+
+          PACKAGE_PATH="./package.json"
+          VERSION=$(jq -r .version $PACKAGE_PATH)
+
+          git fetch
+          git checkout develop
+          git add .
+          git commit -m "Module: $MODULE | Build mode: $BUILD_MODE | Version: $VERSION | Release latest src"
+          git push origin develop
+
+          git checkout main
+          git merge --allow-unrelated-histories develop
+          git push origin main
+
+      - name: Publish package on NPM 📦
+        run: |
+          cd packages/$MODULE
+          pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
