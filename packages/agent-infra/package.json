@@ -1,6 +1,6 @@
 {
   "name": "@minimaltech/agent-infra",
-  "version": "0.0.1-5",
+  "version": "0.0.1-6",
   "description": "Minimal Technology - AI Agent Infrastructure - MastraAI Framework",
   "keywords": [
     "ai agent",
@@ -92,7 +92,6 @@
     "@mastra/memory": "^0.15.2",
     "@mastra/pg": "^0.16.0",
     "@mastra/rag": "^1.2.6",
-    "@mastra/core": "^0.18.0",
     "ai": "^5.0.56",
     "zod": "3.25.76"
   }
