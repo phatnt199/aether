@@ -29,6 +29,8 @@
       "default": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./package.json": "./package.json",
+
     "./@lb/auth": {
       "default": "./dist/base/loopback/@lb/auth/index.js",
       "types": "./dist/base/loopback/@lb/auth/index.d.ts"
@@ -60,8 +62,7 @@
     "./lb-repo": {
       "default": "./dist/base/loopback/@lb/repository/index.js",
       "types": "./dist/base/loopback/@lb/repository/index.d.ts"
-    },
-    "./package.json": "./package.json"
+    }
   },
   "engines": {
     "node": ">=18"
