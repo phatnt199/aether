@@ -45,6 +45,22 @@
       "default": "./dist/base/loopback/@lb/repository/index.js",
       "types": "./dist/base/loopback/@lb/repository/index.d.ts"
     },
+    "./lb-auth": {
+      "default": "./dist/base/loopback/@lb/auth/index.js",
+      "types": "./dist/base/loopback/@lb/auth/index.d.ts"
+    },
+    "./lb-core": {
+      "default": "./dist/base/loopback/@lb/core/index.js",
+      "types": "./dist/base/loopback/@lb/core/index.d.ts"
+    },
+    "./lb-rest": {
+      "default": "./dist/base/loopback/@lb/rest/index.js",
+      "types": "./dist/base/loopback/@lb/rest/index.d.ts"
+    },
+    "./lb-repo": {
+      "default": "./dist/base/loopback/@lb/repository/index.js",
+      "types": "./dist/base/loopback/@lb/repository/index.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "engines": {
