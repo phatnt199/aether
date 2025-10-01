@@ -47,6 +47,7 @@
       "default": "./dist/base/loopback/@lb/repository/index.js",
       "types": "./dist/base/loopback/@lb/repository/index.d.ts"
     },
+
     "./lb-auth": {
       "default": "./dist/base/loopback/@lb/auth/index.js",
       "types": "./dist/base/loopback/@lb/auth/index.d.ts"
