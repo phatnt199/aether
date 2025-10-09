@@ -13,11 +13,14 @@ export const VectorMixin = <
     uuid?: { columnName: string };
     embedding: {
       columnName?: string;
+      vectorType?: 'string';
       vectorSize: number;
     };
   },
 ) => {
   const { uuid, embedding } = options;
+
+  const vectorType = embedding?.vectorType ?? 'vector';
 
   if (!embedding?.vectorSize) {
     throw getError({
@@ -41,7 +44,7 @@ export const VectorMixin = <
       type: 'any',
       postgresql: {
         columnName: embedding?.columnName ?? 'embedding',
-        dataType: `vector(${int(embedding.vectorSize)})`,
+        dataType: `${vectorType}(${int(embedding.vectorSize)})`,
       },
     })
     embedding?: EmbeddingType;
