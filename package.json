@@ -1,188 +1,21 @@
 {
-  "name": "@minimaltech/node-infra",
-  "version": "0.4.1",
-  "description": "Minimal Technology NodeJS Infrastructure - Loopback 4 Framework",
-  "keywords": [
-    "web",
-    "restful",
-    "rest",
-    "api",
-    "express",
-    "auth",
-    "security",
-    "backend",
-    "framework",
-    "backend framework",
-    "StrongLoop",
-    "loopback",
-    "loopback-application",
-    "infrastructure",
-    "minimaltech",
-    "minimaltek",
-    "mt",
-    "infra",
-    "nodejs",
-    "nodejs framework"
-  ],
-  "exports": {
-    ".": {
-      "default": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./@lb/auth": {
-      "default": "./dist/base/loopback/@lb/auth/index.js",
-      "types": "./dist/base/loopback/@lb/auth/index.d.ts"
-    },
-    "./@lb/core": {
-      "default": "./dist/base/loopback/@lb/core/index.js",
-      "types": "./dist/base/loopback/@lb/core/index.d.ts"
-    },
-    "./@lb/rest": {
-      "default": "./dist/base/loopback/@lb/rest/index.js",
-      "types": "./dist/base/loopback/@lb/rest/index.d.ts"
-    },
-    "./@loopback/authentication": {
-      "default": "./dist/base/loopback/authentication/index.js",
-      "types": "./dist/base/loopback/authentication/index.d.ts"
-    },
-    "./@loopback/authorization": {
-      "default": "./dist/base/loopback/authorization/index.js",
-      "types": "./dist/base/loopback/authorization/index.d.ts"
-    },
-    "./@loopback/boot": {
-      "default": "./dist/base/loopback/boot/index.js",
-      "types": "./dist/base/loopback/boot/index.d.ts"
-    },
-    "./@loopback/core": {
-      "default": "./dist/base/loopback/core/index.js",
-      "types": "./dist/base/loopback/core/index.d.ts"
-    },
-    "./@loopback/http-server": {
-      "default": "./dist/base/loopback/http-server/index.js",
-      "types": "./dist/base/loopback/http-server/index.d.ts"
-    },
-    "./@loopback/metadata": {
-      "default": "./dist/base/loopback/metadata/index.js",
-      "types": "./dist/base/loopback/metadata/index.d.ts"
-    },
-    "./@loopback/repository": {
-      "default": "./dist/base/loopback/repository/index.js",
-      "types": "./dist/base/loopback/repository/index.d.ts"
-    },
-    "./@loopback/rest": {
-      "default": "./dist/base/loopback/rest/index.js",
-      "types": "./dist/base/loopback/rest/index.d.ts"
-    },
-    "./@loopback/security": {
-      "default": "./dist/base/loopback/security/index.js",
-      "types": "./dist/base/loopback/security/index.d.ts"
-    },
-    "./@loopback/service-proxy": {
-      "default": "./dist/base/loopback/service-proxy/index.js",
-      "types": "./dist/base/loopback/service-proxy/index.d.ts"
-    },
-    "./package.json": "./package.json"
-  },
-  "engines": {
-    "node": ">=18"
-  },
+  "name": "@minimaltech/infra",
+  "version": "0.0.1",
+  "description": "Minimal Technology Project Infrastructure",
   "scripts": {
-    "build": "sh ./scripts/build.sh",
-    "build:watch": "lb-tsc --watch",
-    "clean": "sh ./scripts/clean.sh",
-    "eslint": "eslint --report-unused-disable-directives .",
-    "lint": "pnpm eslint && pnpm prettier:cli",
-    "lint:fix": "pnpm eslint --fix && pnpm prettier:fix",
-    "prettier:cli": "prettier \"**/*.{js,ts}\" -l",
-    "prettier:fix": "pnpm prettier:cli --write",
-    "rebuild": "sh ./scripts/rebuild.sh no-version",
-    "rebuild:major": "sh ./scripts/rebuild.sh major",
-    "rebuild:minor": "sh ./scripts/rebuild.sh minor",
-    "rebuild:patch": "sh ./scripts/rebuild.sh patch",
-    "pretest:dev": "pnpm run rebuild",
-    "test:dev": "NODE_ENV=development mocha -r dotenv-flow/config -r source-map-support/register --timeout 60000 --exit dist/__tests__/index.js",
-    "prepare": "husky"
+    "clean": "pnpm --filter {packages/*} run clean",
+    "build": "pnpm --filter {packages/*} run build",
+    "rebuild": "pnpm run clean && pnpm run build",
+    "rebuild:common": "pnpm --filter {packages/common} run rebuild",
+    "rebuild:node-infra": "pnpm --filter {packages/node-infra} run rebuild",
+    "rebuild:agent-infra": "pnpm --filter {packages/agent-infra} run rebuild",
+    "postinstall": "pnpm run rebuild:common"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/phatnt199/node-infra.git"
-  },
-  "author": "Minimal Technology <developer@miminaltek.com>",
-  "bugs": {
-    "url": "https://github.com/phatnt199/node-infra/issues"
-  },
-  "homepage": "https://github.com/phatnt199/node-infra/wiki",
+  "author": "Phat Nguyen <tanphat199@gmail.com>",
+  "private": true,
   "license": "MIT",
-  "files": [
-    "README.md",
-    "LICENSE",
-    "dist",
-    "!/**/tests",
-    "!/**/dist/tests",
-    "!/**/__tests__"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@grpc/grpc-js": "^1.12.3",
-    "@grpc/proto-loader": "^0.7.13",
-    "@loopback/authentication": "^11.0.8",
-    "@loopback/authentication-jwt": "^0.15.8",
-    "@loopback/authentication-passport": "^7.0.8",
-    "@loopback/authorization": "^0.15.8",
-    "@loopback/boot": "^7.0.8",
-    "@loopback/core": "^6.1.5",
-    "@loopback/http-server": "^6.0.8",
-    "@loopback/metadata": "^7.0.8",
-    "@loopback/repository": "^7.0.8",
-    "@loopback/rest": "^14.0.8",
-    "@loopback/rest-crud": "^0.18.8",
-    "@loopback/rest-explorer": "^7.0.8",
-    "@loopback/security": "^0.11.8",
-    "@loopback/service-proxy": "^7.0.8",
-    "@node-oauth/oauth2-server": "^5.2.0",
-    "@socket.io/redis-adapter": "^8.3.0",
-    "@socket.io/redis-emitter": "^5.1.0",
-    "axios": "^1.7.8",
-    "bullmq": "^5.31.0",
-    "casbin": "^5.36.0",
-    "cron": "^3.2.1",
-    "dayjs": "^1.11.13",
-    "dotenv-flow": "4.1.0",
-    "ejs": "^3.1.10",
-    "ioredis": "^5.4.1",
-    "jsonwebtoken": "^9.0.2",
-    "knex": "^3.1.0",
-    "lodash": "^4.17.21",
-    "minio": "^8.0.2",
-    "mocha": "^11.0.1",
-    "mqtt": "^5.10.3",
-    "multer": "1.4.5-lts.1",
-    "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1",
-    "winston": "^3.17.0",
-    "winston-daily-rotate-file": "^5.0.0",
-    "winston-transport": "^4.9.0"
-  },
-  "devDependencies": {
-    "@loopback/build": "^11.0.7",
-    "@loopback/testlab": "^7.0.7",
-    "@minimaltech/eslint-node": "^0.1.15",
-    "@types/express": "4.17.21",
-    "@types/jsonwebtoken": "^9.0.7",
-    "@types/lodash": "^4.17.13",
-    "@types/mocha": "^10.0.10",
-    "@types/multer": "^1.4.12",
-    "@types/node": "^20.17.9",
-    "eslint": "^8.57.1",
-    "husky": "^9.1.7",
-    "prettier": "^3.4.1",
-    "source-map-support": "^0.5.21",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.10",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.2"
-  },
-  "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b"
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=10"
+  }
 }

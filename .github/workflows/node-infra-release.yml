@@ -1,18 +1,13 @@
-name: Dispatch NPM Release
+name: "[node-infra] Dispatch NPM Release"
 
 on:
   workflow_dispatch:
     inputs:
-      module:
-        type: choice
-        description: Module (node-infra|agent-infra)
-        options:
-          - node-infra
-          - agent-infra
-
       build_mode:
         type: choice
-        description: Build Mode (patch | minor | major | pre<patch | minor | major | release>)
+        description: |
+          Build Mode 
+          (patch | minor | major | pre<patch | minor | major | release>)
         options:
           - patch
           - minor
@@ -23,7 +18,7 @@ on:
           - prerelease
 
 env:
-  MODULE: ${{ github.event.inputs.module }}
+  MODULE: node-infra 
   BUILD_MODE: ${{ github.event.inputs.build_mode }}
 
 jobs:
