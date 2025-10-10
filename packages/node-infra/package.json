@@ -1,6 +1,6 @@
 {
   "name": "@minimaltech/node-infra",
-  "version": "0.5.9-1",
+  "version": "0.5.9-2",
   "description": "Minimal Technology - NodeJS Infrastructure - Loopback 4 Framework",
   "keywords": [
     "web",
@@ -46,7 +46,6 @@
       "default": "./dist/base/loopback/@lb/repository/index.js",
       "types": "./dist/base/loopback/@lb/repository/index.d.ts"
     },
-
     "./@lb/auth": {
       "default": "./dist/base/loopback/@lb/auth/index.js",
       "types": "./dist/base/loopback/@lb/auth/index.d.ts"
