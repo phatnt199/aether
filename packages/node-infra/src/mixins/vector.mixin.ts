@@ -13,7 +13,7 @@ export const VectorMixin = <
     uuid?: { columnName: string };
     embedding: {
       columnName?: string;
-      vectorType?: 'string';
+      vectorType?: string;
       vectorSize: number;
     };
   },
