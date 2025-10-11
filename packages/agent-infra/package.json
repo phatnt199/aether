@@ -22,11 +22,7 @@
       "default": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./package.json": "./package.json",
-    "./mastra-core": {
-      "default": "./dist/base/mastra/core/index.js",
-      "types": "./dist/base/mastra/core/index.d.ts"
-    }
+    "./package.json": "./package.json"
   },
   "engines": {
     "node": ">=18"
@@ -73,7 +69,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@mastra/core": "^0.20.0",
     "@minimaltech/node-infra": "workspace:*",
     "dayjs": "catalog:common",
     "lodash": "catalog:common"
@@ -90,5 +85,8 @@
     "tsc-alias": "catalog:develop",
     "tsconfig-paths": "catalog:develop",
     "typescript": "catalog:develop"
+  },
+  "peerDependencies": {
+    "@mastra/core": ">=0.20"
   }
 }
