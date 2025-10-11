@@ -17,5 +17,31 @@
   "engines": {
     "node": ">=18",
     "pnpm": ">=10"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "catalogs": {
+      "build": {
+        "@loopback/build": "^12.0.4"
+      },
+      "common": {
+        "dayjs": "^1.11.18",
+        "lodash": "^4.17.21"
+      },
+      "develop": {
+        "@minimaltech/eslint-node": "^0.2.1",
+        "@types/lodash": "^4.17.20",
+        "@types/node": "^22.18.6",
+        "eslint": "^9.36.0",
+        "prettier": "^3.6.2",
+        "source-map-support": "^0.5.21",
+        "ts-node": "^10.9.2",
+        "tsc-alias": "^1.8.16",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.8.3"
+      }
+    }
   }
 }
