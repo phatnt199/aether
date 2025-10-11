@@ -43,6 +43,9 @@ export type * from '@mastra/core/logger';
 export * from '@mastra/core/mcp';
 export type * from '@mastra/core/mcp';
 
+export * from '@mastra/core/mastra';
+export type * from '@mastra/core/mastra';
+
 export * from '@mastra/core/memory';
 export type * from '@mastra/core/memory';
 
