@@ -1,12 +1,10 @@
-import { EnvironmentKeys, IdType, TInjectionGetter } from '@/common';
-import { applicationEnvironment, ApplicationLogger, LoggerFactory } from '@/helpers';
+import { EnvironmentKeys, IdType } from '@/common';
+import { applicationEnvironment, LoggerFactory } from '@/helpers';
 import { getSchemaObject } from '@/utilities';
 import { authenticate } from '@loopback/authentication';
 import { Context, Getter, inject } from '@loopback/core';
 import {
   api,
-  ExpressRequestHandler,
-  ExpressServer,
   ExpressServerConfig,
   get,
   post,
@@ -19,34 +17,32 @@ import { Request, Response } from '@node-oauth/oauth2-server';
 
 import { OAuth2Service } from '../services';
 
-import { BaseController } from '@/base/controllers';
+import { AbstractExpressRequestHandler, BaseController } from '@/base/controllers';
 import isEmpty from 'lodash/isEmpty';
 import { join } from 'node:path';
 import { Authentication, IAuthenticateOAuth2RestOptions, OAuth2Request } from '../common';
 
 interface IOAuth2ControllerOptions {
   config?: ExpressServerConfig | undefined;
-  parent?: Context;
+  context: Context;
   authServiceKey: string;
-  injectionGetter: TInjectionGetter;
   viewFolder?: string;
 }
 
 // --------------------------------------------------------------------------------
-export class DefaultOAuth2ExpressServer extends ExpressServer {
+export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
   private static instance: DefaultOAuth2ExpressServer;
 
   private authServiceKey: string;
-  private injectionGetter: TInjectionGetter;
   private viewFolder?: string;
 
-  private logger: ApplicationLogger;
-
   constructor(opts: IOAuth2ControllerOptions) {
-    super(opts.config, opts.parent);
+    super({
+      ...opts,
+      scope: DefaultOAuth2ExpressServer.name,
+    });
 
     this.authServiceKey = opts.authServiceKey;
-    this.injectionGetter = opts.injectionGetter;
     this.viewFolder = opts.viewFolder;
 
     this.logger = LoggerFactory.getLogger([DefaultOAuth2ExpressServer.name]);
@@ -61,10 +57,6 @@ export class DefaultOAuth2ExpressServer extends ExpressServer {
     }
 
     return this.instance;
-  }
-
-  getApplicationHandler() {
-    return this.expressApp as ExpressRequestHandler;
   }
 
   binding() {
@@ -134,7 +126,7 @@ export class DefaultOAuth2ExpressServer extends ExpressServer {
         return;
       }
 
-      const oauth2Service = this.injectionGetter<OAuth2Service>('services.OAuth2Service');
+      const oauth2Service = this.getSync<OAuth2Service>('services.OAuth2Service');
 
       const decryptedClient = oauth2Service.decryptClientToken({ token });
       oauth2Service

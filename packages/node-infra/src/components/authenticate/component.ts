@@ -140,9 +140,9 @@ export class AuthenticateComponent extends BaseComponent {
     this.application.mountExpressRouter(
       oauth2Options.restOptions?.restPath ?? '/oauth2',
       DefaultOAuth2ExpressServer.getInstance({
+        context: this.application,
         viewFolder,
         authServiceKey: handler.authServiceKey,
-        injectionGetter: <T>(key: string | BindingKey<T>) => this.application.getSync<T>(key),
       }).getApplicationHandler(),
     );
   }
