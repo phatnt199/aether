@@ -5,6 +5,7 @@ import {
   IEnvironmentValidationResult,
   IRepository,
   IService,
+  TInjectionGetter,
   ValueOrPromise,
 } from '@/common/types';
 import { GrpcTags } from '@/components';
@@ -17,6 +18,7 @@ import {
   ApplicationConfig,
   Binding,
   BindingFromClassOptions,
+  BindingKey,
   BindingScope,
   Constructor,
   ControllerClass,
@@ -56,6 +58,7 @@ export abstract class BaseApplication
   implements IApplication
 {
   protected logger: ApplicationLogger;
+
   models: Set<string>;
 
   constructor(opts: {
@@ -146,6 +149,10 @@ export abstract class BaseApplication
 
   getServerAddress() {
     return `${this.getServerHost()}:${this.getServerPort()}`;
+  }
+
+  getInjectionGetter(): TInjectionGetter {
+    return <T>(key: string | BindingKey<T>) => this.getSync<T>(key);
   }
 
   getDatasourceSync<D extends JugglerDataSource>(dsName: string): D {

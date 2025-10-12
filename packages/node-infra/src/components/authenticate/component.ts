@@ -143,7 +143,7 @@ export class AuthenticateComponent extends BaseComponent {
         context: this.application,
         viewFolder,
         authServiceKey: handler.authServiceKey,
-        injectionGetter: <T>(key: string | BindingKey<T>) => this.application.getSync<T>(key),
+        injectionGetter: this.application.getInjectionGetter(),
       }).getApplicationHandler(),
     );
   }

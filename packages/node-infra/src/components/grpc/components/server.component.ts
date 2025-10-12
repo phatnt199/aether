@@ -1,6 +1,6 @@
 import { BaseApplication } from '@/base/applications';
 import { BaseComponent } from '@/base/base.component';
-import { Binding, BindingKey, CoreBindings, inject } from '@loopback/core';
+import { Binding, CoreBindings, inject } from '@loopback/core';
 
 import { GrpcServerKeys, IGrpcServerOptions } from '../common';
 import { GrpcServer } from '../helpers';
@@ -42,7 +42,7 @@ export class GrpcServerComponent extends BaseComponent {
       address,
       credentials,
       options: serverOptions,
-      injectionGetter: <T>(key: string | BindingKey<T>) => this.application.getSync<T>(key),
+      injectionGetter: this.application.getInjectionGetter(),
     });
     server.start();
 
