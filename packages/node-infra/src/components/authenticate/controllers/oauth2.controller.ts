@@ -1,4 +1,4 @@
-import { EnvironmentKeys, IdType } from '@/common';
+import { EnvironmentKeys, IdType, TInjectionGetter } from '@/common';
 import { applicationEnvironment, LoggerFactory } from '@/helpers';
 import { getSchemaObject } from '@/utilities';
 import { authenticate } from '@loopback/authentication';
@@ -24,7 +24,8 @@ import { Authentication, IAuthenticateOAuth2RestOptions, OAuth2Request } from '.
 
 interface IOAuth2ControllerOptions {
   config?: ExpressServerConfig | undefined;
-  context: Context;
+  context?: Context;
+  injectionGetter: TInjectionGetter;
   authServiceKey: string;
   viewFolder?: string;
 }
