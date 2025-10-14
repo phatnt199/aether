@@ -163,6 +163,9 @@ importers:
       '@loopback/filter':
         specifier: ^6.0.4
         version: 6.0.4
+      '@loopback/health':
+        specifier: ^0.15.5
+        version: 0.15.5(@loopback/core@7.0.4)(@loopback/rest@15.0.5(@loopback/core@7.0.4)(@loopback/repository@8.0.4(@loopback/core@7.0.4)))
       '@loopback/http-server':
         specifier: ^7.0.4
         version: 7.0.4
@@ -459,6 +462,10 @@ packages:
   '@casbin/expression-eval@5.3.0':
     resolution: {integrity: sha512-mMTHMYXcnBBv/zMvxMpcdVyt2bfw8Y0GnmRLbkFQ1CVJZb4XZp7xWjRh7ymOLuJdsu58rci9gmOOv/99DtJvPA==}
 
+  '@cloudnative/health@2.1.2':
+    resolution: {integrity: sha512-mEQdbj9dM4KMClS358MCzbqXUmj+Vw5snjDb5bXdaf1sZvVu7+3UqR4HaG4RoNkNUwe1yjfIuengdyWp9quF1A==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+
   '@colors/colors@1.6.0':
     resolution: {integrity: sha512-Ir+AOibqzrIsL6ajt3Rz3LskB7OiMVHqltZmspbW/TJuTVuyOMirVqAkjfY6JISiLHgyNqicAC8AyHHGzNd/dA==}
     engines: {node: '>=0.1.90'}
@@ -669,6 +676,13 @@ packages:
   '@loopback/filter@6.0.4':
     resolution: {integrity: sha512-RjCdyIG9bKFbi4OWWOL1kH2c1vpF+o6jWVgh0J32h88rmQQpXE0qoDhilRK3Z880wRAizMv4V8UHB6hYLAIGhg==}
     engines: {node: 20 || 22 || 24}
+
+  '@loopback/health@0.15.5':
+    resolution: {integrity: sha512-JMo38VbxWhTgFwefrU4kBNqUKC7o/xCkF67TIDhXU6ZcwCXsc5rl1qRLZbxw+7awu3B2b5LP4QxUNC0esGUSlA==}
+    engines: {node: 20 || 22 || 24}
+    peerDependencies:
+      '@loopback/core': ^7.0.0
+      '@loopback/rest': ^15.0.1
 
   '@loopback/http-server@7.0.4':
     resolution: {integrity: sha512-cp8M0b7P7Bvx6eP3dMPL6Yd/N3/M1Z8//JkKQpdJ5Jqe1xLWtCzhA8o5Sc1Yhnb9wB0Hn0bAMP4INggkZmzCvA==}
@@ -4722,6 +4736,8 @@ snapshots:
     dependencies:
       jsep: 0.3.5
 
+  '@cloudnative/health@2.1.2': {}
+
   '@colors/colors@1.6.0': {}
 
   '@cspotcode/source-map-support@0.8.1':
@@ -5023,6 +5039,13 @@ snapshots:
 
   '@loopback/filter@6.0.4':
     dependencies:
+      tslib: 2.8.1
+
+  '@loopback/health@0.15.5(@loopback/core@7.0.4)(@loopback/rest@15.0.5(@loopback/core@7.0.4)(@loopback/repository@8.0.4(@loopback/core@7.0.4)))':
+    dependencies:
+      '@cloudnative/health': 2.1.2
+      '@loopback/core': 7.0.4
+      '@loopback/rest': 15.0.5(@loopback/core@7.0.4)(@loopback/repository@8.0.4(@loopback/core@7.0.4))
       tslib: 2.8.1
 
   '@loopback/http-server@7.0.4':

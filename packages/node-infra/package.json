@@ -117,6 +117,7 @@
     "@loopback/boot": "^8.0.5",
     "@loopback/core": "^7.0.4",
     "@loopback/filter": "^6.0.4",
+    "@loopback/health": "^0.15.5",
     "@loopback/http-server": "^7.0.4",
     "@loopback/metadata": "^8.0.4",
     "@loopback/repository": "^8.0.4",
