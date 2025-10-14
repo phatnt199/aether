@@ -1,5 +1,6 @@
+import { BaseApplication } from '@/base/applications';
+import { BaseComponent } from '@/base/base.component';
 import { HealthBindings, HealthComponent, HealthTags } from '@loopback/health';
-import { BaseApplication, BaseComponent } from '@minimaltech/node-infra';
 import { CoreBindings, inject } from '@minimaltech/node-infra/lb-core';
 import { DataSource, RepositoryTags } from '@minimaltech/node-infra/lb-repo';
 
