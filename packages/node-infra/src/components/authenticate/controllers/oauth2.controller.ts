@@ -1,5 +1,5 @@
 import { EnvironmentKeys, IdType, TInjectionGetter } from '@/common';
-import { applicationEnvironment, LoggerFactory } from '@/helpers';
+import { applicationEnvironment } from '@/helpers';
 import { getSchemaObject } from '@/utilities';
 import { authenticate } from '@loopback/authentication';
 import { Context, Getter, inject } from '@loopback/core';
@@ -45,8 +45,6 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
 
     this.authServiceKey = opts.authServiceKey;
     this.viewFolder = opts.viewFolder;
-
-    this.logger = LoggerFactory.getLogger([DefaultOAuth2ExpressServer.name]);
 
     this.binding();
   }

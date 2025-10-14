@@ -17,8 +17,7 @@ export abstract class AbstractExpressRequestHandler extends ExpressServer {
     super(config, context);
 
     this.logger = LoggerFactory.getLogger([scope]);
-
-    this.binding();
+    this.injectionGetter = opts.injectionGetter;
   }
 
   getApplicationHandler() {
