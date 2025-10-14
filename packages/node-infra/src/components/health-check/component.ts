@@ -1,6 +1,6 @@
 import { BaseApplication } from '@/base/applications';
 import { BaseComponent } from '@/base/base.component';
-import { HealthBindings, HealthComponent, HealthTags } from '@loopback/health';
+import { HealthComponent, HealthTags } from '@loopback/health';
 import { CoreBindings, inject } from '@minimaltech/node-infra/lb-core';
 import { DataSource, RepositoryTags } from '@minimaltech/node-infra/lb-repo';
 
@@ -16,13 +16,6 @@ export class HealthcheckComponent extends BaseComponent {
   binding() {
     const t = performance.now();
     this.logger.info('[binding] START | Binding application/datasource healthcheck...!');
-
-    this.application.configure(HealthBindings.COMPONENT).to({
-      healthPath: '/health',
-      livePath: '/live',
-      readyPath: '/ready',
-      openApiSpec: true,
-    });
     this.application.component(HealthComponent);
 
     const dsBindings = this.application.findByTag(RepositoryTags.DATASOURCE);
