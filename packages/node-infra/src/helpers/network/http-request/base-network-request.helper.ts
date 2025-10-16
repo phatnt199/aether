@@ -86,6 +86,7 @@ export class AxiosNetworkRequest extends BaseNetworkRequest<'axios'> {
 
     const defaultConfigs: Partial<IAxiosRequestOptions> = {
       ...rest,
+      baseURL: rest.baseUrl,
       withCredentials: true,
       timeout: 60 * 1000,
       validateStatus: (status: number) => status < 500,
