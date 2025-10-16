@@ -26,7 +26,7 @@ export class NodeFetcher extends AbstractNetworkFetchableHelper<
   // -------------------------------------------------------------
   // SEND REQUEST
   // -------------------------------------------------------------
-  send(opts: INodeFetchRequestOptions, logger?: any) {
+  override send(opts: INodeFetchRequestOptions, logger?: any) {
     const { url, method = 'get', params, body, headers } = opts;
     const requestConfigs: RequestInit = {
       ...this.defaultConfigs,

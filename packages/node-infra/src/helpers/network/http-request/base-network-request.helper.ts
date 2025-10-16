@@ -76,6 +76,10 @@ export class BaseNetworkRequest<T extends TFetcherVariant> extends BaseHelper {
   getNetworkService() {
     return this.fetcher;
   }
+
+  getWorker() {
+    return this.fetcher.getWorker();
+  }
 }
 
 // -----------------------------------------------------------------------------

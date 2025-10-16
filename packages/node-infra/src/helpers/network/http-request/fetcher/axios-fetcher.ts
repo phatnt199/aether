@@ -1,6 +1,6 @@
 import { AnyObject } from '@/common';
 import { stringify } from '@/utilities/url.utility';
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import https from 'node:https';
 import { AbstractNetworkFetchableHelper } from './base-fetcher';
 
@@ -18,8 +18,6 @@ export class AxiosFetcher extends AbstractNetworkFetchableHelper<
   IAxiosRequestOptions,
   axios.AxiosResponse<any, any>['data']
 > {
-  private worker: AxiosInstance;
-
   constructor(opts: { name: string; defaultConfigs: AxiosRequestConfig; logger?: any }) {
     super({ name: opts.name, variant: 'axios' });
     const { defaultConfigs } = opts;
