@@ -82,11 +82,11 @@ export class BaseNetworkRequest<T extends TFetcherVariant> extends BaseHelper {
 export class AxiosNetworkRequest extends BaseNetworkRequest<'axios'> {
   constructor(opts: Omit<IAxiosNetworkOptions, 'fetcher' | 'variant'>) {
     const { name, networkOptions } = opts;
-    const { headers = {}, ...rest } = networkOptions;
+    const { headers = {}, baseUrl, ...rest } = networkOptions;
 
     const defaultConfigs: Partial<IAxiosRequestOptions> = {
       ...rest,
-      baseURL: rest.baseUrl,
+      baseURL: baseUrl,
       withCredentials: true,
       timeout: 60 * 1000,
       validateStatus: (status: number) => status < 500,
