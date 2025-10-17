@@ -2,9 +2,9 @@ import { AnyObject } from '@/common';
 import { stringify } from '@/utilities/url.utility';
 import axios, { AxiosRequestConfig } from 'axios';
 import https from 'node:https';
-import { AbstractNetworkFetchableHelper } from './base-fetcher';
+import { AbstractNetworkFetchableHelper, IRequestOptions } from './base-fetcher';
 
-export interface IAxiosRequestOptions extends AxiosRequestConfig {
+export interface IAxiosRequestOptions extends AxiosRequestConfig, IRequestOptions {
   url: string;
   method?: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options';
   params?: AnyObject;
@@ -29,7 +29,7 @@ export class AxiosFetcher extends AbstractNetworkFetchableHelper<
   // -------------------------------------------------------------
   // SEND REQUEST
   // -------------------------------------------------------------
-  send<T = any>(opts: IAxiosRequestOptions, logger?: any) {
+  override send<T = any>(opts: IAxiosRequestOptions, logger?: any) {
     const { url, method = 'get', params = {}, body: data, headers, ...rest } = opts;
     const props: AxiosRequestConfig = {
       url,

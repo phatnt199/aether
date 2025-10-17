@@ -1,7 +1,7 @@
 import { stringify } from '@/utilities/url.utility';
-import { AbstractNetworkFetchableHelper } from './base-fetcher';
+import { AbstractNetworkFetchableHelper, IRequestOptions } from './base-fetcher';
 
-export interface INodeFetchRequestOptions extends RequestInit {
+export interface INodeFetchRequestOptions extends RequestInit, IRequestOptions {
   url: string;
   params?: Record<string | symbol, any>;
 }
@@ -26,13 +26,26 @@ export class NodeFetcher extends AbstractNetworkFetchableHelper<
   // -------------------------------------------------------------
   // SEND REQUEST
   // -------------------------------------------------------------
-  override send(opts: INodeFetchRequestOptions, logger?: any) {
-    const { url, method = 'get', params, body, headers } = opts;
+  override async send(opts: INodeFetchRequestOptions, logger?: any) {
+    const { url, method = 'get', params, body, headers, timeout, signal, ...rest } = opts;
+
+    let timeoutId: NodeJS.Timeout | undefined;
+    let abortController: AbortController | undefined;
+
+    if (timeout) {
+      abortController = new AbortController();
+      timeoutId = setTimeout(() => {
+        abortController?.abort();
+      }, timeout);
+    }
+
     const requestConfigs: RequestInit = {
       ...this.defaultConfigs,
+      ...rest,
       method,
       body,
       headers,
+      signal: abortController?.signal ?? signal,
     };
 
     let requestUrl = '';
@@ -44,7 +57,14 @@ export class NodeFetcher extends AbstractNetworkFetchableHelper<
       requestUrl = urlParts.join();
     }
 
-    logger?.info('[send] URL: %s | Props: %o', url, requestConfigs);
-    return fetch(requestUrl, requestConfigs);
+    logger?.info('[send] URL: %s | Props: %o | Timeout: %s', url, requestConfigs, timeout);
+
+    try {
+      return await fetch(requestUrl, requestConfigs);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
   }
 }

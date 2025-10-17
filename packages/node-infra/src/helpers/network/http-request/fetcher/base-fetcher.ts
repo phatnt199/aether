@@ -7,6 +7,7 @@ export interface IRequestOptions {
   url: string;
   params?: Record<string | symbol, any>;
   method?: string;
+  timeout?: number;
   [extra: symbol | string]: any;
 }
 
