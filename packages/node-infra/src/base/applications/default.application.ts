@@ -1,7 +1,7 @@
 import { BindingKeys, EnvironmentKeys, IEnvironmentValidationResult } from '@/common';
 import { MigrationComponent } from '@/components';
 import { MigrationKeys } from '@/components/migration/common';
-import { KvMemDataSource, PostgresDataSource } from '@/datasources';
+import { PostgresDataSource } from '@/datasources';
 import { applicationEnvironment } from '@/helpers';
 import { ContentRangeInterceptor } from '@/interceptors/content-range.interceptor';
 import { toBoolean } from '@/utilities';
@@ -61,7 +61,7 @@ export abstract class DefaultRestApplication extends BaseApplication {
 
     // Configuring datasources
     this.dataSource(PostgresDataSource);
-    this.dataSource(KvMemDataSource);
+    // this.dataSource(KvMemDataSource);
 
     // Migration
     this.configureMigration();
