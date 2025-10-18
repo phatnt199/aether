@@ -112,13 +112,10 @@
     "@grpc/proto-loader": "^0.8.0",
     "@loopback/authentication": "^12.0.6",
     "@loopback/authentication-jwt": "^0.16.6",
-    "@loopback/authentication-passport": "^8.0.6",
     "@loopback/authorization": "^0.16.5",
     "@loopback/boot": "^8.0.5",
     "@loopback/core": "^7.0.4",
-    "@loopback/filter": "^6.0.4",
     "@loopback/health": "^0.15.5",
-    "@loopback/http-server": "^7.0.4",
     "@loopback/metadata": "^8.0.4",
     "@loopback/repository": "^8.0.4",
     "@loopback/rest": "^15.0.5",
@@ -150,9 +147,7 @@
     "winston-transport": "^4.9.0"
   },
   "peerDependenciesMeta": {
-    "mocha": {
-      "optional": true
-    }
+    "mocha": { "optional": true }
   },
   "devDependencies": {
     "@loopback/build": "catalog:build",

@@ -148,9 +148,6 @@ importers:
       '@loopback/authentication-jwt':
         specifier: ^0.16.6
         version: 0.16.7(@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))))(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
-      '@loopback/authentication-passport':
-        specifier: ^8.0.6
-        version: 8.0.7(@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))))(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
       '@loopback/authorization':
         specifier: ^0.16.5
         version: 0.16.6(@loopback/core@7.0.5)
@@ -160,15 +157,9 @@ importers:
       '@loopback/core':
         specifier: ^7.0.4
         version: 7.0.5
-      '@loopback/filter':
-        specifier: ^6.0.4
-        version: 6.0.5
       '@loopback/health':
         specifier: ^0.15.5
         version: 0.15.6(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
-      '@loopback/http-server':
-        specifier: ^7.0.4
-        version: 7.0.5
       '@loopback/metadata':
         specifier: ^8.0.4
         version: 8.0.5
@@ -619,14 +610,6 @@ packages:
     peerDependencies:
       '@loopback/authentication': ^12.0.1
       '@loopback/core': ^7.0.1
-      '@loopback/rest': ^15.0.1
-
-  '@loopback/authentication-passport@8.0.7':
-    resolution: {integrity: sha512-XoES0BjulENBPnSKekfOqzepQGW6d3sgVF4Smc2qkoxY7c/evJVgBbWHBK9DPadAMGIJF6UnDeS7FFamilVyjg==}
-    engines: {node: 20 || 22 || 24}
-    peerDependencies:
-      '@loopback/authentication': ^12.0.1
-      '@loopback/core': ^7.0.0
       '@loopback/rest': ^15.0.1
 
   '@loopback/authentication@12.0.7':
@@ -3571,14 +3554,6 @@ packages:
   pascal-case@3.1.2:
     resolution: {integrity: sha512-uWlGT3YSnK9x3BQJaOdcZwrnV6hPpd8jFH1/ucpiLRPh/2zCVJKS19E4GvYHvaCcACn3foXZ0cLB9Wrx1KGe5g==}
 
-  passport-strategy@1.0.0:
-    resolution: {integrity: sha512-CB97UUvDKJde2V0KDWWB3lyf6PC3FaZP7YxZ2G8OAtn9p4HI9j9JLP9qjOGZFvyl8uwNT8qM+hGnz/n16NI7oA==}
-    engines: {node: '>= 0.4.0'}
-
-  passport@0.7.0:
-    resolution: {integrity: sha512-cPLl+qZpSc+ireUvt+IzqbED1cHHkDoVYMo30jbJIdOOjQ1MQYZBPiNvmi8UM6lJuOpTPXJGZQk0DtC4y61MYQ==}
-    engines: {node: '>= 0.4.0'}
-
   path-case@3.0.4:
     resolution: {integrity: sha512-qO4qCFjXqVTrcbPt/hQfhTQ+VhFsqNKOPtytgNKkKxSoEp3XPUQ8ObFuePylOIok5gjn69ry8XiULxCwot3Wfg==}
 
@@ -3614,9 +3589,6 @@ packages:
   path-type@4.0.0:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
-
-  pause@0.0.1:
-    resolution: {integrity: sha512-KG8UEiEVkR3wGEb4m5yZkVCzigAD+cVEJck2CzYZO37ZGJfctvVptVO192MwrtPhzONn6go8ylnOdMhKqi4nfg==}
 
   pg-connection-string@2.6.2:
     resolution: {integrity: sha512-ch6OwaeaPYcova4kKZ15sbJ2hKb/VP48ZD2gE7i1J+L4MspCtBMAx8nMgz7bksc7IojCIIWuEhHibSMFH8m8oA==}
@@ -4319,9 +4291,6 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  util-promisifyall@1.0.6:
-    resolution: {integrity: sha512-l+o62sbaqStC1xt7oEhlafC4jWBgkOjBXvlPwxkvOYmNqpY8dNXuKdOa+VHjkYz2Fw98e0HvJtNKUg0+6hfP2w==}
-
   util@0.12.5:
     resolution: {integrity: sha512-kZf/K6hEIrWHI6XqOFUiiMa+79wE/D8Q+NCNAWclkyg3b4d2k7s0QGepNjiABc+aR3N1PAyHL7p6UcLY6LmrnA==}
 
@@ -4923,18 +4892,6 @@ snapshots:
       bcryptjs: 3.0.2
       debug: 4.4.3(supports-color@8.1.1)
       jsonwebtoken: 9.0.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@loopback/authentication-passport@8.0.7(@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))))(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))':
-    dependencies:
-      '@loopback/authentication': 12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
-      '@loopback/core': 7.0.5
-      '@loopback/rest': 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
-      '@loopback/security': 0.12.6(@loopback/core@7.0.5)
-      passport: 0.7.0
-      tslib: 2.8.1
-      util-promisifyall: 1.0.6
     transitivePeerDependencies:
       - supports-color
 
@@ -8592,14 +8549,6 @@ snapshots:
       no-case: 3.0.4
       tslib: 2.8.1
 
-  passport-strategy@1.0.0: {}
-
-  passport@0.7.0:
-    dependencies:
-      passport-strategy: 1.0.0
-      pause: 0.0.1
-      utils-merge: 1.0.1
-
   path-case@3.0.4:
     dependencies:
       dot-case: 3.0.4
@@ -8628,8 +8577,6 @@ snapshots:
   path-to-regexp@6.3.0: {}
 
   path-type@4.0.0: {}
-
-  pause@0.0.1: {}
 
   pg-connection-string@2.6.2: {}
 
@@ -9379,8 +9326,6 @@ snapshots:
       react: 19.2.0
 
   util-deprecate@1.0.2: {}
-
-  util-promisifyall@1.0.6: {}
 
   util@0.12.5:
     dependencies:
