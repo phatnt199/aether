@@ -141,7 +141,6 @@
     "knex": "^3.1.0",
     "lodash": "catalog:common",
     "minio": "^8.0.6",
-    "mocha": "^11.7.2",
     "mqtt": "^5.14.1",
     "multer": "^2.0.2",
     "socket.io": "^4.8.1",
@@ -149,6 +148,11 @@
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
     "winston-transport": "^4.9.0"
+  },
+  "peerDependenciesMeta": {
+    "mocha": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@loopback/build": "catalog:build",
@@ -160,11 +164,13 @@
     "@types/multer": "^2.0.0",
     "@types/node": "catalog:develop",
     "eslint": "catalog:develop",
+    "mocha": "^11.7.2",
     "prettier": "catalog:develop",
     "source-map-support": "catalog:develop",
     "ts-node": "catalog:develop",
     "tsc-alias": "catalog:develop",
     "tsconfig-paths": "catalog:develop",
     "typescript": "catalog:develop"
-  }
+  },
+  "sideEffects": false
 }
