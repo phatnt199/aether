@@ -1,6 +1,6 @@
 {
   "name": "@minimaltech/node-infra",
-  "version": "0.5.9-13",
+  "version": "0.5.9-14",
   "description": "Minimal Technology - NodeJS Infrastructure - Loopback 4 Framework",
   "keywords": [
     "web",
@@ -147,7 +147,9 @@
     "winston-transport": "^4.9.0"
   },
   "peerDependenciesMeta": {
-    "mocha": { "optional": true }
+    "mocha": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@loopback/build": "catalog:build",
