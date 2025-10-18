@@ -4,8 +4,8 @@ import { getError } from '@/utilities';
 import { inject } from '@loopback/core';
 
 const kvmemOptions: IDataSourceOptions = {
-  name: 'kvmem',
-  connector: 'kv-memory',
+  name: 'memory',
+  connector: 'memory',
 };
 
 export class KvMemDataSource extends BaseDataSource<IDataSourceOptions> {
