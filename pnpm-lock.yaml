@@ -58,7 +58,7 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       typescript:
-        specifier: ^5.9.3
+        specifier: ~5.9.3
         version: 5.9.3
 
   packages/common:
@@ -68,7 +68,7 @@ importers:
         version: 12.0.5
       '@minimaltech/eslint-node':
         specifier: ^0.2.1
-        version: 0.2.1(@typescript-eslint/parser@8.46.1(eslint@9.38.0)(typescript@5.8.3))
+        version: 0.2.1(@typescript-eslint/parser@8.46.1(eslint@9.38.0)(typescript@5.9.3))
       '@types/node':
         specifier: ^22.18.6
         version: 22.18.11
@@ -83,7 +83,7 @@ importers:
         version: 0.5.21
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.18.11)(typescript@5.8.3)
+        version: 10.9.2(@types/node@22.18.11)(typescript@5.9.3)
       tsc-alias:
         specifier: ^1.8.16
         version: 1.8.16
@@ -91,65 +91,65 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       typescript:
-        specifier: 5.8.3
-        version: 5.8.3
+        specifier: ~5.9.3
+        version: 5.9.3
 
   packages/node-infra:
     dependencies:
       '@grpc/grpc-js':
-        specifier: ^1.13.4
+        specifier: ^1.14.0
         version: 1.14.0
       '@grpc/proto-loader':
         specifier: ^0.8.0
         version: 0.8.0
       '@loopback/authentication':
-        specifier: ^11.0.8
-        version: 11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
+        specifier: ^12.0.6
+        version: 12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
       '@loopback/authentication-jwt':
-        specifier: ^0.15.8
-        version: 0.15.14(@loopback/authentication@11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))))(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
+        specifier: ^0.16.6
+        version: 0.16.7(@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))))(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
       '@loopback/authentication-passport':
-        specifier: ^7.0.8
-        version: 7.0.14(@loopback/authentication@11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))))(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
+        specifier: ^8.0.6
+        version: 8.0.7(@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))))(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
       '@loopback/authorization':
-        specifier: ^0.15.8
-        version: 0.15.14(@loopback/core@6.1.11)
+        specifier: ^0.16.5
+        version: 0.16.6(@loopback/core@7.0.5)
       '@loopback/boot':
-        specifier: ^7.0.8
-        version: 7.0.14(@loopback/core@6.1.11)
+        specifier: ^8.0.5
+        version: 8.0.6(@loopback/core@7.0.5)
       '@loopback/core':
-        specifier: ^6.1.5
-        version: 6.1.11
+        specifier: ^7.0.4
+        version: 7.0.5
       '@loopback/filter':
-        specifier: ^5.0.11
-        version: 5.0.13
+        specifier: ^6.0.4
+        version: 6.0.5
       '@loopback/health':
         specifier: ^0.15.6
-        version: 0.15.6(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
+        version: 0.15.6(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
       '@loopback/http-server':
-        specifier: ^6.0.8
-        version: 6.0.14
+        specifier: ^7.0.4
+        version: 7.0.5
       '@loopback/metadata':
-        specifier: ^7.0.8
-        version: 7.0.14
+        specifier: ^8.0.4
+        version: 8.0.5
       '@loopback/repository':
-        specifier: ^7.0.8
-        version: 7.0.14(@loopback/core@6.1.11)
+        specifier: ^8.0.4
+        version: 8.0.5(@loopback/core@7.0.5)
       '@loopback/rest':
-        specifier: ^14.0.8
-        version: 14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
+        specifier: ^15.0.5
+        version: 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
       '@loopback/rest-crud':
-        specifier: ^0.18.8
-        version: 0.18.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
+        specifier: ^0.19.5
+        version: 0.19.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
       '@loopback/rest-explorer':
-        specifier: ^7.0.8
-        version: 7.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
+        specifier: ^8.0.5
+        version: 8.0.6(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
       '@loopback/security':
-        specifier: ^0.11.8
-        version: 0.11.14(@loopback/core@6.1.11)
+        specifier: ^0.12.5
+        version: 0.12.6(@loopback/core@7.0.5)
       '@loopback/service-proxy':
-        specifier: ^7.0.8
-        version: 7.0.14(@loopback/core@6.1.11)
+        specifier: ^8.0.4
+        version: 8.0.5(@loopback/core@7.0.5)
       '@node-oauth/oauth2-server':
         specifier: ^5.2.1
         version: 5.2.1
@@ -263,7 +263,7 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       typescript:
-        specifier: ^5.9.3
+        specifier: ~5.9.3
         version: 5.9.3
 
 packages:
@@ -575,53 +575,53 @@ packages:
   '@jsdevtools/ono@7.1.3':
     resolution: {integrity: sha512-4JQNk+3mVzK3xh2rqd6RB4J46qUR19azEHBneZyTZM+c456qOrbbM/5xcR8huNCCcbVt7+UmizG6GuUvPvKUYg==}
 
-  '@loopback/authentication-jwt@0.15.14':
-    resolution: {integrity: sha512-+R762ybtcFyO5b8i3VBlVMGZWyHcdUl8Mn5q2e/riCJPEhjhlFupTR44ale/he93/nkxnXiGzAEJKRxXGGRzSA==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/authentication-jwt@0.16.7':
+    resolution: {integrity: sha512-Fsu5rR2qg4yY6LvAtU0/cKl1OcTqU4239MDVvAQk4UYAZvek7uCjGCLxby2iltGojna6WZ5TJqdSg93IUJVl8Q==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/authentication': ^11.0.0
-      '@loopback/core': ^6.0.0
-      '@loopback/rest': ^14.0.0
+      '@loopback/authentication': ^12.0.1
+      '@loopback/core': ^7.0.1
+      '@loopback/rest': ^15.0.1
 
-  '@loopback/authentication-passport@7.0.14':
-    resolution: {integrity: sha512-a7s0opbbylkbbysmfGzUXeOCcTzGMGPGpXVTMglNRqJWXTboO2u00LnP6Usim0nDIM6i8dKGCEQPeidyc89WjA==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/authentication-passport@8.0.7':
+    resolution: {integrity: sha512-XoES0BjulENBPnSKekfOqzepQGW6d3sgVF4Smc2qkoxY7c/evJVgBbWHBK9DPadAMGIJF6UnDeS7FFamilVyjg==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/authentication': ^11.0.0
-      '@loopback/core': ^6.0.0
-      '@loopback/rest': ^14.0.0
+      '@loopback/authentication': ^12.0.1
+      '@loopback/core': ^7.0.0
+      '@loopback/rest': ^15.0.1
 
-  '@loopback/authentication@11.0.14':
-    resolution: {integrity: sha512-8FDXdCwN0xYqIwUhJNdlmF2UhDfiSe4JTH+Jm4DowgQekaJK6VNQHgNFJcErUMS2+RcYK7EsS8XmxIpOTJL6UQ==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/authentication@12.0.7':
+    resolution: {integrity: sha512-xwxgp3M+2U7liBZElhU536Pr1kKMd5ohB95O4jNQm8amCJM9pnpQds9uUa2EZQeJixAJh2Oh+8E2RvqeHY+N4Q==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
-      '@loopback/rest': ^14.0.0
+      '@loopback/core': ^7.0.0
+      '@loopback/rest': ^15.0.0
 
-  '@loopback/authorization@0.15.14':
-    resolution: {integrity: sha512-cV21FoKRIxMoP0EEWtzo85o7b5SE/+Cn24PUjA72B1jWGsXytaisqRLxKMpnWPxF7pXoWn0Sfe8BjaeSCqo5zg==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/authorization@0.16.6':
+    resolution: {integrity: sha512-T8Inx4l7Mq3DLQy038xG2n0J/s81ZYJTgaY3AGf35S5JMFJN6GIy+eryP6pnAd1CW3fRMh3My3C15c/TjO0zjw==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.0
 
-  '@loopback/boot@7.0.14':
-    resolution: {integrity: sha512-W8rSJCPUzvlbPWZlfpno50OW3AEEpnrr0VPtb2nJaG3AbiBiiAF8E0+NY0hvJJlgC9KX5RCLmeWDiPQXJy3ehg==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/boot@8.0.6':
+    resolution: {integrity: sha512-PI3p//hk++jqbAUWXZTeqJ+ZqL2MoG2CTBcjVe02dZVyB8Ae0WPXjSq/+htxGGxHV7yB3rhRH6zsrqpvkvrsmw==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.0
 
   '@loopback/build@12.0.5':
     resolution: {integrity: sha512-KlRfOS2bGsjbA5Zp/DY5QeOie/gA6ku7tbqRCkUDFdcYgWqduhIzPOg/aOwxAnLXlxeJjfQVJUobJTgmPMUtgw==}
     engines: {node: 20 || 22 || 24}
     hasBin: true
 
-  '@loopback/context@7.0.14':
-    resolution: {integrity: sha512-5Wgy6gMahkxxh2j0M7dcBGX7GYJB9myYTrOuCs9ektyCm0MO6vzGi/9jShQN9XgfO4FxKnLM9uSrJAPGGPFHLQ==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/context@8.0.5':
+    resolution: {integrity: sha512-bztb6qLGwNEb265tXU8JmRHn0/esPfcZkXzHm6V5b+VLBtsOHOT2TpmTVSoLNEooKFj1i31C8Org+jYI0/7jOQ==}
+    engines: {node: 20 || 22 || 24}
 
-  '@loopback/core@6.1.11':
-    resolution: {integrity: sha512-R5uJDWfKYeBtS48eO2ckE2Ro3/cJ8ROk3u6u2JQ3/bEQUdxbZfgIs9yEHFfdgumv/w3dEilJVr03idn0vptVgg==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/core@7.0.5':
+    resolution: {integrity: sha512-Umh9GG7lZDK2/jKIaHxDftomuH4uOuPtIMubaHyJIadnuUh1ChHvVr72TB6xMwtWrV3CeLJdjMnnQLeLdNPpiw==}
+    engines: {node: 20 || 22 || 24}
 
   '@loopback/eslint-config@16.0.1':
     resolution: {integrity: sha512-R+zUANIwAxJUSzqseU1GuHXNkyWuWJse8211XR/SM5wgcJp6NWvZz/JR7QoOyW4nOoanSwTgvvBPYjXZIQcqDQ==}
@@ -629,15 +629,15 @@ packages:
     peerDependencies:
       eslint: ^8.57.1
 
-  '@loopback/express@7.0.14':
-    resolution: {integrity: sha512-XpYfBnRWBCPkKQkdO3YKz+36txawZ6WXdN4UnANRGPMBOifsDI33J4kd4VWtacATHpxgFpPxJvntKXaFl9GVXw==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/express@8.0.5':
+    resolution: {integrity: sha512-39WCK4dnTtAZ6fWTXmVg0dZc4Gnknd3WRDXt+Wxyl2wQ9My4bblrlqysfd3OxcuR3TIYHA+/GN+moMr46CUg+Q==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.0
 
-  '@loopback/filter@5.0.13':
-    resolution: {integrity: sha512-1vY7Rp4nemdD7cbO9bxV4egTQxpeREqJquDLZ1ZpJ7osrLG5bmP8ThTZe35fsj5p30TrqfRMC7gWedFmy8K59Q==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/filter@6.0.5':
+    resolution: {integrity: sha512-Cs8pq+vTWSsmuHY0iRK40l9QJsiDo7jbSe1M319MibehfsP6aM5XVsDkmpVLBLFrIk2HrYcJ+8GJ6DrrZt2+hQ==}
+    engines: {node: 20 || 22 || 24}
 
   '@loopback/health@0.15.6':
     resolution: {integrity: sha512-BRDTnjonlLI/S2crftar2jy+oLckQdzAKUGumO8lHe7ao2yia7BG4s5mLDmfrXBXAtEnqX77afG3t3J8EZw5Mw==}
@@ -646,72 +646,72 @@ packages:
       '@loopback/core': ^7.0.0
       '@loopback/rest': ^15.0.1
 
-  '@loopback/http-server@6.0.14':
-    resolution: {integrity: sha512-ETpExiNnpZ9Hyh1kS6Bzte+y4apQ2Y9AgdoI5V2F6DdObVll7779kpnbmKs9ifwQdUNQ+lAgJvfo9fKCq5y52Q==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/http-server@7.0.5':
+    resolution: {integrity: sha512-mRYu8mHvKCmr1BVFs9etBiAOt1YjpINZeYM+jSKqk67UVBF3V2Wwzp8ihaZSIk2djITxPP5KgXeFxpWRe3xwfw==}
+    engines: {node: 20 || 22 || 24}
 
-  '@loopback/metadata@7.0.14':
-    resolution: {integrity: sha512-qt4DfeIRFfGCQRXGBXkVvEGXt/LadZJC9Xj38f0sXWNNaDbBuWiFwAXhpIYgsdafLYGCJkziFkk1K87Wa7d75g==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/metadata@8.0.5':
+    resolution: {integrity: sha512-wYNZnj15Q3X2xAmRCjMSaphda/MDy2SNkvx1mdw41yEneEQlITkGoy3k1MJpqJVSkcgmWf/M4DasfRwvyYlOBA==}
+    engines: {node: 20 || 22 || 24}
 
-  '@loopback/model-api-builder@6.0.14':
-    resolution: {integrity: sha512-yS/R6v5S/cq+XbxL1P2+JtODF10I9nf3+htNvCtZX6jHdxM3KOleyXY3/M/5/ks9JHzywDca1KH1NEUsbYWxpQ==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/model-api-builder@7.0.6':
+    resolution: {integrity: sha512-HYT0lbR6iDxItuixwxPKkRt8/n7JSBYfA3TkK6Gfd8DBvtyQ0MYq4d5znPVIoGJmaoghnKYbZEEa9ssUSkklSg==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
-      '@loopback/repository': ^7.0.0
+      '@loopback/core': ^7.0.0
+      '@loopback/repository': ^8.0.1
 
-  '@loopback/openapi-v3@10.0.14':
-    resolution: {integrity: sha512-S1RvDKuqUkwMJHNBJGcOSaUPhgmhdCtndXF1WMgvuMVa3E0KRNi+OWDF87BC3Hg8hQd9wL38sG3gk9vXJLuN4w==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/openapi-v3@11.0.6':
+    resolution: {integrity: sha512-MHGxr81bwiBAwZbTbPxXYzl9rcYTC9D6DZddBY7gj+/qQUoDiU1pggItvnTOufBhdFq5OPMzoOvkgdspXeKxag==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.0
 
-  '@loopback/repository-json-schema@8.0.14':
-    resolution: {integrity: sha512-Nwc6NLd+1EQx85WMqLGH3ShbzJvs4Mand5JsUEm5LRaMLY0Vlf1HGosAlTnq2ty7J15/Mh+9ZBA1DmRvQPgHLQ==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/repository-json-schema@9.0.6':
+    resolution: {integrity: sha512-B+LgU/KXNH9KX/AEh74R5qFUpdBJnOmj91bTHyryt5fN4bdxu1l8x5o1mZ1R2yvEmAHRBDAefQIvHJjfJzUysg==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
-      '@loopback/repository': ^7.0.0
+      '@loopback/core': ^7.0.0
+      '@loopback/repository': ^8.0.1
 
-  '@loopback/repository@7.0.14':
-    resolution: {integrity: sha512-jFQIjtqE0Uis/goXfztiNIKGQ1ITIqsIR8xe8q8j6PJbNoetVaA4A3wz4LaBhuFpyjCgQM8iJdwGKfNTJNzn4w==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/repository@8.0.5':
+    resolution: {integrity: sha512-BR2si3CnZ9e5nGhlJDlAbNrNQAhyTg2Jp8PfZ8U48xqsZvSkLcsW6+wzkHqnzq5+fjVM5c0P9ya65vKL8T9scQ==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.0
 
-  '@loopback/rest-crud@0.18.14':
-    resolution: {integrity: sha512-bV9CIo3x6RilEvHewut9vfEo1s1aEDmA6kEK3bvNsa9C1bxdpRbaPjgTtkV8mqj+tNCashmy5gDL8Noz7oMT3g==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/rest-crud@0.19.6':
+    resolution: {integrity: sha512-9uXHlGh3qPBrrSUe7P9gTFl9DkBVs+jN0tqB4Z/GTn9m1+UzGV3sLDc7m+wWBhlwCJNwsnE0mcFTapR8jWGFwA==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
-      '@loopback/repository': ^7.0.0
-      '@loopback/rest': ^14.0.0
+      '@loopback/core': ^7.0.0
+      '@loopback/repository': ^8.0.1
+      '@loopback/rest': ^15.0.1
 
-  '@loopback/rest-explorer@7.0.14':
-    resolution: {integrity: sha512-NS1QqMHDeFAnK4STz1cpANwApPwE21Qvq7yQK1bNJhenFi739EQFIA7N8aYCSzmL3RkT/hH5Of2M3mZ4b6ehtQ==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/rest-explorer@8.0.6':
+    resolution: {integrity: sha512-kVL6wq/CvIRMJ4fbH1MXf0hJ9Uo2lXN6CW6czoOH35hOt2Z/ByFWE+9p/zQlvck+OeRGXEccTn511Ck5KhlRPg==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
-      '@loopback/rest': ^14.0.0
+      '@loopback/core': ^7.0.0
+      '@loopback/rest': ^15.0.1
 
-  '@loopback/rest@14.0.14':
-    resolution: {integrity: sha512-/rsvY4Bsduin+0MILPoPBkgnrv4TiNt0I1MJwv2LoTIjO6VbYPbEk7dOI6B33FM1gpSXNjTGEH9fwa9fXx9SPA==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/rest@15.0.6':
+    resolution: {integrity: sha512-iPT4avTDSYcv9vlKC2GW/3kKdx4fSAINnAe5byHhBjebBm5lLlHESL6r9S5Jzc4ifMzNRwI90vtm/xgqT5eOwg==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.0
 
-  '@loopback/security@0.11.14':
-    resolution: {integrity: sha512-W26fkVMOnN1aQCDFI4TMPo4LJLBsthpUCBF5UH2yFTTASEjCmMBYgNCZtVASb4nXvzAmocWDPoi1UINbDOIDpw==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/security@0.12.6':
+    resolution: {integrity: sha512-gAZUu+6tIUesOgTBdexpkpYVJNn3rbeX1ReCZyY1LqsI6ilHB7jOIWjymt4VsWEIly4ZvEfl78++ggB03XWOZg==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.1
 
-  '@loopback/service-proxy@7.0.14':
-    resolution: {integrity: sha512-j52kGAgh/WDFpfxAN5RSzMh4++OES9xqy0Drszfjwzz+8s2WKZCDdss4UrvRuTYvfabRj8I/lz2IeeeXgrhGDw==}
-    engines: {node: 18 || 20 || 22}
+  '@loopback/service-proxy@8.0.5':
+    resolution: {integrity: sha512-Hf9L5S4kE6aZlnHblriKFeDng0vNSr8AZj/dnKvPPPrgQkF3LBbwgzSQnjNOiv/b9ERC0vH6b+TshLlbxYYMAQ==}
+    engines: {node: 20 || 22 || 24}
     peerDependencies:
-      '@loopback/core': ^6.0.0
+      '@loopback/core': ^7.0.0
 
   '@mastra/core@0.21.1':
     resolution: {integrity: sha512-lyASrQCLiW+tleVRL16pBN5YfBg14IBEXYl2uGmrOsJ0QiPX/pHzcmYe0n7Oh48dYzu9YB/MgbQuY5PLzks8uQ==}
@@ -1389,9 +1389,6 @@ packages:
   '@types/express@4.17.23':
     resolution: {integrity: sha512-Crp6WY9aTYP3qPi2wGDo9iUe/rceX01UMhnF1jmwDcKCFM6cx7YhGP/Mpr3y9AASpfHixIG0E6azCcL5OcDHsQ==}
 
-  '@types/glob@8.1.0':
-    resolution: {integrity: sha512-IO+MJPVhoqz+28h1qLAcBEH2+xHMK6MTyHJc7MTnnYb6wsoLR29POVGJ7LycmVXIqyy/4/2ShP5sUwTXuOwb/w==}
-
   '@types/http-errors@2.0.5':
     resolution: {integrity: sha512-r8Tayk8HJnX0FztbZN7oVqGccWgw98T/0neJphO91KkmOzug1KkofZURD4UaD5uH8AqcFLfdPErnBod0u71/qg==}
 
@@ -1412,9 +1409,6 @@ packages:
 
   '@types/mime@1.3.5':
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
-
-  '@types/minimatch@5.1.2':
-    resolution: {integrity: sha512-K0VQKziLUWkVKiRVrx4a40iPaxTUefQmjtkQofBkYRcoaaL/8rhwDWww9qWbrgicNOgnpIsMxyNIUM4+n6dUIA==}
 
   '@types/mocha@10.0.10':
     resolution: {integrity: sha512-xPyYSz1cMPnJQhl0CLMH68j3gprKZaTjG3s5Vi+fDgx+uhG9NOXwbVt52eFS8ECyXhyKcjDLCBEqBExKuiZb7Q==}
@@ -1466,9 +1460,6 @@ packages:
 
   '@types/send@1.2.0':
     resolution: {integrity: sha512-zBF6vZJn1IaMpg3xUF25VK3gd3l8zwE0ZLRX7dsQyQi+jp4E8mMDJNGDYnYse+bQhYwWERTxVwHpi3dMOq7RKQ==}
-
-  '@types/serve-static@1.15.7':
-    resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
 
   '@types/serve-static@1.15.9':
     resolution: {integrity: sha512-dOTIuqpWLyl3BBXU3maNQsS4A3zuuoYRNIvYSxxhebPfXg2mzWQEPne/nlJ37yOse6uGgR386uTpdsx4D0QZWA==}
@@ -3526,8 +3517,8 @@ packages:
     resolution: {integrity: sha512-CB97UUvDKJde2V0KDWWB3lyf6PC3FaZP7YxZ2G8OAtn9p4HI9j9JLP9qjOGZFvyl8uwNT8qM+hGnz/n16NI7oA==}
     engines: {node: '>= 0.4.0'}
 
-  passport@0.6.0:
-    resolution: {integrity: sha512-0fe+p3ZnrWRW74fe8+SvCyf4a3Pb2/h7gFkQ8yTJpAO50gDzlfjZUZTO1k5Eg9kUct22OxHLqDZoKUWRHOh9ug==}
+  passport@0.7.0:
+    resolution: {integrity: sha512-cPLl+qZpSc+ireUvt+IzqbED1cHHkDoVYMo30jbJIdOOjQ1MQYZBPiNvmi8UM6lJuOpTPXJGZQk0DtC4y61MYQ==}
     engines: {node: '>= 0.4.0'}
 
   path-case@3.0.4:
@@ -4057,8 +4048,8 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  swagger-ui-dist@5.21.0:
-    resolution: {integrity: sha512-E0K3AB6HvQd8yQNSMR7eE5bk+323AUxjtCz/4ZNKiahOlPhPJxqn3UPIGs00cyY/dhrTDJ61L7C/a8u6zhGrZg==}
+  swagger-ui-dist@5.29.4:
+    resolution: {integrity: sha512-gJFDz/gyLOCQtWwAgqs6Rk78z9ONnqTnlW11gimG9nLap8drKa3AJBKpzIQMIjl5PD2Ix+Tn+mc/tfoT2tgsng==}
 
   synckit@0.11.11:
     resolution: {integrity: sha512-MeQTA1r0litLUf0Rp/iisCaL8761lKAZHaimlbGK4j0HysC4PLfqygQj9srcs0m2RdtDYnF8UuYyKpbjHYp7Jw==}
@@ -4845,59 +4836,58 @@ snapshots:
 
   '@jsdevtools/ono@7.1.3': {}
 
-  '@loopback/authentication-jwt@0.15.14(@loopback/authentication@11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))))(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))':
+  '@loopback/authentication-jwt@0.16.7(@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))))(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))':
     dependencies:
-      '@loopback/authentication': 11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
-      '@loopback/core': 6.1.11
-      '@loopback/rest': 14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
-      '@loopback/security': 0.11.14(@loopback/core@6.1.11)
+      '@loopback/authentication': 12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
+      '@loopback/core': 7.0.5
+      '@loopback/rest': 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
+      '@loopback/security': 0.12.6(@loopback/core@7.0.5)
       bcryptjs: 3.0.2
       debug: 4.4.3(supports-color@8.1.1)
       jsonwebtoken: 9.0.2
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/authentication-passport@7.0.14(@loopback/authentication@11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))))(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))':
+  '@loopback/authentication-passport@8.0.7(@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))))(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))':
     dependencies:
-      '@loopback/authentication': 11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))
-      '@loopback/core': 6.1.11
-      '@loopback/rest': 14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
-      '@loopback/security': 0.11.14(@loopback/core@6.1.11)
-      passport: 0.6.0
+      '@loopback/authentication': 12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))
+      '@loopback/core': 7.0.5
+      '@loopback/rest': 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
+      '@loopback/security': 0.12.6(@loopback/core@7.0.5)
+      passport: 0.7.0
       tslib: 2.8.1
       util-promisifyall: 1.0.6
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/authentication@11.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))':
+  '@loopback/authentication@12.0.7(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/rest': 14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
-      '@loopback/security': 0.11.14(@loopback/core@6.1.11)
-      '@types/express': 4.17.21
+      '@loopback/core': 7.0.5
+      '@loopback/rest': 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
+      '@loopback/security': 0.12.6(@loopback/core@7.0.5)
+      '@types/express': 4.17.23
       '@types/lodash': 4.17.20
       lodash: 4.17.21
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/authorization@0.15.14(@loopback/core@6.1.11)':
+  '@loopback/authorization@0.16.6(@loopback/core@7.0.5)':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/security': 0.11.14(@loopback/core@6.1.11)
+      '@loopback/core': 7.0.5
+      '@loopback/security': 0.12.6(@loopback/core@7.0.5)
       debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/boot@7.0.14(@loopback/core@6.1.11)':
+  '@loopback/boot@8.0.6(@loopback/core@7.0.5)':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/model-api-builder': 6.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
-      '@loopback/repository': 7.0.14(@loopback/core@6.1.11)
-      '@loopback/service-proxy': 7.0.14(@loopback/core@6.1.11)
+      '@loopback/core': 7.0.5
+      '@loopback/model-api-builder': 7.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
+      '@loopback/repository': 8.0.5(@loopback/core@7.0.5)
+      '@loopback/service-proxy': 8.0.5(@loopback/core@7.0.5)
       '@types/debug': 4.1.12
-      '@types/glob': 8.1.0
       debug: 4.4.3(supports-color@8.1.1)
       glob: 11.0.3
       tslib: 2.8.1
@@ -4924,9 +4914,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/context@7.0.14':
+  '@loopback/context@8.0.5':
     dependencies:
-      '@loopback/metadata': 7.0.14
+      '@loopback/metadata': 8.0.5
       '@types/debug': 4.1.12
       debug: 4.4.3(supports-color@8.1.1)
       hyperid: 3.3.0
@@ -4936,9 +4926,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/core@6.1.11':
+  '@loopback/core@7.0.5':
     dependencies:
-      '@loopback/context': 7.0.14
+      '@loopback/context': 8.0.5
       debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
@@ -4956,12 +4946,12 @@ snapshots:
       - supports-color
       - typescript
 
-  '@loopback/express@7.0.14(@loopback/core@6.1.11)':
+  '@loopback/express@8.0.5(@loopback/core@7.0.5)':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/http-server': 6.0.14
+      '@loopback/core': 7.0.5
+      '@loopback/http-server': 7.0.5
       '@types/body-parser': 1.19.6
-      '@types/express': 4.17.21
+      '@types/express': 4.17.23
       '@types/express-serve-static-core': 4.19.7
       '@types/http-errors': 2.0.5
       body-parser: 2.2.0
@@ -4974,18 +4964,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/filter@5.0.13':
+  '@loopback/filter@6.0.5':
     dependencies:
       tslib: 2.8.1
 
-  '@loopback/health@0.15.6(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))':
+  '@loopback/health@0.15.6(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))':
     dependencies:
       '@cloudnative/health': 2.1.2
-      '@loopback/core': 6.1.11
-      '@loopback/rest': 14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
+      '@loopback/core': 7.0.5
+      '@loopback/rest': 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
       tslib: 2.8.1
 
-  '@loopback/http-server@6.0.14':
+  '@loopback/http-server@7.0.5':
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       stoppable: 1.1.0
@@ -4993,7 +4983,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/metadata@7.0.14':
+  '@loopback/metadata@8.0.5':
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       lodash: 4.17.21
@@ -5002,16 +4992,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/model-api-builder@6.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))':
+  '@loopback/model-api-builder@7.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/repository': 7.0.14(@loopback/core@6.1.11)
+      '@loopback/core': 7.0.5
+      '@loopback/repository': 8.0.5(@loopback/core@7.0.5)
       tslib: 2.8.1
 
-  '@loopback/openapi-v3@10.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))':
+  '@loopback/openapi-v3@11.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/repository-json-schema': 8.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
+      '@loopback/core': 7.0.5
+      '@loopback/repository-json-schema': 9.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
       debug: 4.4.3(supports-color@8.1.1)
       http-status: 1.8.1
       json-merge-patch: 1.0.2
@@ -5022,20 +5012,20 @@ snapshots:
       - '@loopback/repository'
       - supports-color
 
-  '@loopback/repository-json-schema@8.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))':
+  '@loopback/repository-json-schema@9.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/repository': 7.0.14(@loopback/core@6.1.11)
+      '@loopback/core': 7.0.5
+      '@loopback/repository': 8.0.5(@loopback/core@7.0.5)
       '@types/json-schema': 7.0.15
       debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/repository@7.0.14(@loopback/core@6.1.11)':
+  '@loopback/repository@8.0.5(@loopback/core@7.0.5)':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/filter': 5.0.13
+      '@loopback/core': 7.0.5
+      '@loopback/filter': 6.0.5
       '@types/debug': 4.1.12
       debug: 4.4.3(supports-color@8.1.1)
       lodash: 4.17.21
@@ -5044,39 +5034,39 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/rest-crud@0.18.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))':
+  '@loopback/rest-crud@0.19.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/model-api-builder': 6.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
-      '@loopback/repository': 7.0.14(@loopback/core@6.1.11)
-      '@loopback/rest': 14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
+      '@loopback/core': 7.0.5
+      '@loopback/model-api-builder': 7.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
+      '@loopback/repository': 8.0.5(@loopback/core@7.0.5)
+      '@loopback/rest': 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
       debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/rest-explorer@7.0.14(@loopback/core@6.1.11)(@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11)))':
+  '@loopback/rest-explorer@8.0.6(@loopback/core@7.0.5)(@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5)))':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/rest': 14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
+      '@loopback/core': 7.0.5
+      '@loopback/rest': 15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
       ejs: 3.1.10
-      swagger-ui-dist: 5.21.0
+      swagger-ui-dist: 5.29.4
       tslib: 2.8.1
 
-  '@loopback/rest@14.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))':
+  '@loopback/rest@15.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))':
     dependencies:
-      '@loopback/core': 6.1.11
-      '@loopback/express': 7.0.14(@loopback/core@6.1.11)
-      '@loopback/http-server': 6.0.14
-      '@loopback/openapi-v3': 10.0.14(@loopback/core@6.1.11)(@loopback/repository@7.0.14(@loopback/core@6.1.11))
+      '@loopback/core': 7.0.5
+      '@loopback/express': 8.0.5(@loopback/core@7.0.5)
+      '@loopback/http-server': 7.0.5
+      '@loopback/openapi-v3': 11.0.6(@loopback/core@7.0.5)(@loopback/repository@8.0.5(@loopback/core@7.0.5))
       '@openapi-contrib/openapi-schema-to-json-schema': 5.1.0
       '@types/body-parser': 1.19.6
       '@types/cors': 2.8.19
-      '@types/express': 4.17.21
+      '@types/express': 4.17.23
       '@types/express-serve-static-core': 4.19.7
       '@types/http-errors': 2.0.5
       '@types/on-finished': 2.3.5
-      '@types/serve-static': 1.15.7
+      '@types/serve-static': 1.15.9
       '@types/type-is': 1.6.7
       ajv: 8.17.1
       ajv-errors: 3.0.0(ajv@8.17.1)
@@ -5101,17 +5091,17 @@ snapshots:
       - '@loopback/repository'
       - supports-color
 
-  '@loopback/security@0.11.14(@loopback/core@6.1.11)':
+  '@loopback/security@0.12.6(@loopback/core@7.0.5)':
     dependencies:
-      '@loopback/core': 6.1.11
+      '@loopback/core': 7.0.5
       debug: 4.4.3(supports-color@8.1.1)
       tslib: 2.8.1
     transitivePeerDependencies:
       - supports-color
 
-  '@loopback/service-proxy@7.0.14(@loopback/core@6.1.11)':
+  '@loopback/service-proxy@8.0.5(@loopback/core@7.0.5)':
     dependencies:
-      '@loopback/core': 6.1.11
+      '@loopback/core': 7.0.5
       loopback-datasource-juggler: 5.2.2
       tslib: 2.8.1
     transitivePeerDependencies:
@@ -5203,22 +5193,6 @@ snapshots:
       typescript-eslint: 8.46.1(eslint@9.38.0)(typescript@5.8.3)
     transitivePeerDependencies:
       - '@types/eslint'
-      - jiti
-      - supports-color
-
-  '@minimaltech/eslint-node@0.2.1(@typescript-eslint/parser@8.46.1(eslint@9.38.0)(typescript@5.8.3))':
-    dependencies:
-      '@eslint/eslintrc': 3.3.1
-      '@eslint/js': 9.38.0
-      '@minimaltech/eslint-common': 0.0.28
-      '@typescript-eslint/eslint-plugin': 8.46.1(@typescript-eslint/parser@8.46.1(eslint@9.38.0)(typescript@5.8.3))(eslint@9.38.0)(typescript@5.8.3)
-      eslint: 9.38.0
-      eslint-plugin-n: 17.23.1(eslint@9.38.0)(typescript@5.8.3)
-      typescript: 5.8.3
-      typescript-eslint: 8.46.1(eslint@9.38.0)(typescript@5.8.3)
-    transitivePeerDependencies:
-      - '@types/eslint'
-      - '@typescript-eslint/parser'
       - jiti
       - supports-color
 
@@ -6114,11 +6088,6 @@ snapshots:
       '@types/qs': 6.14.0
       '@types/serve-static': 1.15.9
 
-  '@types/glob@8.1.0':
-    dependencies:
-      '@types/minimatch': 5.1.2
-      '@types/node': 24.8.1
-
   '@types/http-errors@2.0.5': {}
 
   '@types/json-schema@7.0.15': {}
@@ -6137,8 +6106,6 @@ snapshots:
       '@types/node': 24.8.1
 
   '@types/mime@1.3.5': {}
-
-  '@types/minimatch@5.1.2': {}
 
   '@types/mocha@10.0.10': {}
 
@@ -6201,12 +6168,6 @@ snapshots:
     dependencies:
       '@types/node': 24.8.1
 
-  '@types/serve-static@1.15.7':
-    dependencies:
-      '@types/http-errors': 2.0.5
-      '@types/node': 24.8.1
-      '@types/send': 1.2.0
-
   '@types/serve-static@1.15.9':
     dependencies:
       '@types/http-errors': 2.0.5
@@ -6242,23 +6203,6 @@ snapshots:
       ts-api-utils: 1.4.3(typescript@5.2.2)
     optionalDependencies:
       typescript: 5.2.2
-    transitivePeerDependencies:
-      - supports-color
-
-  '@typescript-eslint/eslint-plugin@8.46.1(@typescript-eslint/parser@8.46.1(eslint@9.38.0)(typescript@5.8.3))(eslint@9.38.0)(typescript@5.8.3)':
-    dependencies:
-      '@eslint-community/regexpp': 4.12.1
-      '@typescript-eslint/parser': 8.46.1(eslint@9.38.0)(typescript@5.8.3)
-      '@typescript-eslint/scope-manager': 8.46.1
-      '@typescript-eslint/type-utils': 8.46.1(eslint@9.38.0)(typescript@5.8.3)
-      '@typescript-eslint/utils': 8.46.1(eslint@9.38.0)(typescript@5.8.3)
-      '@typescript-eslint/visitor-keys': 8.46.1
-      eslint: 9.38.0
-      graphemer: 1.4.0
-      ignore: 7.0.5
-      natural-compare: 1.4.0
-      ts-api-utils: 2.1.0(typescript@5.8.3)
-      typescript: 5.8.3
     transitivePeerDependencies:
       - supports-color
 
@@ -8522,7 +8466,7 @@ snapshots:
 
   passport-strategy@1.0.0: {}
 
-  passport@0.6.0:
+  passport@0.7.0:
     dependencies:
       passport-strategy: 1.0.0
       pause: 0.0.1
@@ -9093,7 +9037,7 @@ snapshots:
 
   supports-preserve-symlinks-flag@1.0.0: {}
 
-  swagger-ui-dist@5.21.0:
+  swagger-ui-dist@5.29.4:
     dependencies:
       '@scarf/scarf': 1.4.0
 
@@ -9159,7 +9103,7 @@ snapshots:
       picomatch: 4.0.3
       typescript: 5.8.3
 
-  ts-node@10.9.2(@types/node@22.18.11)(typescript@5.8.3):
+  ts-node@10.9.2(@types/node@22.18.11)(typescript@5.9.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
@@ -9173,7 +9117,7 @@ snapshots:
       create-require: 1.1.1
       diff: 4.0.2
       make-error: 1.3.6
-      typescript: 5.8.3
+      typescript: 5.9.3
       v8-compile-cache-lib: 3.0.1
       yn: 3.1.1
 
