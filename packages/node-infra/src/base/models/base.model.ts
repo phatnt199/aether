@@ -11,12 +11,7 @@ import {
 import { Entity, property } from '@loopback/repository';
 
 // ---------------------------------------------------------------------
-export class BaseEntity extends Entity {
-  constructor(data?: Partial<BaseEntity>) {
-    super(data);
-    Object.assign(this, data);
-  }
-}
+export class BaseEntity extends Entity {}
 
 // ---------------------------------------------------------------------
 export class BaseIdEntity extends BaseEntity {
