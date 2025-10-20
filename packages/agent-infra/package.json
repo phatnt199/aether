@@ -70,8 +70,8 @@
   },
   "dependencies": {
     "@minimaltech/node-infra": "workspace:*",
-    "dayjs": "catalog:common",
-    "lodash": "catalog:common"
+    "dayjs": "^1.11.18",
+    "lodash": "^4.17.21"
   },
   "devDependencies": {
     "@loopback/build": "^12.0.4",
