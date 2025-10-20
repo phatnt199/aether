@@ -1,6 +1,6 @@
 {
   "name": "@minimaltech/node-infra",
-  "version": "0.5.9-23",
+  "version": "0.5.9-24",
   "description": "Minimal Technology - NodeJS Infrastructure - Loopback 4 Framework",
   "keywords": [
     "web",
@@ -170,4 +170,3 @@
   },
   "sideEffects": false
 }
-
