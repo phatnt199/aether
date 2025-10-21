@@ -1,7 +1,7 @@
 import { MetadataInspector } from '@loopback/metadata';
 import { getJsonSchema, jsonToSchemaObject, SchemaObject } from '@loopback/rest';
 
-import { BaseEntity } from '@/base/models/base.model';
+import { BaseEntity, BaseIdEntity } from '@/base/models/base.model';
 
 // --------------------------------------------------------------------------------------------------------------
 export const getIdSchema = <E extends BaseEntity>(
@@ -14,7 +14,7 @@ export const getIdSchema = <E extends BaseEntity>(
 
 // --------------------------------------------------------------------------------------------------------------
 export const getIdType = <E extends BaseEntity>(
-  entity: typeof BaseEntity & { prototype: E },
+  entity: typeof BaseIdEntity & { prototype: E },
 ): 'string' | 'number' => {
   let idType: 'string' | 'number' = 'number';
 

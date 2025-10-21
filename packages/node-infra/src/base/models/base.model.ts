@@ -87,8 +87,12 @@ export class BaseSoftDeleteTzEntity extends BaseNumberSoftDeleteTzEntity {}
 export type TBaseSoftDeleteTzEntity = BaseNumberSoftDeleteTzEntity | BaseStringSoftDeleteTzEntity;
 
 // ---------------------------------------------------------------------
-export class BaseNumberDuplicatableTzEntity extends DuplicatableMixin(BaseNumberTzEntity) {}
-export class BaseStringDuplicatableTzEntity extends DuplicatableMixin(BaseNumberTzEntity) {}
+export class BaseNumberDuplicatableTzEntity extends DuplicatableMixin(BaseNumberTzEntity, {
+  idType: 'number',
+}) {}
+export class BaseStringDuplicatableTzEntity extends DuplicatableMixin(BaseNumberTzEntity, {
+  idType: 'string',
+}) {}
 export class BaseDuplicatableTzEntity extends BaseNumberDuplicatableTzEntity {}
 export type TBaseDuplicatableTzEntity =
   | BaseNumberDuplicatableTzEntity
