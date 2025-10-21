@@ -6,3 +6,4 @@ onlyBuiltDependencies:
   - msgpackr-extract
   - protobufjs
   - esbuild
+  - electron
