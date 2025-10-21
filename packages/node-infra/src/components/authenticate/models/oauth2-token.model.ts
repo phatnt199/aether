@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/models';
+import { BaseNumberTzEntity } from '@/base/models';
 import { AnyObject, IdType, OAuth2TokenStatuses } from '@/common';
 import { belongsTo, model, property } from '@loopback/repository';
 import { OAuth2Client } from './oauth2-client.model';
@@ -12,7 +12,7 @@ import { OAuth2Client } from './oauth2-client.model';
     hiddenProperties: ['createdAt', 'modifiedAt'],
   },
 })
-export class OAuth2Token extends BaseTzEntity {
+export class OAuth2Token extends BaseNumberTzEntity {
   @property({
     type: 'string',
   })

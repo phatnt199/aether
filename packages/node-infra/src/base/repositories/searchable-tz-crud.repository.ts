@@ -14,7 +14,7 @@ import {
   BaseObjectSearchTzEntity,
   BaseSearchableTzEntity,
   BaseTextSearchTzEntity,
-  BaseTzEntity,
+  TBaseTzEntity,
 } from './../models';
 import { TzCrudRepository } from './tz-crud.repository';
 
@@ -45,7 +45,7 @@ export abstract class SearchableTzCrudRepository<
   abstract renderTextSearch(opts: { data?: DataObject<E>; entity: E & R }): string;
   abstract renderObjectSearch(opts: { data?: DataObject<E>; entity: E & R }): object;
 
-  abstract onInclusionChanged<RM extends BaseTzEntity>(opts: {
+  abstract onInclusionChanged<RM extends TBaseTzEntity>(opts: {
     relation: string;
     relationRepository: TzCrudRepository<RM>;
     entities: RM[];
@@ -53,7 +53,7 @@ export abstract class SearchableTzCrudRepository<
   }): Promise<void>;
 
   // ----------------------------------------------------------------------------------------------------
-  protected async registerOnInclusionChanged<RM extends BaseTzEntity>(
+  protected async registerOnInclusionChanged<RM extends TBaseTzEntity>(
     relation: string,
     relationRepositoryGetter: Getter<TzCrudRepository<RM>>,
   ) {
@@ -84,7 +84,7 @@ export abstract class SearchableTzCrudRepository<
   }
 
   // ----------------------------------------------------------------------------------------------------
-  protected async handleInclusionChanged<RM extends BaseTzEntity>(opts: {
+  protected async handleInclusionChanged<RM extends TBaseTzEntity>(opts: {
     relationName: string;
     relationType: TRelationType;
     entities: RM[];

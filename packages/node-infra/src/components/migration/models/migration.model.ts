@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/models';
+import { BaseNumberTzEntity } from '@/base/models';
 import { MigrationStatuses } from '@/common';
 import { model, property } from '@loopback/repository';
 
@@ -17,7 +17,7 @@ import { model, property } from '@loopback/repository';
     },
   },
 })
-export class Migration extends BaseTzEntity {
+export class Migration extends BaseNumberTzEntity {
   @property({
     type: 'string',
     required: true,

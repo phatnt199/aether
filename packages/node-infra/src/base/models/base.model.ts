@@ -14,9 +14,9 @@ import { Entity, property } from '@loopback/repository';
 export class BaseEntity extends Entity {}
 
 // ---------------------------------------------------------------------
-export class BaseIdEntity extends BaseEntity {
-  @property({ type: 'number', id: true, generated: true })
-  id: number;
+export class BaseKVEntity<T = any> extends BaseEntity {
+  @property({ type: 'object' })
+  payload: T;
 }
 
 // ---------------------------------------------------------------------
@@ -24,21 +24,18 @@ export class BaseNumberIdEntity extends BaseEntity {
   @property({ type: 'number', id: true, generated: true })
   id: number;
 }
-
-// ---------------------------------------------------------------------
 export class BaseStringIdEntity extends BaseEntity {
   @property({ type: 'string', id: true })
   id: string;
 }
+export class BaseIdEntity extends BaseNumberIdEntity {}
+export type TBaseIdEntity = BaseNumberIdEntity | BaseStringIdEntity;
 
 // ---------------------------------------------------------------------
-export class BaseKVEntity extends BaseEntity {
-  @property({ type: 'object' })
-  payload: any;
-}
-
-// ---------------------------------------------------------------------
-export class BaseTzEntity extends TzMixin(BaseIdEntity) {}
+export class BaseNumberTzEntity extends TzMixin(BaseNumberIdEntity) {}
+export class BaseStringTzEntity extends TzMixin(BaseStringIdEntity) {}
+export class BaseTzEntity extends BaseNumberTzEntity {}
+export type TBaseTzEntity = BaseNumberTzEntity | BaseStringTzEntity;
 
 // ---------------------------------------------------------------------
 /**
@@ -48,25 +45,58 @@ export class BaseTzEntity extends TzMixin(BaseIdEntity) {}
  *
  * In case you need to include User, directly extends {@link UserAuditMixin}
  */
-export class BaseUserAuditTzEntity extends UserAuditMixin(BaseTzEntity) {}
+export class BaseNumberUserAuditTzEntity extends UserAuditMixin(BaseNumberTzEntity) {}
+export class BaseStringUserAuditTzEntity extends UserAuditMixin(BaseStringTzEntity) {}
+export class BaseUserAuditTzEntity extends BaseNumberUserAuditTzEntity {}
+export type TBaseUserAuditTzEntity = BaseNumberUserAuditTzEntity | BaseStringUserAuditTzEntity;
 
 // ---------------------------------------------------------------------
-export class BaseDataTypeTzEntity extends DataTypeMixin(BaseTzEntity) {}
+export class BaseNumberDataTypeTzEntity extends DataTypeMixin(BaseNumberTzEntity) {}
+export class BaseStringDataTypeTzEntity extends DataTypeMixin(BaseStringTzEntity) {}
+export class BaseDataTypeTzEntity extends BaseNumberDataTypeTzEntity {}
+export type TBaseDataTypeTzEntity = BaseNumberDataTypeTzEntity | BaseStringDataTypeTzEntity;
 
 // ---------------------------------------------------------------------
-export class BaseTextSearchTzEntity extends TextSearchMixin(BaseTzEntity) {}
+export class BaseNumberTextSearchTzEntity extends TextSearchMixin(BaseNumberTzEntity) {}
+export class BaseStringTextSearchTzEntity extends TextSearchMixin(BaseStringTzEntity) {}
+export class BaseTextSearchTzEntity extends BaseNumberTextSearchTzEntity {}
+export type TBaseTextSearchTzEntity = BaseNumberTextSearchTzEntity | BaseStringTextSearchTzEntity;
 
 // ---------------------------------------------------------------------
-export class BaseObjectSearchTzEntity extends ObjectSearchMixin(BaseTzEntity) {}
+export class BaseNumberObjectSearchTzEntity extends ObjectSearchMixin(BaseNumberTzEntity) {}
+export class BaseStringObjectSearchTzEntity extends ObjectSearchMixin(BaseStringTzEntity) {}
+export class BaseObjectSearchTzEntity extends BaseNumberObjectSearchTzEntity {}
+export type TBaseObjectSearchTzEntity =
+  | BaseNumberObjectSearchTzEntity
+  | BaseStringObjectSearchTzEntity;
 
 // ---------------------------------------------------------------------
-export class BaseSearchableTzEntity extends ObjectSearchMixin(TextSearchMixin(BaseTzEntity)) {}
+export class BaseNumberSearchableTzEntity extends ObjectSearchMixin(
+  TextSearchMixin(BaseNumberTzEntity),
+) {}
+export class BaseStringSearchableTzEntity extends ObjectSearchMixin(
+  TextSearchMixin(BaseStringTzEntity),
+) {}
+export class BaseSearchableTzEntity extends BaseNumberSearchableTzEntity {}
+export type TBaseSearchableTzEntity = BaseNumberSearchableTzEntity | BaseStringSearchableTzEntity;
 
 // ---------------------------------------------------------------------
-export class BaseSoftDeleteTzEntity extends SoftDeleteModelMixin(BaseTzEntity) {}
+export class BaseNumberSoftDeleteTzEntity extends SoftDeleteModelMixin(BaseNumberTzEntity) {}
+export class BaseStringSoftDeleteTzEntity extends SoftDeleteModelMixin(BaseStringTzEntity) {}
+export class BaseSoftDeleteTzEntity extends BaseNumberSoftDeleteTzEntity {}
+export type TBaseSoftDeleteTzEntity = BaseNumberSoftDeleteTzEntity | BaseStringSoftDeleteTzEntity;
 
 // ---------------------------------------------------------------------
-export class BaseDuplicatableTzEntity extends DuplicatableMixin(BaseTzEntity) {}
+export class BaseNumberDuplicatableTzEntity extends DuplicatableMixin(BaseNumberTzEntity, {
+  idType: 'number',
+}) {}
+export class BaseStringDuplicatableTzEntity extends DuplicatableMixin(BaseNumberTzEntity, {
+  idType: 'string',
+}) {}
+export class BaseDuplicatableTzEntity extends BaseNumberDuplicatableTzEntity {}
+export type TBaseDuplicatableTzEntity =
+  | BaseNumberDuplicatableTzEntity
+  | BaseStringDuplicatableTzEntity;
 
 // ---------------------------------------------------------------------
 export class BaseBigIdEntity extends BaseEntity {

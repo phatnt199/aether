@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/models';
+import { BaseNumberTzEntity } from '@/base/models';
 import { model, property } from '@loopback/repository';
 
 @model({
@@ -10,7 +10,7 @@ import { model, property } from '@loopback/repository';
     hiddenProperties: ['createdAt', 'modifiedAt'],
   },
 })
-export class OAuth2Scope extends BaseTzEntity {
+export class OAuth2Scope extends BaseNumberTzEntity {
   @property({
     type: 'string',
     postgresql: { columnName: 'identifier' },

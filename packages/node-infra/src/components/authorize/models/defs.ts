@@ -1,11 +1,11 @@
-import { BaseTzEntity } from '@/base/models';
+import { BaseNumberTzEntity } from '@/base/models';
 import { AnyObject, RoleStatuses, UserStatuses, UserTypes } from '@/common';
 import { PrincipalMixin } from '@/mixins';
 import { property } from '@loopback/repository';
 
 // -----------------------------------------------------------------------
 export const defineUser = () => {
-  class User extends BaseTzEntity {
+  class User extends BaseNumberTzEntity {
     @property({
       type: 'string',
     })
@@ -67,7 +67,7 @@ export const defineUser = () => {
 
 // -----------------------------------------------------------------------
 export const defineRole = () => {
-  class Role extends BaseTzEntity {
+  class Role extends BaseNumberTzEntity {
     @property({
       type: 'string',
       require: true,
@@ -106,7 +106,7 @@ export const defineRole = () => {
 
 // -----------------------------------------------------------------------
 export const definePermission = <T extends AnyObject = AnyObject>() => {
-  class Permission extends BaseTzEntity {
+  class Permission extends BaseNumberTzEntity {
     @property({
       type: 'string',
     })
@@ -163,7 +163,7 @@ export const definePermission = <T extends AnyObject = AnyObject>() => {
 
 // -----------------------------------------------------------------------
 export const definePermissionMapping = () => {
-  class PermissionMapping extends BaseTzEntity {
+  class PermissionMapping extends BaseNumberTzEntity {
     @property({
       type: 'number',
       postgresql: { columnName: 'user_id' },
@@ -194,7 +194,7 @@ export const definePermissionMapping = () => {
 
 // -----------------------------------------------------------------------
 export const defineUserRole = () => {
-  class UserRole extends PrincipalMixin(BaseTzEntity, 'Role', 'number') {
+  class UserRole extends PrincipalMixin(BaseNumberTzEntity, 'Role', 'number') {
     @property({
       type: 'number',
       postgresql: { columnName: 'user_id' },

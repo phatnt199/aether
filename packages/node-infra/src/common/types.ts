@@ -1,5 +1,5 @@
-import { AbstractTzRepository } from '@/base';
-import { BaseEntity, BaseIdEntity, BaseTzEntity } from '@/base/models';
+import { BaseEntity, TBaseIdEntity, TBaseTzEntity } from '@/base/models';
+import { AbstractTzRepository } from '@/base/repositories';
 import {
   Binding,
   BindingFromClassOptions,
@@ -152,7 +152,7 @@ export interface IDangerFilter extends Omit<Filter, 'order'> {
 export interface IRepository {}
 export type TDBAction = Options & { transaction?: Transaction };
 
-export interface IPersistableRepository<E extends BaseIdEntity> extends IRepository {
+export interface IPersistableRepository<E extends TBaseIdEntity> extends IRepository {
   findOne(filter?: Filter<E>, options?: TDBAction): Promise<E | null>;
 
   existsWith(where?: Where<any>, options?: TDBAction): Promise<boolean>;
@@ -169,7 +169,7 @@ export interface IPersistableRepository<E extends BaseIdEntity> extends IReposit
   replaceById(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<void>;
 }
 
-export interface ITzRepository<E extends BaseTzEntity> extends IPersistableRepository<E> {
+export interface ITzRepository<E extends TBaseTzEntity> extends IPersistableRepository<E> {
   mixTimestamp(entity: DataObject<E>, options?: { newInstance: boolean }): DataObject<E>;
   mixUserAudit(
     entity: DataObject<E>,
@@ -193,7 +193,7 @@ export interface ICrudMethodOptions {
   [extra: symbol | string]: any;
 }
 
-export interface ICrudService<E extends BaseTzEntity> extends IService {
+export interface ICrudService<E extends TBaseTzEntity> extends IService {
   repository: AbstractTzRepository<E, EntityRelationType>;
 
   // R

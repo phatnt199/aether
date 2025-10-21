@@ -1,5 +1,6 @@
 export * from './data-type.mixin';
 export * from './duplicatable.mixin';
+export * from './id.mixin';
 export * from './object-search.mixin';
 export * from './principal.mixin';
 export * from './soft-delete.mixin';

@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/models';
+import { TBaseTzEntity } from '@/base/models';
 import { IdType } from '@/common/types';
 import { getError } from '@/utilities';
 import { MixinTarget } from '@loopback/core';
@@ -6,8 +6,8 @@ import { belongsTo, Entity, EntityResolver, model, property } from '@loopback/re
 
 export const UserAuditMixin = <
   E extends MixinTarget<Entity>,
-  C extends BaseTzEntity = BaseTzEntity,
-  M extends BaseTzEntity = BaseTzEntity,
+  C extends TBaseTzEntity = TBaseTzEntity,
+  M extends TBaseTzEntity = TBaseTzEntity,
 >(
   superClass: E,
   opts?: {

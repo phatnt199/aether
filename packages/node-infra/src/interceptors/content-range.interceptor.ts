@@ -1,4 +1,4 @@
-import { BaseIdEntity } from '@/base/models';
+import { TBaseIdEntity } from '@/base/models';
 import { App, EntityRelations, IController, ICrudController } from '@/common';
 import {
   inject,
@@ -44,18 +44,18 @@ export class ContentRangeInterceptor implements Provider<Interceptor> {
   }
 
   // -------------------------------------------------------------------------------------
-  async handleSingleEntity(opts: { context: InvocationContext; result: Array<BaseIdEntity> }) {
+  async handleSingleEntity(opts: { context: InvocationContext; result: Array<TBaseIdEntity> }) {
     const { context } = opts;
     const { args, target } = context;
     const controller = target as ICrudController;
 
-    let filter: Filter<BaseIdEntity> | null = {};
+    let filter: Filter<TBaseIdEntity> | null = {};
     filter = args?.[0];
     if (!controller.repository) {
       return;
     }
 
-    const repository = controller.repository as CrudRepository<BaseIdEntity>;
+    const repository = controller.repository as CrudRepository<TBaseIdEntity>;
 
     if (!filter) {
       filter = {
@@ -81,7 +81,7 @@ export class ContentRangeInterceptor implements Provider<Interceptor> {
   }
 
   // -------------------------------------------------------------------------------------
-  async handleRelationalEntity(opts: { context: InvocationContext; result: Array<BaseIdEntity> }) {
+  async handleRelationalEntity(opts: { context: InvocationContext; result: Array<TBaseIdEntity> }) {
     const { context } = opts;
     const { args, target } = context;
     const controller = target as ICrudController;
@@ -90,8 +90,8 @@ export class ContentRangeInterceptor implements Provider<Interceptor> {
       return;
     }
 
-    const refId: BaseIdEntity = args[0];
-    let filter: Filter<BaseIdEntity> = args[1];
+    const refId: TBaseIdEntity = args[0];
+    let filter: Filter<TBaseIdEntity> = args[1];
     const ref = get(controller.sourceRepository, relation.name)?.(refId);
 
     if (!controller.sourceRepository || !controller.targetRepository || !refId || !ref) {
@@ -157,7 +157,7 @@ export class ContentRangeInterceptor implements Provider<Interceptor> {
   // -------------------------------------------------------------------------------------
   async enrichResponseContentRange(opts: {
     context: InvocationContext;
-    result: Array<BaseIdEntity>;
+    result: Array<TBaseIdEntity>;
   }) {
     const { context } = opts;
     const { target } = context;

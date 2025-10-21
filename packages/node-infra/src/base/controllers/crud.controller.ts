@@ -1,5 +1,4 @@
 import { Getter, inject } from '@loopback/core';
-import { CrudRestControllerOptions } from '@loopback/rest-crud';
 import {
   Count,
   CountSchema,
@@ -21,18 +20,20 @@ import {
   requestBody,
   SchemaRef,
 } from '@loopback/rest';
+import { CrudRestControllerOptions } from '@loopback/rest-crud';
 
-import { BaseIdEntity, BaseTzEntity, AbstractTzRepository } from './../';
-import { EntityRelationType, IController, IdType } from '@/common/types';
 import { App } from '@/common';
-import { applyLimit } from './common';
-import { SecurityBindings } from '@loopback/security';
+import { EntityRelationType, IController, IdType } from '@/common/types';
 import { IJWTTokenPayload } from '@/components/authenticate/common/types';
 import { getIdSchema } from '@/utilities/model.utility';
+import { SecurityBindings } from '@loopback/security';
+import { BaseEntity } from '../models';
+import { DefaultCrudRepository } from '../repositories';
+import { applyLimit } from './common';
 
 // --------------------------------------------------------------------------------------------------------------
-export interface ICrudControllerOptions<E extends BaseIdEntity> {
-  entity: typeof BaseIdEntity & { prototype: E };
+export interface ICrudControllerOptions<E extends BaseEntity> {
+  entity: typeof BaseEntity & { prototype: E };
   repository: { name: string };
   controller: CrudRestControllerOptions & { defaultLimit?: number };
   schema?: {
@@ -52,7 +53,7 @@ export interface ICrudControllerOptions<E extends BaseIdEntity> {
 }
 
 // --------------------------------------------------------------------------------------------------------------
-export const defineCrudController = <E extends BaseTzEntity>(opts: ICrudControllerOptions<E>) => {
+export const defineCrudController = <E extends BaseEntity>(opts: ICrudControllerOptions<E>) => {
   const {
     entity: entityOptions,
     repository: repositoryOptions,
@@ -68,10 +69,11 @@ export const defineCrudController = <E extends BaseTzEntity>(opts: ICrudControll
   };
 
   class ReadController implements IController {
-    repository: AbstractTzRepository<E, EntityRelationType>;
+    repository: DefaultCrudRepository<E, EntityRelationType>;
+
     defaultLimit: number;
 
-    constructor(repository: AbstractTzRepository<E, EntityRelationType>) {
+    constructor(repository: DefaultCrudRepository<E, EntityRelationType>) {
       this.repository = repository;
       this.defaultLimit = controllerOptions?.defaultLimit ?? App.DEFAULT_QUERY_LIMIT;
     }
@@ -173,7 +175,7 @@ export const defineCrudController = <E extends BaseTzEntity>(opts: ICrudControll
     getCurrentUser?: Getter<IJWTTokenPayload>;
 
     constructor(
-      repository: AbstractTzRepository<E, EntityRelationType>,
+      repository: DefaultCrudRepository<E, EntityRelationType>,
       getCurrentUser?: Getter<IJWTTokenPayload>,
     ) {
       super(repository);
@@ -216,7 +218,7 @@ export const defineCrudController = <E extends BaseTzEntity>(opts: ICrudControll
               schemaOptions?.createRequestBody ??
               getModelSchemaRef(entityOptions, {
                 title: `New ${entityOptions.name} payload`,
-                exclude: ['id', 'createdAt', 'modifiedAt'],
+                // exclude: ['id', 'createdAt', 'modifiedAt'],
               }),
           },
         },
