@@ -1,4 +1,4 @@
-import { TFetcherResponse, TFetcherVariant } from '../types';
+import { TFetcherResponse, TFetcherVariant, TFetcherWorker } from '../types';
 
 const HTTP = 'http';
 const HTTPS = 'https';
@@ -7,6 +7,7 @@ export interface IRequestOptions {
   url: string;
   params?: Record<string | symbol, any>;
   method?: string;
+  timeout?: number;
   [extra: symbol | string]: any;
 }
 
@@ -21,6 +22,8 @@ export interface IFetchable<
   put(opts: RQ, logger?: any): Promise<RS>;
   patch(opts: RQ, logger?: any): Promise<RS>;
   delete(opts: RQ, logger?: any): Promise<RS>;
+
+  getWorker(): TFetcherWorker<V>;
 }
 
 export abstract class AbstractNetworkFetchableHelper<
@@ -31,6 +34,7 @@ export abstract class AbstractNetworkFetchableHelper<
 {
   protected name: string;
   protected variant: V;
+  protected worker: TFetcherWorker<V>;
 
   constructor(opts: { name: string; variant: V }) {
     this.name = opts.name;
@@ -41,6 +45,10 @@ export abstract class AbstractNetworkFetchableHelper<
 
   getProtocol(url: string) {
     return url.startsWith('http:') ? HTTP : HTTPS;
+  }
+
+  getWorker() {
+    return this.worker;
   }
 
   // -------------------------------------------------------------

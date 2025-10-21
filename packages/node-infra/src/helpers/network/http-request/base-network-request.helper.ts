@@ -11,7 +11,12 @@ import { TFetcherResponse, TFetcherVariant } from './types';
 export interface IFetcherRequestOptions<T extends TFetcherVariant> {
   name: string;
   variant: TFetcherVariant;
-  networkOptions: { baseUrl?: string; headers?: AnyObject };
+  networkOptions: {
+    baseUrl?: string;
+    headers?: AnyObject;
+    timeout?: number;
+    [extra: symbol | string]: any;
+  };
   fetcher: IFetchable<T, IRequestOptions, TFetcherResponse<T>>;
 }
 
@@ -76,23 +81,27 @@ export class BaseNetworkRequest<T extends TFetcherVariant> extends BaseHelper {
   getNetworkService() {
     return this.fetcher;
   }
+
+  getWorker() {
+    return this.fetcher.getWorker();
+  }
 }
 
 // -----------------------------------------------------------------------------
 export class AxiosNetworkRequest extends BaseNetworkRequest<'axios'> {
   constructor(opts: Omit<IAxiosNetworkOptions, 'fetcher' | 'variant'>) {
     const { name, networkOptions } = opts;
-    const { headers = {}, baseUrl, ...rest } = networkOptions;
+    const { headers = {}, baseUrl, timeout = 60 * 1000, ...rest } = networkOptions;
 
     const defaultConfigs: Partial<IAxiosRequestOptions> = {
       ...rest,
       baseURL: baseUrl,
       withCredentials: true,
-      timeout: 60 * 1000,
-      validateStatus: (status: number) => status < 500,
       headers: Object.assign({}, headers, {
         ['content-type']: headers['content-type'] ?? 'application/json; charset=utf-8',
       }),
+      validateStatus: (status: number) => status < 500,
+      timeout,
     };
 
     super({

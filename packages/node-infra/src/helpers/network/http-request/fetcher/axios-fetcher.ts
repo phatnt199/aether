@@ -1,10 +1,10 @@
 import { AnyObject } from '@/common';
 import { stringify } from '@/utilities/url.utility';
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import https from 'node:https';
-import { AbstractNetworkFetchableHelper } from './base-fetcher';
+import { AbstractNetworkFetchableHelper, IRequestOptions } from './base-fetcher';
 
-export interface IAxiosRequestOptions extends AxiosRequestConfig {
+export interface IAxiosRequestOptions extends AxiosRequestConfig, IRequestOptions {
   url: string;
   method?: 'get' | 'post' | 'put' | 'patch' | 'delete' | 'options';
   params?: AnyObject;
@@ -18,8 +18,6 @@ export class AxiosFetcher extends AbstractNetworkFetchableHelper<
   IAxiosRequestOptions,
   axios.AxiosResponse<any, any>['data']
 > {
-  private worker: AxiosInstance;
-
   constructor(opts: { name: string; defaultConfigs: AxiosRequestConfig; logger?: any }) {
     super({ name: opts.name, variant: 'axios' });
     const { defaultConfigs } = opts;
@@ -31,7 +29,7 @@ export class AxiosFetcher extends AbstractNetworkFetchableHelper<
   // -------------------------------------------------------------
   // SEND REQUEST
   // -------------------------------------------------------------
-  send<T = any>(opts: IAxiosRequestOptions, logger?: any) {
+  override send<T = any>(opts: IAxiosRequestOptions, logger?: any) {
     const { url, method = 'get', params = {}, body: data, headers, ...rest } = opts;
     const props: AxiosRequestConfig = {
       url,

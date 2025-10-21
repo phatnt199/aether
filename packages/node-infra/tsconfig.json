@@ -13,6 +13,13 @@
     "removeComments": false,
     "moduleResolution": "nodenext",
     
+    /* Optimization */
+    "declaration": true,
+    "declarationMap": false,
+    "sourceMap": false,
+    "inlineSourceMap": false,
+    "inlineSources": false,
+    
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
@@ -27,6 +34,7 @@
     "paths": {
       "@/*": ["./*"]
     }
+
   },
   "include": ["src", "./*.config.*", ".prettierrc.*"],
   "exclude": ["node_modules", "dist"]
