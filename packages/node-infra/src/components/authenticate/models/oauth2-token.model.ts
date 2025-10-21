@@ -1,4 +1,4 @@
-import { BaseNumberTzEntity } from '@/base';
+import { BaseNumberTzEntity } from '@/base/models';
 import { AnyObject, IdType, OAuth2TokenStatuses } from '@/common';
 import { belongsTo, model, property } from '@loopback/repository';
 import { OAuth2Client } from './oauth2-client.model';

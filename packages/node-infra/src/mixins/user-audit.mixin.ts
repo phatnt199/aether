@@ -1,4 +1,4 @@
-import { TBaseTzEntity } from '@/base';
+import { TBaseTzEntity } from '@/base/models';
 import { IdType } from '@/common/types';
 import { getError } from '@/utilities';
 import { MixinTarget } from '@loopback/core';
