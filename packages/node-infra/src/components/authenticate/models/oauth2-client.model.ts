@@ -1,4 +1,4 @@
-import { BaseTzEntity } from '@/base/models';
+import { BaseNumberTzEntity } from '@/base';
 import { NumberIdType } from '@/common';
 import { model, property } from '@loopback/repository';
 
@@ -11,7 +11,7 @@ import { model, property } from '@loopback/repository';
     hiddenProperties: ['createdAt', 'modifiedAt', 'clientSecret'],
   },
 })
-export class OAuth2Client extends BaseTzEntity {
+export class OAuth2Client extends BaseNumberTzEntity {
   @property({
     type: 'string',
     postgresql: { columnName: 'identifier' },

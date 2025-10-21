@@ -2,10 +2,10 @@ import { Filter } from '@loopback/repository';
 
 import { App, IController } from '@/common';
 import { ApplicationLogger, LoggerFactory } from '@/helpers';
-import { BaseTzEntity } from './../models';
+import { BaseEntity } from '../models';
 
 // --------------------------------------------------------------------------------------------------------------
-export const applyLimit = <E extends BaseTzEntity>(filter?: Filter<E>) => {
+export const applyLimit = <E extends BaseEntity>(filter?: Filter<E>) => {
   const rs: Filter<E> = {
     ...(filter ?? {}),
   };

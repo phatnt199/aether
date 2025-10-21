@@ -1,11 +1,11 @@
-import { BaseIdEntity } from '@/base/models/base.model';
+import { BaseEntity, BaseNumberIdEntity } from '@/base/models';
 import { IdType } from '@/common';
 import { getIdType } from '@/utilities/model.utility';
 import { MixinTarget } from '@loopback/core';
 import { model, property } from '@loopback/repository';
 
-export const DuplicatableMixin = <E extends MixinTarget<BaseIdEntity>>(superClass: E) => {
-  const sourceIdType = getIdType(BaseIdEntity);
+export const DuplicatableMixin = <E extends MixinTarget<BaseEntity>>(superClass: E) => {
+  const sourceIdType = getIdType(BaseNumberIdEntity);
 
   @model()
   class Mixed extends superClass {

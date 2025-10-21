@@ -3,14 +3,14 @@ import { QueryBuilderHelper } from '@/helpers';
 import { buildBatchUpdateQuery, getError } from '@/utilities';
 import { Count, DataObject, juggler, Where } from '@loopback/repository';
 
-import { BaseTzEntity, BaseUserAuditTzEntity } from './../models';
 import { AbstractTzRepository } from './base.repository';
 
 import get from 'lodash/get';
+import { TBaseTzEntity, TBaseUserAuditTzEntity } from '../models';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 export abstract class TzCrudRepository<
-  E extends BaseTzEntity,
+  E extends TBaseTzEntity,
   R extends EntityRelationType = EntityRelationType,
 > extends AbstractTzRepository<E, R> {
   constructor(entityClass: EntityClassType<E>, dataSource: juggler.DataSource, scope?: string) {
@@ -301,10 +301,10 @@ export abstract class TzCrudRepository<
     }
 
     if (options?.newInstance) {
-      (entity as BaseUserAuditTzEntity).createdBy = options.authorId;
+      (entity as TBaseUserAuditTzEntity).createdBy = options.authorId;
     }
 
-    (entity as BaseUserAuditTzEntity).modifiedBy = options.authorId;
+    (entity as TBaseUserAuditTzEntity).modifiedBy = options.authorId;
     return entity;
   }
 

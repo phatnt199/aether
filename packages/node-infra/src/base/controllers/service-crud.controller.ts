@@ -11,23 +11,23 @@ import {
   post,
   put,
   requestBody,
+  RequestContext,
   RestBindings,
   SchemaRef,
-  RequestContext,
 } from '@loopback/rest';
 import { CrudRestControllerOptions } from '@loopback/rest-crud';
 
 import { App } from '@/common';
 import { EntityRelationType, IController, ICrudService, IdType } from '@/common/types';
 import { IJWTTokenPayload } from '@/components/authenticate/common/types';
-import { SecurityBindings } from '@loopback/security';
-import { BaseIdEntity, BaseTzEntity } from './../';
-import { applyLimit } from './common';
 import { getIdSchema } from '@/utilities/model.utility';
+import { SecurityBindings } from '@loopback/security';
+import { BaseEntity, TBaseTzEntity } from '../models';
+import { applyLimit } from './common';
 
 // --------------------------------------------------------------------------------------------------------------
-export interface IServiceCrudControllerOptions<E extends BaseIdEntity> {
-  entity: typeof BaseIdEntity & { prototype: E };
+export interface IServiceCrudControllerOptions<E extends BaseEntity> {
+  entity: typeof BaseEntity & { prototype: E };
   service: { name: string };
   controller: CrudRestControllerOptions & { defaultLimit?: number };
   schema?: {
@@ -49,7 +49,7 @@ export interface IServiceCrudControllerOptions<E extends BaseIdEntity> {
 }
 
 // --------------------------------------------------------------------------------------------------------------
-export const defineServiceCrudController = <E extends BaseTzEntity>(
+export const defineServiceCrudController = <E extends TBaseTzEntity>(
   opts: IServiceCrudControllerOptions<E>,
 ) => {
   const {

@@ -26,10 +26,11 @@ import {
 } from '@/common/types';
 import { IJWTTokenPayload } from '@/components/authenticate';
 import { getError } from '@/utilities';
-import { Class } from '@loopback/service-proxy';
-import { AbstractTzRepository, BaseTzEntity } from './..';
-import { applyLimit, BaseController } from './common';
 import { SecurityBindings } from '@loopback/security';
+import { Class } from '@loopback/service-proxy';
+import { TBaseTzEntity } from '../models';
+import { AbstractTzRepository } from '../repositories';
+import { applyLimit, BaseController } from './common';
 
 // --------------------------------------------------------------------------------------------------------------
 export interface IRelationCrudControllerOptions {
@@ -64,9 +65,9 @@ export interface IRelationCrudControllerOptions {
 
 // --------------------------------------------------------------------------------------------------------------
 export const defineRelationViewController = <
-  S extends BaseTzEntity, // Source Entity Type
-  T extends BaseTzEntity, // Target Entity Type
-  TE extends BaseTzEntity = any, // Through Entity Type
+  S extends TBaseTzEntity, // Source Entity Type
+  T extends TBaseTzEntity, // Target Entity Type
+  TE extends TBaseTzEntity = any, // Through Entity Type
 >(opts: {
   // ------------------------------------------------
   baseClass?: Class<BaseController>;
@@ -324,9 +325,9 @@ export const defineRelationViewController = <
 
 // --------------------------------------------------------------------------------------------------------------
 export const defineAssociateController = <
-  S extends BaseTzEntity,
-  T extends BaseTzEntity,
-  R extends BaseTzEntity | NullableType,
+  S extends TBaseTzEntity,
+  T extends TBaseTzEntity,
+  R extends TBaseTzEntity | NullableType,
 >(opts: {
   baseClass: ReturnType<typeof defineRelationViewController>;
   relation: { name: string; type: TRelationType };
@@ -413,9 +414,9 @@ export const defineAssociateController = <
 
 // --------------------------------------------------------------------------------------------------------------
 export const defineRelationCrudController = <
-  S extends BaseTzEntity,
-  T extends BaseTzEntity,
-  R extends BaseTzEntity | NullableType,
+  S extends TBaseTzEntity,
+  T extends TBaseTzEntity,
+  R extends TBaseTzEntity | NullableType,
 >(
   controllerOptions: IRelationCrudControllerOptions,
 ): ControllerClass => {

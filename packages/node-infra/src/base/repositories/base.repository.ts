@@ -26,7 +26,7 @@ import {
   TransactionalEntityRepository,
   Where,
 } from '@loopback/repository';
-import { BaseEntity, BaseKVEntity, BaseTzEntity } from './../models';
+import { BaseEntity, BaseKVEntity, TBaseTzEntity } from './../models';
 
 import cloneDeep from 'lodash/cloneDeep';
 import get from 'lodash/get';
@@ -49,7 +49,7 @@ export class WhereBuilder<E extends object = AnyObject> extends BaseWhereBuilder
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
-export class DefaultCrudRepository<
+export abstract class DefaultCrudRepository<
   E extends BaseEntity,
   ID,
   Relations extends object = {},
@@ -84,11 +84,16 @@ export class DefaultCrudRepository<
       targetRepositoryGetter,
     });
   }
+
+  abstract existsWith(where?: Where<E>, options?: TDBAction): Promise<boolean>;
+  abstract createWithReturn(data: DataObject<E>, options?: TDBAction): Promise<E>;
+  abstract updateWithReturn(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<E>;
+  abstract upsertWith(data: DataObject<E>, where: Where<E>, options?: TDBAction): Promise<E | null>;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 export abstract class AbstractTzRepository<
-    E extends BaseTzEntity,
+    E extends TBaseTzEntity,
     R extends EntityRelationType = EntityRelationType,
   >
   extends DefaultCrudRepository<E, IdType, R>
@@ -142,11 +147,6 @@ export abstract class AbstractTzRepository<
     entity: DataObject<E>,
     options?: { newInstance: boolean; authorId: IdType },
   ): DataObject<E>;
-
-  abstract existsWith(where?: Where<E>, options?: TDBAction): Promise<boolean>;
-  abstract createWithReturn(data: DataObject<E>, options?: TDBAction): Promise<E>;
-  abstract updateWithReturn(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<E>;
-  abstract upsertWith(data: DataObject<E>, where: Where<E>, options?: TDBAction): Promise<E | null>;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -252,6 +252,31 @@ export abstract class ViewRepository<
   }
 
   override deleteById(_id: IdType, _options?: TDBAction): Promise<void> {
+    throw getError({
+      statusCode: 500,
+      message: 'Cannot manipulate entity with view repository!',
+    });
+  }
+
+  override createWithReturn(_data: DataObject<E>, _options?: TDBAction): Promise<E> {
+    throw getError({
+      statusCode: 500,
+      message: 'Cannot manipulate entity with view repository!',
+    });
+  }
+
+  override updateWithReturn(_id: IdType, _data: DataObject<E>, _options?: TDBAction): Promise<E> {
+    throw getError({
+      statusCode: 500,
+      message: 'Cannot manipulate entity with view repository!',
+    });
+  }
+
+  override upsertWith(
+    _data: DataObject<E>,
+    _where: Where<E>,
+    _options?: TDBAction,
+  ): Promise<E | null> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',

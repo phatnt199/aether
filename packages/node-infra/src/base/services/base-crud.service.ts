@@ -1,11 +1,11 @@
 import { EntityRelationType, ICrudMethodOptions, ICrudService, IdType } from '@/common';
 import { Count, DataObject, Filter, Where } from '@loopback/repository';
 import { applyLimit } from '../controllers/common';
+import { TBaseTzEntity } from '../models';
 import { AbstractTzRepository } from '../repositories';
-import { BaseTzEntity } from './../models';
 import { BaseService } from './base.service';
 
-export abstract class BaseCrudService<E extends BaseTzEntity>
+export abstract class BaseCrudService<E extends TBaseTzEntity>
   extends BaseService
   implements ICrudService<E>
 {
