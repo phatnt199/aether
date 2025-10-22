@@ -27,7 +27,10 @@ export const useApplicationLogger = () => {
   return rs.logger;
 };
 
-export const useInjectable = <T,>(opts: { context?: Context; key: string }) => {
+/**
+ * @deprecated Use `useInjectable` instead.
+ */
+export const useInjectableLegacy = <T,>(opts: { context?: Context; key: string }) => {
   const requestContext = opts?.context;
   const applicationContext = React.useContext(ApplicationContext);
 
