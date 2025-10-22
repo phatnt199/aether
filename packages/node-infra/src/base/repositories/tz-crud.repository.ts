@@ -285,7 +285,7 @@ export abstract class TzCrudRepository<
       entity.createdAt = new Date();
     }
 
-    if (!options.ignoreModified) {
+    if (!options.ignoreModified && 'modifiedAt' in entity) {
       entity.modifiedAt = new Date();
     }
 
