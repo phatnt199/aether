@@ -54,6 +54,22 @@ export default defineConfig({
 
 **📖 [Complete Vite Setup Guide](./VITE_SETUP.md)** | [Browser Compatibility](https://github.com/phatnt199/ra-infra/wiki/Browser-Compatibility-Setup)
 
+## Customization
+
+### Hooks
+
+#### `useInjectable`
+
+If you're using TypeScript, you'll need to specify your new keys, using [module augmentation](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation).
+
+```typescript
+declare module '@minimaltech/ra-infra' {
+  interface IUseInjectableKeysOverrides {
+    ['services.yourServices']: true;
+  }
+}
+```
+
 ## 📚 Documentation
 
 - [Browser Compatibility Setup](https://github.com/phatnt199/ra-infra/wiki/Browser-Compatibility-Setup) - **Read this first!**
