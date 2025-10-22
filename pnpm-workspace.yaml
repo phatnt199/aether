@@ -5,3 +5,5 @@ onlyBuiltDependencies:
   - '@scarf/scarf'
   - msgpackr-extract
   - protobufjs
+  - esbuild
+  - electron

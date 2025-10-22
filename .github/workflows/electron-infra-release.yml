@@ -1,20 +1,11 @@
-name: Dispatch NPM Release
+name: '[electron-infra] Dispatch NPM Release'
 
 on:
   workflow_dispatch:
     inputs:
-      module:
-        type: choice
-        description: Module (node-infra|agent-infra|ra-infra|electron-infra)
-        options:
-          - node-infra
-          - agent-infra
-          - ra-infra
-          - electron-infra
-
       build_mode:
         type: choice
-        description: Build Mode (patch | minor | major | pre<patch | minor | major | release>)
+        description: Build Mode (patch | minor | major | prepatch | preminor | premajor | prerelease)
         options:
           - patch
           - minor
@@ -25,7 +16,7 @@ on:
           - prerelease
 
 env:
-  MODULE: ${{ github.event.inputs.module }}
+  MODULE: electron-infra
   BUILD_MODE: ${{ github.event.inputs.build_mode }}
 
 jobs:
@@ -67,7 +58,13 @@ jobs:
           pnpm --filter "{packages/$MODULE}" run clean 
 
           echo "Compiling $MODULE"
+          pnpm run rebuild:node-infra
           pnpm --filter "{packages/$MODULE}" run rebuild:$BUILD_MODE
+
+      - name: Build application 🔧
+        run: |
+          pnpm run rebuild:${{ github.event.inputs.build_mode }}
+          date > built_generated
 
       - name: Push latest version to repository
         run: |

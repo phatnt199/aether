@@ -1,0 +1,111 @@
+{
+  "name": "@minimaltech/electron-infra",
+  "version": "0.0.23",
+  "description": "Minimal Technology - ElectronJS Infrastructure",
+  "keywords": [
+    "desktop",
+    "desktop app",
+    "desktop framework",
+    "electron",
+    "app",
+    "application",
+    "framework",
+    "ElectronJS",
+    "loopback",
+    "loopback-application",
+    "infrastructure",
+    "minimaltech",
+    "minimaltek",
+    "mt",
+    "infra",
+    "electronjs framework"
+  ],
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./bridge": {
+      "default": "./dist/bridge.js",
+      "types": "./dist/bridge.d.ts"
+    },
+    "./type-generator": {
+      "default": "./dist/typegen.js",
+      "types": "./dist/typegen.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "ei-typegen": "./dist/bin/typegen.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "sh ./scripts/build.sh",
+    "clean": "sh ./scripts/clean.sh",
+    "eslint": "eslint --report-unused-disable-directives .",
+    "lint": "pnpm eslint && pnpm prettier:cli",
+    "lint:fix": "pnpm eslint --fix && pnpm prettier:fix",
+    "prettier:cli": "prettier \"**/*.{js,ts}\" -l",
+    "prettier:fix": "pnpm prettier:cli --write",
+    "rebuild": "sh ./scripts/rebuild.sh no-version",
+    "rebuild:major": "sh ./scripts/rebuild.sh major",
+    "rebuild:minor": "sh ./scripts/rebuild.sh minor",
+    "rebuild:patch": "sh ./scripts/rebuild.sh patch",
+    "rebuild:premajor": "sh ./scripts/rebuild.sh premajor",
+    "rebuild:preminor": "sh ./scripts/rebuild.sh preminor",
+    "rebuild:prepatch": "sh ./scripts/rebuild.sh prepatch",
+    "rebuild:prerelease": "sh ./scripts/rebuild.sh prerelease",
+    "pretest:dev": "pnpm run rebuild",
+    "test:dev": "NODE_ENV=development mocha -r dotenv-flow/config -r source-map-support/register --timeout 60000 --exit dist/__tests__/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/phatnt199/aether.git"
+  },
+  "author": "Minimal Technology <developer@miminaltek.com>",
+  "bugs": {
+    "url": "https://github.com/phatnt199/aether/issues"
+  },
+  "homepage": "https://github.com/phatnt199/aether/wiki",
+  "license": "MIT",
+  "files": [
+    "README.md",
+    "LICENSE",
+    "dist",
+    "!/**/tests",
+    "!/**/dist/tests",
+    "!/**/__tests__"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@minimaltech/node-infra": "workspace:*",
+    "@reduxjs/toolkit": "^2.5.0",
+    "dotenv-flow": "^4.0.1",
+    "electron-updater": "^6.6.2",
+    "fs-extra": "^11.1.1",
+    "lodash": "^4.17.21",
+    "redux": "^5.0.1",
+    "redux-saga": "^1.2.1",
+    "rxjs": "^7.5.6",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@loopback/build": "^11.0.3",
+    "@minimaltech/eslint-node": "^0.1.15",
+    "@types/lodash": "^4.17.13",
+    "@types/node": "^20.17.9",
+    "@types/ws": "^8.5.13",
+    "electron": "^33.2.1",
+    "eslint": "^9.32.0",
+    "prettier": "^3.4.1",
+    "source-map-support": "^0.5.21",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.7.2"
+  }
+}
