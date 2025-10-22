@@ -12,7 +12,16 @@ import {
   Filter,
   Where,
 } from '@loopback/repository';
-import { del, get, param, patch, post, requestBody, SchemaObject } from '@loopback/rest';
+import {
+  del,
+  get,
+  param,
+  ParameterObject,
+  patch,
+  post,
+  requestBody,
+  SchemaObject,
+} from '@loopback/rest';
 import getProp from 'lodash/get';
 
 import { App, EntityRelations } from '@/common';
@@ -25,19 +34,18 @@ import {
   TRelationType,
 } from '@/common/types';
 import { IJWTTokenPayload } from '@/components/authenticate';
-import { getError } from '@/utilities';
+import { getError, getIdSchema } from '@/utilities';
 import { SecurityBindings } from '@loopback/security';
-import { Class } from '@loopback/service-proxy';
-import { TBaseTzEntity } from '../models';
+import { BaseEntity, TBaseTzEntity } from '../models';
 import { AbstractTzRepository } from '../repositories';
 import { applyLimit, BaseController } from './common';
 
 // --------------------------------------------------------------------------------------------------------------
-export interface IRelationCrudControllerOptions {
+export interface IRelationCrudControllerOptions<S, T> {
   association: {
     entities: {
-      source: string;
-      target: string;
+      source: typeof BaseEntity & { prototype: S };
+      target: typeof BaseEntity & { prototype: T };
     };
 
     repositories?: {
@@ -70,12 +78,12 @@ export const defineRelationViewController = <
   TE extends TBaseTzEntity = any, // Through Entity Type
 >(opts: {
   // ------------------------------------------------
-  baseClass?: Class<BaseController>;
+  baseClass?: ControllerClass;
 
   // ------------------------------------------------
   entities: {
-    source: string;
-    target: string;
+    source: typeof BaseEntity & { prototype: S };
+    target: typeof BaseEntity & { prototype: T };
   };
 
   relation: {
@@ -99,6 +107,12 @@ export const defineRelationViewController = <
 
   const restPath = `/{id}/${endPoint ? endPoint : relation.name}`;
   const BaseClass = baseClass ?? BaseController;
+
+  const sourceIdPathParam: ParameterObject = {
+    name: 'id',
+    in: 'path',
+    schema: getIdSchema(entities.source),
+  };
 
   class ViewController extends BaseClass implements ICrudController {
     sourceRepository: AbstractTzRepository<S, EntityRelationType>;
@@ -203,7 +217,7 @@ export const defineRelationViewController = <
       },
     })
     find(
-      @param.path.number('id') id: IdType,
+      @param(sourceIdPathParam) id: IdType,
       @param.query.object('filter') filter?: Filter<T>,
     ): Promise<T | T[]> {
       switch (relation.type) {
@@ -237,7 +251,7 @@ export const defineRelationViewController = <
         },
       },
     })
-    count(@param.path.number('id') id: IdType, @param.query.object('where') where?: Where<T>) {
+    count(@param(sourceIdPathParam) id: IdType, @param.query.object('where') where?: Where<T>) {
       switch (relation.type) {
         case EntityRelations.BELONGS_TO: {
           return new Promise(resolve => {
@@ -329,20 +343,45 @@ export const defineAssociateController = <
   T extends TBaseTzEntity,
   R extends TBaseTzEntity | NullableType,
 >(opts: {
-  baseClass: ReturnType<typeof defineRelationViewController>;
-  relation: { name: string; type: TRelationType };
+  baseClass: ControllerClass;
+
+  // ------------------------------------------------
+  entities: {
+    source: typeof BaseEntity & { prototype: S };
+    target: typeof BaseEntity & { prototype: T };
+  };
+
+  relation: {
+    name: string;
+    type: TRelationType;
+  };
+
+  // ------------------------------------------------
   defaultLimit?: number;
   endPoint?: string;
   schema?: SchemaObject;
 }): ControllerClass => {
   const {
     baseClass,
+    entities,
     relation,
     defaultLimit = App.DEFAULT_QUERY_LIMIT,
     endPoint = '',
     schema,
   } = opts;
   const restPath = `/{id}/${endPoint ? endPoint : relation.name}`;
+
+  const sourceIdPathParam: ParameterObject = {
+    name: 'id',
+    in: 'path',
+    schema: getIdSchema(entities.source),
+  };
+
+  const targetIdPathParam: ParameterObject = {
+    name: 'id',
+    in: 'path',
+    schema: getIdSchema(entities.target),
+  };
 
   class AssociationController extends baseClass implements IController {
     constructor(
@@ -368,8 +407,8 @@ export const defineAssociateController = <
       },
     })
     async link(
-      @param.path.number('id') id: number,
-      @param.path.number('link_id') linkId: number,
+      @param(sourceIdPathParam) id: IdType,
+      @param(targetIdPathParam) linkId: IdType,
     ): Promise<R | null> {
       const isSourceExist = await this.sourceRepository.exists(id);
       if (!isSourceExist) {
@@ -401,8 +440,8 @@ export const defineAssociateController = <
       },
     })
     async unlink(
-      @param.path.number('id') id: number,
-      @param.path.number('link_id') linkId: number,
+      @param(sourceIdPathParam) id: IdType,
+      @param(targetIdPathParam) linkId: IdType,
     ): Promise<R | null> {
       const ref = getProp(this.sourceRepository, relation.name)(id);
       return ref.unlink(linkId);
@@ -418,7 +457,7 @@ export const defineRelationCrudController = <
   T extends TBaseTzEntity,
   R extends TBaseTzEntity | NullableType,
 >(
-  controllerOptions: IRelationCrudControllerOptions,
+  controllerOptions: IRelationCrudControllerOptions<S, T>,
 ): ControllerClass => {
   const {
     association,
@@ -449,7 +488,10 @@ export const defineRelationCrudController = <
 
   const ViewController = defineRelationViewController<S, T>({
     baseClass: BaseController,
-    entities,
+    entities: {
+      source: entities.source,
+      target: entities.target,
+    },
     relation,
     defaultLimit,
     endPoint,
@@ -457,6 +499,7 @@ export const defineRelationCrudController = <
   });
   const AssociationController = defineAssociateController<S, T, R>({
     baseClass: ViewController,
+    entities,
     relation,
     defaultLimit,
     endPoint,
@@ -471,6 +514,12 @@ export const defineRelationCrudController = <
   if (!useControlTarget) {
     return ExtendsableClass;
   }
+
+  const sourceIdPathParam: ParameterObject = {
+    name: 'id',
+    in: 'path',
+    schema: getIdSchema(entities.source),
+  };
 
   // -----------------------------------------------------------------------------------------------
   class Controller extends ExtendsableClass {
@@ -496,7 +545,7 @@ export const defineRelationCrudController = <
       },
     })
     create(
-      @param.path.number('id') id: number,
+      @param(sourceIdPathParam) id: IdType,
       @requestBody({
         required: true,
         content: {
@@ -530,7 +579,7 @@ export const defineRelationCrudController = <
       },
     })
     patch(
-      @param.path.number('id') id: number,
+      @param(sourceIdPathParam) id: IdType,
       @requestBody({
         required: true,
         content: {
@@ -565,7 +614,7 @@ export const defineRelationCrudController = <
       },
     })
     delete(
-      @param.path.number('id') id: number,
+      @param(sourceIdPathParam) id: IdType,
       @param.query.object('where') where?: Where<T>,
     ): Promise<Count> {
       return new Promise<Count>((resolve, reject) => {
@@ -584,12 +633,12 @@ export const defineRelationCrudController = <
     }
   }
 
-  inject(`repositories.${repositories?.source ?? `${entities.source}Repository`}`)(
+  inject(`repositories.${repositories?.source ?? `${entities.source.name}Repository`}`)(
     Controller,
     undefined,
     0,
   );
-  inject(`repositories.${repositories?.target ?? `${entities.target}Repository`}`)(
+  inject(`repositories.${repositories?.target ?? `${entities.target.name}Repository`}`)(
     Controller,
     undefined,
     1,

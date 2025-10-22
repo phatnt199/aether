@@ -8,12 +8,34 @@ export const TzMixin = <E extends MixinTarget<Entity>>(
       columnName: string;
       dataType: string;
     };
-    modifiedAt: {
-      columnName: string;
-      dataType: string;
-    };
+    modifiedAt:
+      | { enable: false }
+      | {
+          enable?: true;
+          columnName: string;
+          dataType: string;
+        };
   },
 ) => {
+  if (!opts?.modifiedAt.enable) {
+    class Mixed extends superClass {
+      @property({
+        type: 'date',
+        postgresql: {
+          columnName: opts?.createdAt?.columnName ?? 'created_at',
+          dataType: opts?.createdAt?.dataType ?? 'TIMESTAMPTZ',
+          default: 'NOW()',
+          nullable: 'NO',
+        },
+      })
+      createdAt: Date;
+
+      modifiedAt: never;
+    }
+
+    return Mixed;
+  }
+
   class Mixed extends superClass {
     @property({
       type: 'date',
