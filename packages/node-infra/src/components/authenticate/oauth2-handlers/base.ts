@@ -242,7 +242,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     );
     const oauth2Client = await oauth2ClientRepository.findOne({
       where: { clientId },
-      fields: ['id', 'identifier', 'name', 'description', 'userId'],
+      fields: ['id', 'identifier', 'clientId', 'name', 'description', 'userId'],
     });
     if (!oauth2Client) {
       throw getError({
