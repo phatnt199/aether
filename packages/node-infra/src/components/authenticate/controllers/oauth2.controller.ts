@@ -125,7 +125,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
         return;
       }
 
-      const oauth2Service = this.getSync<OAuth2Service>('services.OAuth2Service');
+      const oauth2Service = this.injectionGetter<OAuth2Service>('services.OAuth2Service');
 
       const decryptedClient = oauth2Service.decryptClientToken({ token });
       oauth2Service
