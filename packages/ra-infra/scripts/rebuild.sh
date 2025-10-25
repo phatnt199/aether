@@ -16,4 +16,7 @@ pnpm clean
 echo "\nBuilding latest release..."
 pnpm build
 
+echo "\nRunning size limit..."
+pnpm size
+
 echo "\nPLEASE PUSH LATEST BUILT FOR ANY CHANGE(S)"
