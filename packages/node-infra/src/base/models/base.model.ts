@@ -32,8 +32,12 @@ export class BaseIdEntity extends BaseNumberIdEntity {}
 export type TBaseIdEntity = BaseNumberIdEntity | BaseStringIdEntity;
 
 // ---------------------------------------------------------------------
-export class BaseNumberTzEntity extends TzMixin(BaseNumberIdEntity) {}
-export class BaseStringTzEntity extends TzMixin(BaseStringIdEntity) {}
+const tzOpts = {
+  createdAt: { columnName: 'created_at', dataType: 'TIMESTAMPTZ' },
+  modifiedAt: { enable: true, columnName: 'modified_at', dataType: 'TIMESTAMPTZ' },
+};
+export class BaseNumberTzEntity extends TzMixin(BaseNumberIdEntity, tzOpts) {}
+export class BaseStringTzEntity extends TzMixin(BaseStringIdEntity, tzOpts) {}
 export class BaseTzEntity extends BaseNumberTzEntity {}
 export type TBaseTzEntity = BaseNumberTzEntity | BaseStringTzEntity;
 
