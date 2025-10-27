@@ -9,6 +9,7 @@ import isEmpty from 'lodash/isEmpty';
 
 export const defineOAuth2Strategy = (opts: {
   name: string;
+  requiredAuthProvider?: boolean;
   baseURL: string;
   authPath?: string;
 }) => {
@@ -37,6 +38,16 @@ export const defineOAuth2Strategy = (opts: {
     async authenticate(request: Request) {
       const networkService = this.authProvider.getNetworkService();
 
+      if (
+        opts.requiredAuthProvider &&
+        (!request.headers['x-auth-provider'] || request.headers['x-auth-provider'] !== this.name)
+      ) {
+        throw getError({
+          statusCode: ResultCodes.RS_4.Unauthorized,
+          message: 'Invaid authorization provider',
+        });
+      }
+
       if (!request.headers['authorization']) {
         throw getError({
           statusCode: ResultCodes.RS_4.Unauthorized,
@@ -64,12 +75,14 @@ export const registerOAuth2Strategy = (
   context: Context,
   options: {
     strategyName: string;
+    requiredAuthProvider?: boolean;
     authenticateUrl: string;
     authenticatePath?: string;
   },
 ) => {
   const remoteOAuth2Strategy = defineOAuth2Strategy({
     name: options.strategyName,
+    requiredAuthProvider: options.requiredAuthProvider,
     baseURL: options.authenticateUrl,
     authPath: options.authenticatePath ?? '/auth/who-am-i',
   });
