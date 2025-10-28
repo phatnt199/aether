@@ -2,12 +2,20 @@
   "name": "@minimaltech/common",
   "version": "0.0.1",
   "description": "Minimal Technology - Common Infrastructure ",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./tsconfig.common.json": "./tsconfig.common.json"
+  },
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "build": "sh ./scripts/build.sh",
-    "build:watch": "lb-tsc --watch",
     "clean": "sh ./scripts/clean.sh",
     "eslint": "eslint --report-unused-disable-directives .",
     "lint": "pnpm eslint && pnpm prettier:cli",
@@ -30,6 +38,7 @@
     "README.md",
     "LICENSE",
     "dist",
+    "tsconfig.common.json",
     "!/**/tests",
     "!/**/dist/tests",
     "!/**/__tests__"
@@ -37,7 +46,6 @@
   "dependencies": {
   },
   "devDependencies": {
-    "@loopback/build": "^12.0.4",
     "@minimaltech/eslint-node": "^0.2.1",
     "@types/node": "^22.18.6",
     "eslint": "^9.36.0",

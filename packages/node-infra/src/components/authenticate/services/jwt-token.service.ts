@@ -6,7 +6,7 @@ import { TokenServiceBindings } from '@loopback/authentication-jwt';
 import { BindingScope, inject, injectable } from '@loopback/core';
 import { HttpErrors } from '@loopback/rest';
 import { securityId } from '@loopback/security';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { AuthenticateKeys, Authentication, IJWTTokenPayload, TGetTokenExpiresFn } from '../common';
 
 @injectable({ scope: BindingScope.SINGLETON })
@@ -125,7 +125,7 @@ export class JWTTokenService extends BaseService {
       throw new HttpErrors.Unauthorized('Invalid request token!');
     }
 
-    let decodedToken;
+    let decodedToken: string | JwtPayload;
     try {
       decodedToken = jwt.verify(token, this.jwtSecret);
     } catch (error) {
@@ -163,7 +163,7 @@ export class JWTTokenService extends BaseService {
     }
 
     let token: string;
-    const expiresIn = (await this.getTokenExpiresFn?.()) ?? getTokenExpiresFn();
+    const expiresIn = (await this.getTokenExpiresFn?.()) ?? (await getTokenExpiresFn());
     try {
       token = jwt.sign(this.encryptPayload(payload), this.jwtSecret, { expiresIn });
     } catch (error) {

@@ -1,31 +1,10 @@
 {
   "$schema": "http://json.schemastore.org/tsconfig",
-  "extends": "@loopback/build/config/tsconfig.common.json",
+  "extends": "@minimaltech/common/tsconfig.common.json",
   "compilerOptions": {
     "target": "es2015",
     "module": "nodenext",
-
-    /* Bundler mode */
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "importHelpers": false,
-    "esModuleInterop": true,
-    "removeComments": false,
     "moduleResolution": "nodenext",
-    
-    /* Optimization */
-    "declaration": true,
-    "declarationMap": false,
-    "sourceMap": false,
-    "inlineSourceMap": false,
-    "inlineSources": false,
-    
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noImplicitOverride": true,
-    "noFallthroughCasesInSwitch": true,
     
     /* Paths */
     "outDir": "dist",

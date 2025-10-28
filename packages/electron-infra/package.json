@@ -82,6 +82,7 @@
     "access": "public"
   },
   "dependencies": {
+    "@minimaltech/common": "workspace:*",
     "@minimaltech/node-infra": "workspace:*",
     "@reduxjs/toolkit": "^2.5.0",
     "dotenv-flow": "^4.0.1",
@@ -94,7 +95,6 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@loopback/build": "^11.0.3",
     "@minimaltech/eslint-node": "^0.1.15",
     "@types/lodash": "^4.17.13",
     "@types/node": "^20.17.9",
