@@ -82,7 +82,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@minimaltech/common": "workspace:*",
     "@minimaltech/node-infra": "workspace:*",
     "@reduxjs/toolkit": "^2.5.0",
     "dotenv-flow": "^4.0.1",

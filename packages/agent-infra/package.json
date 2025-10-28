@@ -68,7 +68,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@minimaltech/common": "workspace:*",
     "@minimaltech/node-infra": "workspace:*",
     "dayjs": "^1.11.18",
     "lodash": "^4.17.21"
