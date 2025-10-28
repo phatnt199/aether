@@ -16,4 +16,7 @@ pnpm clean
 echo "\nBuilding latest release..."
 pnpm build
 
+echo "\nCalculating bundle size..."
+pnpm size
+
 echo "\nPLEASE PUSH LATEST BUILT FOR ANY CHANGE(S)"
