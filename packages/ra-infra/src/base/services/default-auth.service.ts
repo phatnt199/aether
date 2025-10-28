@@ -22,7 +22,7 @@ export class DefaultAuthService {
   }
 
   saveAuth(opts: {
-    userId: number;
+    userId: number | string;
     username: string;
     token: { value: string; type: string };
   }) {
@@ -34,9 +34,25 @@ export class DefaultAuthService {
     );
   }
 
+  saveOAuth2(opts: {
+    userId: number | string;
+    provider: string;
+    token: { value: string; type: string };
+  }) {
+    const { token, provider, userId } = opts;
+    localStorage.setItem(
+      LocalStorageKeys.KEY_AUTH_TOKEN,
+      JSON.stringify(Object.assign({}, token, { provider })),
+    );
+    localStorage.setItem(
+      LocalStorageKeys.KEY_AUTH_IDENTITY,
+      JSON.stringify({ userId, provider }),
+    );
+  }
+
   cleanUp() {
     Object.keys(localStorage).forEach(key => {
-      if (!key.startsWith('@app/auth/')) {
+      if (!key.startsWith('@app/auth/') && !key.startsWith('@app/oauth2/')) {
         return;
       }
 

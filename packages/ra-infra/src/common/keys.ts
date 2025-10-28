@@ -14,8 +14,6 @@ export class CoreBindings {
 }
 
 export class LocalStorageKeys {
-  static readonly KEY_AUTH_TOKEN_VALUE = '@app/auth/token/value';
-  static readonly KEY_AUTH_TOKEN_TYPE = '@app/auth/token/type';
   static readonly KEY_AUTH_TOKEN = '@app/auth/token';
   static readonly KEY_AUTH_IDENTITY = '@app/auth/identity';
   static readonly KEY_AUTH_PERMISSION = '@app/auth/permission';

@@ -17,10 +17,16 @@ import { Request, Response } from '@node-oauth/oauth2-server';
 
 import { OAuth2Service } from '../services';
 
-import { AbstractExpressRequestHandler, BaseController } from '@/base/controllers';
+import {
+  AbstractExpressRequestHandler,
+  BaseController,
+  defineCrudController,
+} from '@/base/controllers';
 import isEmpty from 'lodash/isEmpty';
 import { join } from 'node:path';
 import { Authentication, IAuthenticateOAuth2RestOptions, OAuth2Request } from '../common';
+import { OAuth2Client } from '../models';
+import { OAuth2ClientRepository } from '../repositories';
 
 interface IOAuth2ControllerOptions {
   config?: ExpressServerConfig | undefined;
@@ -150,12 +156,16 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
           }
 
           oauth2Service
-            .doClientCallback({ c: token, oauth2Token: rs.oauth2TokenRs })
+            .doClientCallback({
+              c: token,
+              oauth2Token: rs.oauth2TokenRs,
+            })
             .then(() => {
               const url = new URL(rs.redirectUrl);
               url.searchParams.append('c', encodeURIComponent(token));
               url.searchParams.append('clientId', client.clientId);
               url.searchParams.append('accessToken', accessToken);
+              url.searchParams.append('userReference', rs.oauth2TokenRs.user?.id ?? '-1');
               response.redirect(url.toString());
             })
             .catch(error => {
@@ -249,3 +259,20 @@ export const defineOAuth2Controller = (opts?: IAuthenticateOAuth2RestOptions) =>
 
   return BaseOAuth2Controller;
 };
+
+// --------------------------------------------------------------------------------
+const _OAuth2ClientController = defineCrudController({
+  entity: OAuth2Client,
+  repository: { name: OAuth2ClientRepository.name },
+  controller: { basePath: '/oauth2/clients' },
+});
+
+@api({ basePath: '/oauth2/clients' })
+export class OAuth2ClientController extends _OAuth2ClientController {
+  constructor(
+    @inject('repositories.OAuth2ClientRepository')
+    protected repository: OAuth2ClientRepository,
+  ) {
+    super(repository);
+  }
+}

@@ -1,13 +1,13 @@
 import { BaseService } from '@/base/services';
+import { ResultCodes } from '@/common';
 import { AES } from '@/helpers';
-import { getError } from '@/utilities';
+import { getError, int } from '@/utilities';
 import { TokenServiceBindings } from '@loopback/authentication-jwt';
 import { BindingScope, inject, injectable } from '@loopback/core';
 import { HttpErrors } from '@loopback/rest';
 import { securityId } from '@loopback/security';
 import jwt from 'jsonwebtoken';
-import { AuthenticateKeys, Authentication, TGetTokenExpiresFn, IJWTTokenPayload } from '../common';
-import { ResultCodes } from '@/common';
+import { AuthenticateKeys, Authentication, IJWTTokenPayload, TGetTokenExpiresFn } from '../common';
 
 @injectable({ scope: BindingScope.SINGLETON })
 export class JWTTokenService extends BaseService {
@@ -53,14 +53,15 @@ export class JWTTokenService extends BaseService {
 
   // --------------------------------------------------------------------------------------
   encryptPayload(payload: IJWTTokenPayload) {
+    const providerKey = this.aes.encrypt('provider', this.applicationSecret);
     const userKey = this.aes.encrypt('userId', this.applicationSecret);
-
     const rolesKey = this.aes.encrypt('roles', this.applicationSecret);
     const clientIdKey = this.aes.encrypt('clientId', this.applicationSecret);
 
-    const { userId, roles, clientId = 'NA' } = payload;
+    const { provider = 'NA', userId, roles, clientId = 'NA' } = payload;
 
     return {
+      [providerKey]: this.aes.encrypt(provider, this.applicationSecret),
       [userKey]: this.aes.encrypt(userId.toString(), this.applicationSecret),
       [rolesKey]: this.aes.encrypt(
         JSON.stringify(roles.map(el => `${el.id}|${el.identifier}|${el.priority}`)),
@@ -86,6 +87,10 @@ export class JWTTokenService extends BaseService {
       const decryptedValue = this.aes.decrypt(decodedToken[encodedAttr], this.applicationSecret);
 
       switch (attr) {
+        case 'provider': {
+          rs.provider = decryptedValue;
+          break;
+        }
         case 'userId': {
           rs.userId = parseInt(decryptedValue);
           rs[securityId] = rs.userId.toString();
@@ -98,7 +103,7 @@ export class JWTTokenService extends BaseService {
         case 'roles': {
           rs.roles = (JSON.parse(decryptedValue) as string[]).map(el => {
             const [id, identifier, priority] = el.split('|');
-            return { id, identifier, priority };
+            return { id, identifier, priority: int(priority) };
           });
           break;
         }

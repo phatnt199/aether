@@ -14,6 +14,12 @@ import { model, property } from '@loopback/repository';
 export class OAuth2Client extends BaseNumberTzEntity {
   @property({
     type: 'string',
+    postgresql: { columnName: 'provider' },
+  })
+  provider: string;
+
+  @property({
+    type: 'string',
     postgresql: { columnName: 'identifier' },
   })
   identifier: string;

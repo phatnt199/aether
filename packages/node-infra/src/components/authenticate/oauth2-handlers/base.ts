@@ -50,6 +50,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
           where: { or: [{ clientId }, { clientId, clientSecret }] },
           fields: [
             'id',
+            'provider',
             'identifier',
             'clientId',
             'name',
@@ -71,6 +72,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
 
           resolve({
             id: oauth2Client.id.toString(),
+            provider: oauth2Client.provider,
             identifier: oauth2Client.identifier,
             clientId: oauth2Client.clientId,
             name: oauth2Client.name,
@@ -105,6 +107,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
         [securityId]: userId.toString(),
         userId: userInformation?.userId ?? userId.toString(),
         roles: userInformation?.roles ?? [],
+        provider: client.provider,
         clientId: client.id,
         scopes,
       },
@@ -198,7 +201,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     );
     const oauth2Client = await oauth2ClientRepository.findOne({
       where: { id: int(oauth2Token.clientId) },
-      fields: ['id', 'identifier', 'name', 'description', 'userId'],
+      fields: ['id', 'provider', 'identifier', 'clientId', 'name', 'description', 'userId'],
     });
     if (!oauth2Client) {
       this.logger.error(
@@ -242,7 +245,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     );
     const oauth2Client = await oauth2ClientRepository.findOne({
       where: { clientId },
-      fields: ['id', 'identifier', 'clientId', 'name', 'description', 'userId'],
+      fields: ['id', 'provider', 'identifier', 'clientId', 'name', 'description', 'userId'],
     });
     if (!oauth2Client) {
       throw getError({
