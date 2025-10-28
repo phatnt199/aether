@@ -1,18 +1,8 @@
-name: Dispatch NPM Release
+name: '[ra-core-infra] Dispatch NPM Release'
 
 on:
   workflow_dispatch:
     inputs:
-      module:
-        type: choice
-        description: Module (node-infra|agent-infra|ra-core-infra|ra-infra|electron-infra)
-        options:
-          - node-infra
-          - agent-infra
-          - ra-core-infra
-          - ra-infra
-          - electron-infra
-
       build_mode:
         type: choice
         description: Build Mode (patch | minor | major | pre<patch | minor | major | release>)
@@ -26,7 +16,7 @@ on:
           - prerelease
 
 env:
-  MODULE: ${{ github.event.inputs.module }}
+  MODULE: ra-core-infra
   BUILD_MODE: ${{ github.event.inputs.build_mode }}
 
 jobs:
