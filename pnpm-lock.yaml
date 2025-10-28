@@ -284,6 +284,82 @@ importers:
         specifier: ~5.9.3
         version: 5.9.3
 
+  packages/ra-core-infra:
+    dependencies:
+      '@loopback/context':
+        specifier: ^8.0.2
+        version: 8.0.5
+      '@loopback/filter':
+        specifier: ^6.0.2
+        version: 6.0.5
+      '@reduxjs/toolkit':
+        specifier: ^2.9.1
+        version: 2.9.2(react-redux@9.2.0(@types/react@18.3.26)(react@19.2.0)(redux@5.0.1))(react@19.2.0)
+      ra-i18n-polyglot:
+        specifier: ^5.12.1
+        version: 5.12.2(react-dom@19.2.0(react@19.2.0))(react-hook-form@7.65.0(react@19.2.0))(react-router-dom@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
+      react-redux:
+        specifier: ^9.1.2
+        version: 9.2.0(@types/react@18.3.26)(react@19.2.0)(redux@5.0.1)
+      react-router-dom:
+        specifier: ^7.9.4
+        version: 7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      '@minimaltech/eslint-react':
+        specifier: ^0.2.1-0
+        version: 0.2.1-0(eslint@9.38.0(jiti@2.6.1))(jiti@2.6.1)
+      '@size-limit/preset-small-lib':
+        specifier: ^11.2.0
+        version: 11.2.0(size-limit@11.2.0)
+      '@types/lodash':
+        specifier: ^4.14.194
+        version: 4.17.20
+      '@types/node':
+        specifier: ^22.10.5
+        version: 22.18.12
+      '@types/react':
+        specifier: ^18.3.12
+        version: 18.3.26
+      '@types/react-dom':
+        specifier: ^18.0.11
+        version: 18.3.7(@types/react@18.3.26)
+      eslint:
+        specifier: ^9.38.0
+        version: 9.38.0(jiti@2.6.1)
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
+      prettier:
+        specifier: 3.6.2
+        version: 3.6.2
+      ra-core:
+        specifier: ^5.12.2
+        version: 5.12.2(react-dom@19.2.0(react@19.2.0))(react-hook-form@7.65.0(react@19.2.0))(react-router-dom@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react-router@7.9.4(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(react@19.2.0)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.0(react@19.2.0)
+      size-limit:
+        specifier: ^11.2.0
+        version: 11.2.0
+      source-map-support:
+        specifier: ^0.5.21
+        version: 0.5.21
+      tsc-alias:
+        specifier: ^1.8.10
+        version: 1.8.16
+      tsconfig-paths:
+        specifier: ^4.2.0
+        version: 4.2.0
+      typescript:
+        specifier: ~5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^7.1.10
+        version: 7.1.12(@types/node@22.18.12)(jiti@2.6.1)
+
   packages/ra-infra:
     dependencies:
       '@loopback/context':
@@ -7920,7 +7996,7 @@ snapshots:
     dependencies:
       '@types/http-cache-semantics': 4.0.4
       '@types/keyv': 3.1.4
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
       '@types/responselike': 1.0.3
 
   '@types/connect@3.4.38':
@@ -7973,7 +8049,7 @@ snapshots:
 
   '@types/keyv@3.1.4':
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
 
   '@types/lodash@4.17.20': {}
 
@@ -8056,7 +8132,7 @@ snapshots:
 
   '@types/responselike@1.0.3':
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
 
   '@types/send@0.17.6':
     dependencies:
@@ -8101,11 +8177,11 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 20.19.23
+      '@types/node': 24.9.1
     optional: true
 
   '@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.2.2))(eslint@8.57.1)(typescript@5.2.2)':
