@@ -64,6 +64,9 @@ node_modules.zip
 # Cache used by TypeScript's incremental build
 *.tsbuildinfo
 
+# Dev packages
+packages/dev*
+
 # Docs
 .docs
 dist

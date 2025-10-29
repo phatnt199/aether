@@ -1,7 +1,7 @@
 import { BaseApplication } from '@/base/applications';
 import { EnvironmentKeys } from '@/common';
 import { AES, applicationEnvironment } from '@/helpers';
-import { getError } from '@/utilities';
+import { executePromiseWithLimit, getError } from '@/utilities';
 import { CoreBindings, inject } from '@loopback/core';
 import { RequestContext } from '@loopback/rest';
 import { Request, Response, Token } from '@node-oauth/oauth2-server';
@@ -220,11 +220,12 @@ export class OAuth2Service extends BaseService {
       accessToken,
       authorizationCode,
       accessTokenExpiresAt,
+      provider: client.provider,
       user,
     };
 
-    await Promise.all(
-      callbackUrls.map(callbackUrl => {
+    const tasks = callbackUrls.map(callbackUrl => {
+      return () => {
         return new Promise((resolve, reject) => {
           fetch(callbackUrl, {
             method: 'POST',
@@ -244,7 +245,9 @@ export class OAuth2Service extends BaseService {
               reject(error);
             });
         });
-      }),
-    );
+      };
+    });
+
+    await executePromiseWithLimit({ tasks, limit: 5 });
   }
 }

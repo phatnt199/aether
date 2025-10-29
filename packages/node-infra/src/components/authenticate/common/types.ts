@@ -8,6 +8,7 @@ export interface IJWTTokenPayload extends UserProfile {
   userId: IdType;
   roles: { id: IdType; identifier: string; priority: number }[];
   clientId?: string;
+  provider?: string;
 }
 
 export interface ITokenPayload extends IJWTTokenPayload {}

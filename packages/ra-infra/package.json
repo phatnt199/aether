@@ -1,6 +1,6 @@
 {
   "name": "@minimaltech/ra-infra",
-  "version": "0.0.7-11",
+  "version": "0.0.7",
   "description": "Minimal Technology - ReactJS Infrastructure",
   "keywords": [
     "web",
@@ -35,6 +35,7 @@
     "node": ">=18"
   },
   "scripts": {
+    "size": "size-limit",
     "build": "sh ./scripts/build.sh",
     "test": "ts-node ./src/__test__/index.ts",
     "clean": "sh ./scripts/clean.sh",
@@ -84,6 +85,7 @@
     "@minimaltech/eslint-react": "^0.2.1-0",
     "@mui/icons-material": "^5.12.3",
     "@mui/material": "^5.12.3",
+    "@size-limit/preset-small-lib": "^11.2.0",
     "@types/lodash": "^4.14.194",
     "@types/node": "^22.10.5",
     "@types/react": "^18.3.12",
@@ -94,6 +96,7 @@
     "react": "^19.2.0",
     "react-admin": "^5.12.1",
     "react-dom": "^19.2.0",
+    "size-limit": "^11.2.0",
     "source-map-support": "^0.5.21",
     "tsc-alias": "^1.8.10",
     "tsconfig-paths": "^4.2.0",
@@ -109,5 +112,11 @@
     "react-admin": ">=5.12.0",
     "react-dom": ">=18.0",
     "react-redux": "^9.1.2"
-  }
+  },
+  "size-limit": [
+    {
+      "path": "./dist/index.js",
+      "limit": "50 KB"
+    }
+  ]
 }

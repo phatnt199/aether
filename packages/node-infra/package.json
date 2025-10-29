@@ -1,6 +1,6 @@
 {
   "name": "@minimaltech/node-infra",
-  "version": "0.5.9-28",
+  "version": "0.5.10-2",
   "description": "Minimal Technology - NodeJS Infrastructure - Loopback 4 Framework",
   "keywords": [
     "web",
@@ -61,14 +61,14 @@
     "./@lb/repo": {
       "default": "./dist/base/loopback/@lb/repository/index.js",
       "types": "./dist/base/loopback/@lb/repository/index.d.ts"
-    }
+    },
+    "./configs/tsconfig.common.json": "./configs/tsconfig.common.json"
   },
   "engines": {
     "node": ">=18"
   },
   "scripts": {
     "build": "sh ./scripts/build.sh",
-    "build:watch": "lb-tsc --watch",
     "clean": "sh ./scripts/clean.sh",
     "eslint": "eslint --report-unused-disable-directives .",
     "lint": "pnpm eslint && pnpm prettier:cli",
@@ -100,6 +100,7 @@
     "README.md",
     "LICENSE",
     "dist",
+    "configs",
     "!/**/tests",
     "!/**/dist/tests",
     "!/**/__tests__"

@@ -5,10 +5,11 @@ on:
     inputs:
       module:
         type: choice
-        description: Module (node-infra|agent-infra|ra-infra|electron-infra)
+        description: Module (node-infra|agent-infra|ra-core-infra|ra-infra|electron-infra)
         options:
           - node-infra
           - agent-infra
+          - ra-core-infra
           - ra-infra
           - electron-infra
 

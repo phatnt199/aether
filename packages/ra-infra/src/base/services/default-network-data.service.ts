@@ -45,7 +45,10 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
       });
     }
 
-    return `${authToken?.type || 'Bearer'} ${authToken.value}`;
+    return {
+      provider: authToken?.provider,
+      token: `${authToken?.type || 'Bearer'} ${authToken.value}`,
+    };
   }
 
   //-------------------------------------------------------------
@@ -70,7 +73,11 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
 
     const authHeader = this.getRequestAuthorizationHeader();
 
-    return { ...defaultHeaders, ['Authorization']: authHeader };
+    return {
+      ...defaultHeaders,
+      ['x-auth-provider']: authHeader.provider,
+      ['authorization']: authHeader.token,
+    };
   }
 
   //-------------------------------------------------------------
