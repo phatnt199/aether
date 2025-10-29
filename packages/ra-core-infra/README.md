@@ -95,7 +95,6 @@ declare module '@minimaltech/ra-core-infra' {
 
 - **Base Applications**: Abstract application classes with DI
 - **Providers**: Data providers, auth providers, i18n providers
-<!-- - **UI Components**: Custom React Admin components -->
 - **Services**: Network services, CRUD services
 - **Utilities**: Helper functions and utilities
 

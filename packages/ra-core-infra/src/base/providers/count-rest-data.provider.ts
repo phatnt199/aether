@@ -1,4 +1,4 @@
-import { RaRecord } from 'react-admin';
+import { RaRecord } from 'ra-core';
 
 import { AnyType, RequestTypes, TRequestMethod, TRequestType } from '@/common';
 import { DefaultRestDataProvider } from './default-rest-data.provider';
