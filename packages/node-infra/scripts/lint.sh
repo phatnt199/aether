@@ -8,6 +8,6 @@ case $current_branch in
   ;;
 *)
   echo "[hooks][pre-commit] Linting application"
-  pnpm run lint
+  bun run lint
   ;;
 esac
