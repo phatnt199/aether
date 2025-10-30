@@ -1,9 +1,9 @@
+import { BaseEntity } from '@/base';
+import type { MixinTarget } from '@/common/types';
 import { property } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
 
 /**
  * Text search mixin - adds tsvector field for full-text search
- * Matches Loopback 4's TextSearchMixin
  *
  * @param Base - Base class to extend
  * @returns Extended class with text search field
@@ -15,7 +15,7 @@ import type { ClassType } from '@/common/types';
  * }
  * ```
  */
-export function TextSearchMixin<T extends ClassType<any>>(Base: T) {
+export function TextSearchMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class TextSearchModel extends Base {
     @property({
       type: 'string',

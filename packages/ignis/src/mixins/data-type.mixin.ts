@@ -1,41 +1,41 @@
-import { property } from "@/decorators/model.decorators";
-import type { ClassType } from "@/common/types";
+import { property } from '@/decorators/model.decorators';
+import type { MixinTarget } from '@/common/types';
+import { BaseEntity } from '@/base';
 
 /**
  * Data type mixin - adds polymorphic type fields
- * Matches Loopback 4's DataTypeMixin
  */
-export function DataTypeMixin<T extends ClassType<any>>(Base: T) {
+export function DataTypeMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class DataTypeModel extends Base {
     @property({
-      type: "string",
+      type: 'string',
       required: true,
-      description: "Entity type discriminator",
+      description: 'Entity type discriminator',
     })
     type: string;
 
     @property({
-      type: "string",
-      description: "Entity category",
+      type: 'string',
+      description: 'Entity category',
     })
     category?: string;
 
     @property({
-      type: "string",
-      description: "Entity scheme",
+      type: 'string',
+      description: 'Entity scheme',
     })
     scheme?: string;
 
     @property({
-      type: "array",
-      itemType: "string",
-      description: "Entity tags",
+      type: 'array',
+      itemType: 'string',
+      description: 'Entity tags',
     })
     tags?: string[];
 
     @property({
-      type: "object",
-      description: "Additional metadata",
+      type: 'object',
+      description: 'Additional metadata',
     })
     metadata?: Record<string, any>;
   }

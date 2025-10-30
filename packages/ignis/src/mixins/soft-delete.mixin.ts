@@ -1,9 +1,9 @@
+import { BaseEntity } from '@/base';
+import type { MixinTarget } from '@/common/types';
 import { property } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
 
 /**
  * Soft delete mixin - adds isDeleted flag
- * Matches Loopback 4's SoftDeleteModelMixin
  *
  * @param Base - Base class to extend
  * @returns Extended class with soft delete field
@@ -15,14 +15,17 @@ import type { ClassType } from '@/common/types';
  * }
  * ```
  */
-export function SoftDeleteModelMixin<T extends ClassType<any>>(Base: T) {
+export function SoftDeleteModelMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class SoftDeleteModel extends Base {
     @property({
       type: 'boolean',
-      default: false,
+      default: () => false,
       description: 'Soft delete flag',
     })
     isDeleted?: boolean;
+
+    @property({ type: 'date' })
+    deletedAt?: Date;
   }
 
   return SoftDeleteModel;

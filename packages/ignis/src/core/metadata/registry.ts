@@ -1,17 +1,17 @@
-import type { ClassType } from "@/common/types";
-import "reflect-metadata";
-import { METADATA_KEY } from "./constants";
+import type { ClassType } from '@/common/types';
+import 'reflect-metadata';
+import { METADATA_KEY } from './constants';
 import type {
   AuthenticateMetadata,
   AuthorizeMetadata,
-  ControllerMetadata,
+  IControllerMetadata,
   InjectMetadata,
   InjectableMetadata,
-  ParameterMetadata,
-  PropertyMetadata,
+  IParameterMetadata,
+  IPropertyMetadata,
   RelationMetadata,
-  RouteMetadata,
-} from "./types";
+  IRouteMetadata,
+} from './types';
 
 /**
  * Central metadata registry for storing and retrieving decorator metadata
@@ -19,16 +19,11 @@ import type {
 export class MetadataRegistry {
   // ==================== Controller Metadata ====================
 
-  static setControllerMetadata(
-    target: ClassType<any>,
-    metadata: ControllerMetadata,
-  ): void {
+  static setControllerMetadata(target: ClassType<any>, metadata: IControllerMetadata): void {
     Reflect.defineMetadata(METADATA_KEY.CONTROLLER, metadata, target);
   }
 
-  static getControllerMetadata(
-    target: ClassType<any>,
-  ): ControllerMetadata | undefined {
+  static getControllerMetadata(target: ClassType<any>): IControllerMetadata | undefined {
     return Reflect.getMetadata(METADATA_KEY.CONTROLLER, target);
   }
 
@@ -37,14 +32,14 @@ export class MetadataRegistry {
   static addRouteMetadata(
     target: ClassType<any>,
     methodName: string | symbol,
-    metadata: RouteMetadata,
+    metadata: IRouteMetadata,
   ): void {
     const routes = this.getRouteMetadata(target) || [];
     routes.push({ ...metadata, methodName });
     Reflect.defineMetadata(METADATA_KEY.ROUTES, routes, target);
   }
 
-  static getRouteMetadata(target: ClassType<any>): RouteMetadata[] {
+  static getRouteMetadata(target: ClassType<any>): IRouteMetadata[] {
     return Reflect.getMetadata(METADATA_KEY.ROUTES, target) || [];
   }
 
@@ -53,7 +48,7 @@ export class MetadataRegistry {
   static addParameterMetadata(
     target: any,
     methodName: string | symbol,
-    metadata: ParameterMetadata,
+    metadata: IParameterMetadata,
   ): void {
     const key = `${METADATA_KEY.PARAMETERS.toString()}:${String(methodName)}`;
     const parameters = Reflect.getMetadata(key, target) || [];
@@ -64,7 +59,7 @@ export class MetadataRegistry {
   static getParameterMetadata(
     target: any,
     methodName: string | symbol,
-  ): ParameterMetadata[] | undefined {
+  ): IParameterMetadata[] | undefined {
     const key = `${METADATA_KEY.PARAMETERS.toString()}:${String(methodName)}`;
     return Reflect.getMetadata(key, target);
   }
@@ -78,9 +73,7 @@ export class MetadataRegistry {
     Reflect.defineMetadata(METADATA_KEY.MODEL, metadata, target);
   }
 
-  static getModelMetadata(
-    target: ClassType<any>,
-  ): { name?: string; settings?: any } | undefined {
+  static getModelMetadata(target: ClassType<any>): { name?: string; settings?: any } | undefined {
     return Reflect.getMetadata(METADATA_KEY.MODEL, target);
   }
 
@@ -89,27 +82,21 @@ export class MetadataRegistry {
   static addPropertyMetadata(
     target: any,
     propertyName: string | symbol,
-    metadata: PropertyMetadata,
+    metadata: IPropertyMetadata,
   ): void {
     const properties = this.getPropertiesMetadata(target) || new Map();
     properties.set(propertyName, metadata);
-    Reflect.defineMetadata(
-      METADATA_KEY.PROPERTIES,
-      properties,
-      target.constructor,
-    );
+    Reflect.defineMetadata(METADATA_KEY.PROPERTIES, properties, target.constructor);
   }
 
-  static getPropertiesMetadata(
-    target: any,
-  ): Map<string | symbol, PropertyMetadata> | undefined {
+  static getPropertiesMetadata(target: any): Map<string | symbol, IPropertyMetadata> | undefined {
     return Reflect.getMetadata(METADATA_KEY.PROPERTIES, target.constructor);
   }
 
   static getPropertyMetadata(
     target: any,
     propertyName: string | symbol,
-  ): PropertyMetadata | undefined {
+  ): IPropertyMetadata | undefined {
     const properties = this.getPropertiesMetadata(target);
     return properties?.get(propertyName);
   }
@@ -123,16 +110,10 @@ export class MetadataRegistry {
   ): void {
     const relations = this.getRelationsMetadata(target) || new Map();
     relations.set(propertyName, metadata);
-    Reflect.defineMetadata(
-      METADATA_KEY.RELATIONS,
-      relations,
-      target.constructor,
-    );
+    Reflect.defineMetadata(METADATA_KEY.RELATIONS, relations, target.constructor);
   }
 
-  static getRelationsMetadata(
-    target: any,
-  ): Map<string | symbol, RelationMetadata> | undefined {
+  static getRelationsMetadata(target: any): Map<string | symbol, RelationMetadata> | undefined {
     return Reflect.getMetadata(METADATA_KEY.RELATIONS, target.constructor);
   }
 
@@ -146,11 +127,7 @@ export class MetadataRegistry {
 
   // ==================== Injection Metadata ====================
 
-  static addInjectMetadata(
-    target: any,
-    index: number,
-    metadata: InjectMetadata,
-  ): void {
+  static addInjectMetadata(target: any, index: number, metadata: InjectMetadata): void {
     const injects = Reflect.getMetadata(METADATA_KEY.INJECT, target) || [];
     injects[index] = metadata;
     Reflect.defineMetadata(METADATA_KEY.INJECT, injects, target);
@@ -160,16 +137,11 @@ export class MetadataRegistry {
     return Reflect.getMetadata(METADATA_KEY.INJECT, target);
   }
 
-  static setInjectableMetadata(
-    target: ClassType<any>,
-    metadata: InjectableMetadata,
-  ): void {
+  static setInjectableMetadata(target: ClassType<any>, metadata: InjectableMetadata): void {
     Reflect.defineMetadata(METADATA_KEY.INJECTABLE, metadata, target);
   }
 
-  static getInjectableMetadata(
-    target: ClassType<any>,
-  ): InjectableMetadata | undefined {
+  static getInjectableMetadata(target: ClassType<any>): InjectableMetadata | undefined {
     return Reflect.getMetadata(METADATA_KEY.INJECTABLE, target);
   }
 
@@ -219,7 +191,7 @@ export class MetadataRegistry {
   static getMethodNames(target: ClassType<any>): string[] {
     const prototype = target.prototype;
     const methods = Object.getOwnPropertyNames(prototype).filter(
-      (name) => name !== "constructor" && typeof prototype[name] === "function",
+      name => name !== 'constructor' && typeof prototype[name] === 'function',
     );
     return methods;
   }
@@ -237,7 +209,7 @@ export class MetadataRegistry {
    */
   static clearMetadata(target: any): void {
     const keys = Reflect.getMetadataKeys(target);
-    keys.forEach((key) => {
+    keys.forEach(key => {
       Reflect.deleteMetadata(key, target);
     });
   }

@@ -10,7 +10,8 @@
     "rebuild:agent-infra": "bun run --filter \"./packages/agent-infra\" rebuild",
     "rebuild:ra-core-infra": "bun run --filter \"./packages/ra-core-infra\" rebuild",
     "rebuild:ra-infra": "bun run --filter \"./packages/ra-infra\" rebuild",
-    "rebuild:electron-infra": "bun run --filter \"./packages/electron-infra\" rebuild"
+    "rebuild:electron-infra": "bun run --filter \"./packages/electron-infra\" rebuild",
+    "rebuild:ignis": "bun run --filter \"./packages/ignis\" rebuild"
   },
   "author": "Phat Nguyen <tanphat199@gmail.com>",
   "private": true,

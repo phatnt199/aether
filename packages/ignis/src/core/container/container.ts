@@ -1,9 +1,5 @@
-import {
-  container as tsyringeContainer,
-  DependencyContainer,
-  InjectionToken,
-} from "tsyringe";
-import type { ClassType } from "@/common/types";
+import { container as tsyringeContainer, DependencyContainer, InjectionToken } from 'tsyringe';
+import type { ClassType } from '@/common/types';
 
 export class Binding<T = any> {
   constructor(
@@ -12,7 +8,7 @@ export class Binding<T = any> {
   ) {}
 
   to(value: ClassType<T>) {
-    this.container.register(this.key, { useClass: value as any });
+    this.container.register(this.key, { useClass: value });
     return this;
   }
 
@@ -21,7 +17,7 @@ export class Binding<T = any> {
   }
 
   toDynamicValue(factory: () => T) {
-    this.container.register(this.key as any, { useFactory: () => factory() });
+    this.container.register(this.key, { useFactory: () => factory() });
     return this;
   }
 
@@ -31,16 +27,16 @@ export class Binding<T = any> {
   }
 
   toAlias(alias: string | symbol) {
-    this.container.register(this.key as any, { useToken: alias as any });
+    this.container.register(this.key as any, { useToken: alias });
     return this;
   }
 
-  inScope(scope: "Singleton" | "Transient" | "Request") {
+  inScope(_scope: 'Singleton' | 'Transient' | 'Request') {
     // TSyringe handles scopes automatically based on registration
     return this;
   }
 
-  tag(...tags: (string | { [key: string]: any })[]) {
+  tag(..._tags: (string | { [key: string]: any })[]) {
     // Store tags metadata if needed
     return this;
   }
@@ -94,7 +90,7 @@ export class Container {
   /**
    * Unbind a key
    */
-  unbind(key: string | symbol): boolean {
+  unbind(_key: string | symbol): boolean {
     this.tsyringe.clearInstances();
     return true;
   }

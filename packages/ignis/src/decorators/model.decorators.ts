@@ -1,30 +1,246 @@
-import { MetadataRegistry } from "@/core/metadata/registry";
-import type { PropertyMetadata, RelationMetadata } from "@/core/metadata/types";
-import type { ClassType, AnyObject } from "@/common/types";
+import type { AnyObject, ClassType } from '@/common/types';
+import { MetadataRegistry } from '@/core/metadata/registry';
+import type { IPropertyMetadata, RelationMetadata } from '@/core/metadata/types';
 
 /**
- * @model decorator - marks a class as a model/entity
- * Matches Loopback 4's @model()
+ * Drizzle ORM specific settings for the @model decorator
+ */
+export interface DrizzleModelSettings {
+  /**
+   * PostgreSQL schema name (e.g., 'public', 'auth', 'app')
+   * @default 'public'
+   */
+  schema?: string;
+
+  /**
+   * Custom table name in the database
+   * If not provided, uses the model name (lowercased)
+   */
+  tableName?: string;
+
+  /**
+   * Enable strict mode - requires all properties to be defined with @property decorator
+   * @default true
+   */
+  strict?: boolean;
+
+  /**
+   * PostgreSQL table-level options
+   */
+  postgresql?: {
+    /**
+     * Enable Row-Level Security (RLS)
+     * @default false
+     */
+    rowLevelSecurity?: boolean;
+
+    /**
+     * Table inheritance - inherit from another table
+     * @example 'base_entity'
+     */
+    inherits?: string;
+
+    /**
+     * Table storage parameters
+     * @example { fillfactor: 70, autovacuum_enabled: true }
+     */
+    storageParameters?: Record<string, any>;
+
+    /**
+     * Tablespace for the table
+     */
+    tablespace?: string;
+
+    /**
+     * Enable unlogged table (faster but not crash-safe)
+     * @default false
+     */
+    unlogged?: boolean;
+  };
+
+  /**
+   * Indexes to create at table level
+   */
+  indexes?: Array<{
+    /**
+     * Index name
+     */
+    name?: string;
+
+    /**
+     * Columns to include in the index
+     */
+    columns: string[];
+
+    /**
+     * Index type
+     * @default 'btree'
+     */
+    type?: 'btree' | 'hash' | 'gist' | 'gin' | 'brin';
+
+    /**
+     * Create unique index
+     * @default false
+     */
+    unique?: boolean;
+
+    /**
+     * Partial index WHERE clause
+     * @example 'deleted_at IS NULL'
+     */
+    where?: string;
+
+    /**
+     * Index method options
+     */
+    using?: string;
+  }>;
+
+  /**
+   * Composite unique constraints
+   */
+  uniqueConstraints?: Array<{
+    /**
+     * Constraint name
+     */
+    name?: string;
+
+    /**
+     * Columns that form the unique constraint
+     */
+    columns: string[];
+  }>;
+
+  /**
+   * Check constraints
+   */
+  checkConstraints?: Array<{
+    /**
+     * Constraint name
+     */
+    name?: string;
+
+    /**
+     * SQL expression for the check
+     * @example 'age >= 18'
+     */
+    expression: string;
+  }>;
+
+  /**
+   * Enable soft delete support
+   * Automatically filters out deleted records in queries
+   * @default false
+   */
+  softDelete?: boolean;
+
+  /**
+   * Enable timestamp tracking (createdAt, updatedAt)
+   * @default false
+   */
+  timestamps?: boolean;
+
+  /**
+   * Enable user audit tracking (createdBy, modifiedBy)
+   * @default false
+   */
+  userAudit?: boolean;
+
+  /**
+   * Additional Drizzle-specific options
+   */
+  drizzle?: {
+    /**
+     * Skip generating migrations for this table
+     * @default false
+     */
+    skipMigration?: boolean;
+
+    /**
+     * Table comment (PostgreSQL)
+     */
+    comment?: string;
+  };
+}
+
+/**
+ * @model decorator - marks a class as a model/entity with Drizzle ORM support
+ * @param options - Model options including Drizzle-specific settings
  *
- * @param options - Model options
- *
- * @example
+ * @example Basic usage:
  * ```ts
- * @model({ settings: { strict: true } })
- * export class User extends Entity {
- *   @property({ type: 'number', id: true, generated: true })
- *   id: number;
- *
+ * @model({ name: 'users' })
+ * export class User extends BaseNumberTzEntity {
  *   @property({ type: 'string', required: true })
- *   name: string;
+ *   email: string;
  * }
  * ```
+ *
+ * @example With PostgreSQL schema:
+ * ```ts
+ * @model({
+ *   name: 'users',
+ *   settings: {
+ *     schema: 'auth',
+ *     tableName: 'app_users'
+ *   }
+ * })
+ * export class User extends Entity { }
+ * ```
+ *
+ * @example With indexes and constraints:
+ * ```ts
+ * @model({
+ *   name: 'products',
+ *   settings: {
+ *     indexes: [
+ *       { columns: ['sku'], unique: true },
+ *       { columns: ['category', 'price'], type: 'btree' }
+ *     ],
+ *     uniqueConstraints: [
+ *       { name: 'unique_product_code', columns: ['code', 'vendor_id'] }
+ *     ],
+ *     checkConstraints: [
+ *       { name: 'positive_price', expression: 'price > 0' }
+ *     ]
+ *   }
+ * })
+ * export class Product extends Entity { }
+ * ```
+ *
+ * @example With PostgreSQL features:
+ * ```ts
+ * @model({
+ *   name: 'audit_logs',
+ *   settings: {
+ *     postgresql: {
+ *       rowLevelSecurity: true,
+ *       unlogged: false,
+ *       storageParameters: { fillfactor: 70 }
+ *     },
+ *     timestamps: true,
+ *     userAudit: true
+ *   }
+ * })
+ * export class AuditLog extends Entity { }
+ * ```
  */
-export function model(options?: { name?: string; settings?: AnyObject }) {
+export function model(options?: {
+  /**
+   * Model/table name
+   * Used as the table name in the database (unless tableName is specified in settings)
+   */
+  name?: string;
+
+  /**
+   * Drizzle ORM-specific settings
+   */
+  settings?: DrizzleModelSettings;
+}) {
   return function <T extends { new (...args: any[]): {} }>(target: T) {
     const metadata = {
       name: options?.name || target.name,
-      settings: options?.settings,
+      settings: options?.settings || {},
     };
 
     MetadataRegistry.setModelMetadata(target, metadata);
@@ -34,8 +250,6 @@ export function model(options?: { name?: string; settings?: AnyObject }) {
 
 /**
  * @property decorator - defines a model property
- * Matches Loopback 4's @property()
- *
  * @param metadata - Property metadata
  *
  * @example
@@ -49,12 +263,11 @@ export function model(options?: { name?: string; settings?: AnyObject }) {
  * email: string;
  * ```
  */
-export function property(metadata?: PropertyMetadata) {
+export function property(metadata?: IPropertyMetadata) {
   return function (target: any, propertyKey: string | symbol) {
-    // Get design-time type from TypeScript
-    const designType = Reflect.getMetadata("design:type", target, propertyKey);
+    const designType = Reflect.getMetadata('design:type', target, propertyKey);
 
-    const fullMetadata: PropertyMetadata = {
+    const fullMetadata: IPropertyMetadata = {
       type: metadata?.type || designType?.name?.toLowerCase(),
       required: metadata?.required,
       id: metadata?.id,
@@ -71,8 +284,6 @@ export function property(metadata?: PropertyMetadata) {
 
 /**
  * @belongsTo decorator - defines a belongsTo relation
- * Matches Loopback 4's @belongsTo()
- *
  * @param target - Target model class or name
  * @param definition - Relation definition
  *
@@ -85,38 +296,31 @@ export function property(metadata?: PropertyMetadata) {
  * user?: User;
  * ```
  */
-export function belongsTo(
-  target: string | ClassType<any> | (() => ClassType<any>),
+export function belongsTo<T>(
+  target: () => ClassType<T>,
   definition?: {
     keyFrom?: string;
     keyTo?: string;
     name?: string;
   },
 ) {
-  return function (targetPrototype: any, propertyKey: string | symbol) {
-    const targetModel =
-      typeof target === "function" && target.length === 0 ? target() : target;
+  return (targetPrototype: any, propertyKey: string | symbol) => {
+    const targetModel = typeof target === 'function' && target.length === 0 ? target() : target;
 
     const metadata: RelationMetadata = {
-      type: "belongsTo",
+      type: 'belongsTo',
       target: targetModel,
       foreignKey: definition?.keyFrom || `${String(propertyKey)}Id`,
       keyFrom: definition?.keyFrom,
-      keyTo: definition?.keyTo || "id",
+      keyTo: definition?.keyTo || 'id',
     };
 
-    MetadataRegistry.addRelationMetadata(
-      targetPrototype,
-      propertyKey,
-      metadata,
-    );
+    MetadataRegistry.addRelationMetadata(targetPrototype, propertyKey, metadata);
   };
 }
 
 /**
  * @hasOne decorator - defines a hasOne relation
- * Matches Loopback 4's @hasOne()
- *
  * @param target - Target model class or getter
  * @param definition - Relation definition
  *
@@ -126,36 +330,29 @@ export function belongsTo(
  * profile?: Profile;
  * ```
  */
-export function hasOne(
-  target: string | ClassType<any> | (() => ClassType<any>),
+export function hasOne<T>(
+  target: () => ClassType<T>,
   definition?: {
     keyFrom?: string;
     keyTo?: string;
   },
 ) {
   return function (targetPrototype: any, propertyKey: string | symbol) {
-    const targetModel =
-      typeof target === "function" && target.length === 0 ? target() : target;
+    const targetModel = typeof target === 'function' && target.length === 0 ? target() : target;
 
     const metadata: RelationMetadata = {
-      type: "hasOne",
+      type: 'hasOne',
       target: targetModel,
-      keyFrom: definition?.keyFrom || "id",
+      keyFrom: definition?.keyFrom || 'id',
       keyTo: definition?.keyTo,
     };
 
-    MetadataRegistry.addRelationMetadata(
-      targetPrototype,
-      propertyKey,
-      metadata,
-    );
+    MetadataRegistry.addRelationMetadata(targetPrototype, propertyKey, metadata);
   };
 }
 
 /**
  * @hasMany decorator - defines a hasMany relation
- * Matches Loopback 4's @hasMany()
- *
  * @param target - Target model class or getter
  * @param definition - Relation definition
  *
@@ -165,8 +362,8 @@ export function hasOne(
  * orders?: Order[];
  * ```
  */
-export function hasMany(
-  target: string | ClassType<any> | (() => ClassType<any>),
+export function hasMany<T>(
+  target: () => ClassType<T>,
   definition?: {
     keyFrom?: string;
     keyTo?: string;
@@ -178,41 +375,33 @@ export function hasMany(
   },
 ) {
   return function (targetPrototype: any, propertyKey: string | symbol) {
-    const targetModel =
-      typeof target === "function" && target.length === 0 ? target() : target;
+    const targetModel = typeof target === 'function' && target.length === 0 ? target() : target;
 
     const metadata: RelationMetadata = {
-      type: definition?.through ? "hasManyThrough" : "hasMany",
+      type: definition?.through ? 'hasManyThrough' : 'hasMany',
       target: targetModel,
-      keyFrom: definition?.keyFrom || "id",
+      keyFrom: definition?.keyFrom || 'id',
       keyTo: definition?.keyTo,
       through: definition?.through,
     };
 
-    MetadataRegistry.addRelationMetadata(
-      targetPrototype,
-      propertyKey,
-      metadata,
-    );
+    MetadataRegistry.addRelationMetadata(targetPrototype, propertyKey, metadata);
   };
 }
 
 /**
  * Helper to get model schema reference (for OpenAPI)
- * Matches Loopback's getModelSchemaRef()
  */
 export function getModelSchemaRef(
   modelClass: ClassType<any>,
   options?: { includeRelations?: boolean; exclude?: string[] },
 ) {
   const modelMetadata = MetadataRegistry.getModelMetadata(modelClass);
-  const properties = MetadataRegistry.getPropertiesMetadata(
-    modelClass.prototype,
-  );
+  const properties = MetadataRegistry.getPropertiesMetadata(modelClass.prototype);
 
   const schema: AnyObject = {
     title: modelMetadata?.name || modelClass.name,
-    type: "object",
+    type: 'object',
     properties: {},
   };
 
@@ -235,19 +424,18 @@ export function getModelSchemaRef(
 
 /**
  * Get filter schema for a model (for query parameters)
- * Matches Loopback's getFilterSchemaFor()
  */
-export function getFilterSchemaFor(modelClass: ClassType<any>) {
+export function getFilterSchemaFor(_modelClass: ClassType<any>) {
   return {
-    type: "object",
+    type: 'object',
     properties: {
-      where: { type: "object" },
-      fields: { type: "object" },
-      include: { type: "array" },
-      order: { type: "array" },
-      limit: { type: "number" },
-      skip: { type: "number" },
-      offset: { type: "number" },
+      where: { type: 'object' },
+      fields: { type: 'object' },
+      include: { type: 'array' },
+      order: { type: 'array' },
+      limit: { type: 'number' },
+      skip: { type: 'number' },
+      offset: { type: 'number' },
     },
   };
 }

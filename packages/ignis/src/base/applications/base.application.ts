@@ -1,20 +1,20 @@
-import { Hono } from "hono";
-import { serve } from "@hono/node-server";
-import type { Context } from "hono";
-import { Container, globalContainer } from "@/core/container";
-import { MetadataRegistry } from "@/core/metadata";
-import type { RouteMetadata, ParameterMetadata } from "@/core/metadata/types";
+import { App as AppConstants } from '@/common/constants';
+import { CoreBindings } from '@/common/bindings';
 import type {
-  IApplication,
   ClassType,
-  ValueOrPromise,
+  IApplication,
+  IDataSource,
   IRepository,
   IService,
-  IDataSource,
-} from "@/common/types";
-import { CoreBindings } from "@/common/keys";
-import { App as AppConstants } from "@/common/constants";
-import { ParameterType } from "@/core/metadata/constants";
+  ValueOrPromise,
+} from '@/common/types';
+import { Container, globalContainer } from '@/core/container';
+import { MetadataRegistry } from '@/core/metadata';
+import { ParameterType } from '@/core/metadata/constants';
+import type { IParameterMetadata, IRouteMetadata } from '@/core/metadata/types';
+import { serve } from '@hono/node-server';
+import type { Context } from 'hono';
+import { Hono } from 'hono';
 
 /**
  * Application configuration
@@ -41,7 +41,7 @@ export class BaseApplication implements IApplication {
     this.config = {
       port: config.port || AppConstants.PORT,
       host: config.host || AppConstants.HOST,
-      basePath: config.basePath || "/",
+      basePath: config.basePath || '/',
       ...config,
     };
 
@@ -60,7 +60,7 @@ export class BaseApplication implements IApplication {
     this.controllers.add(ctor);
 
     // Register controller in DI container
-    const name = typeof nameOrOptions === "string" ? nameOrOptions : ctor.name;
+    const name = typeof nameOrOptions === 'string' ? nameOrOptions : ctor.name;
     this.container.register(`controllers.${name}`, ctor);
 
     return this;
@@ -74,7 +74,7 @@ export class BaseApplication implements IApplication {
 
     // Instantiate and initialize component
     const instance = this.container.resolve(ctor);
-    if (typeof (instance as any).init === "function") {
+    if (typeof (instance as any).init === 'function') {
       (instance as any).init(this);
     }
   }
@@ -143,7 +143,7 @@ export class BaseApplication implements IApplication {
   /**
    * Initialize application
    */
-  async initialize(opts?: { sequence?: ClassType<any> }): Promise<void> {
+  async initialize(): Promise<void> {
     await this.preConfigure();
 
     // Register all controllers and their routes
@@ -159,9 +159,8 @@ export class BaseApplication implements IApplication {
    */
   protected registerController(controllerClass: ClassType<any>): void {
     // Get controller metadata
-    const controllerMetadata =
-      MetadataRegistry.getControllerMetadata(controllerClass);
-    const basePath = controllerMetadata?.basePath || "/";
+    const controllerMetadata = MetadataRegistry.getControllerMetadata(controllerClass);
+    const basePath = controllerMetadata?.basePath || '/';
 
     // Get all route metadata
     const routes = MetadataRegistry.getRouteMetadata(controllerClass);
@@ -182,19 +181,14 @@ export class BaseApplication implements IApplication {
   /**
    * Register a single route
    */
-  protected registerRoute(
-    controllerInstance: any,
-    route: RouteMetadata,
-    basePath: string,
-  ): void {
+  protected registerRoute(controllerInstance: any, route: IRouteMetadata, basePath: string): void {
     const fullPath = this.normalizePath(basePath, route.path);
     const method = route.method.toLowerCase();
     const methodName = route.methodName;
 
     // Get parameter metadata
     const paramMetadata =
-      MetadataRegistry.getParameterMetadata(controllerInstance, methodName) ||
-      [];
+      MetadataRegistry.getParameterMetadata(controllerInstance, methodName) || [];
 
     // Sort parameters by index
     paramMetadata.sort((a, b) => a.index - b.index);
@@ -203,8 +197,8 @@ export class BaseApplication implements IApplication {
     const handler = async (c: Context) => {
       try {
         // Bind context to container
-        c.set("container", this.container);
-        c.set("application", this);
+        c.set('container', this.container);
+        c.set('application', this);
 
         // Extract parameters
         const args = await this.extractParameters(c, paramMetadata);
@@ -218,7 +212,7 @@ export class BaseApplication implements IApplication {
         return c.json(
           {
             error: {
-              message: error.message || "Internal Server Error",
+              message: error.message || 'Internal Server Error',
               statusCode: error.statusCode || 500,
             },
           },
@@ -230,9 +224,7 @@ export class BaseApplication implements IApplication {
     // Register with Hono
     (this.hono as any)[method](fullPath, handler);
 
-    console.log(
-      `Registered route: ${route.method} ${fullPath} -> ${String(methodName)}`,
-    );
+    console.log(`Registered route: ${route.method} ${fullPath} -> ${String(methodName)}`);
   }
 
   /**
@@ -240,7 +232,7 @@ export class BaseApplication implements IApplication {
    */
   protected async extractParameters(
     ctx: Context,
-    paramMetadata: ParameterMetadata[],
+    paramMetadata: IParameterMetadata[],
   ): Promise<any[]> {
     const args: any[] = [];
 
@@ -250,19 +242,13 @@ export class BaseApplication implements IApplication {
       } else {
         switch (param.type) {
           case ParameterType.PATH:
-            args[param.index] = param.name
-              ? ctx.req.param(param.name)
-              : ctx.req.param();
+            args[param.index] = param.name ? ctx.req.param(param.name) : ctx.req.param();
             break;
           case ParameterType.QUERY:
-            args[param.index] = param.name
-              ? ctx.req.query(param.name)
-              : ctx.req.query();
+            args[param.index] = param.name ? ctx.req.query(param.name) : ctx.req.query();
             break;
           case ParameterType.HEADER:
-            args[param.index] = param.name
-              ? ctx.req.header(param.name)
-              : ctx.req.header();
+            args[param.index] = param.name ? ctx.req.header(param.name) : ctx.req.header();
             break;
           case ParameterType.BODY:
             try {
@@ -293,8 +279,8 @@ export class BaseApplication implements IApplication {
    * Normalize path segments
    */
   protected normalizePath(...segments: string[]): string {
-    const joined = segments.join("/").replace(/\/+/g, "/").replace(/\/$/, "");
-    return joined || "/";
+    const joined = segments.join('/').replace(/\/+/g, '/').replace(/\/$/, '');
+    return joined || '/';
   }
 
   /**
@@ -316,7 +302,7 @@ export class BaseApplication implements IApplication {
     return process.cwd();
   }
 
-  getMigrateModels(opts: {
+  getMigrateModels(_opts: {
     ignoreModels?: string[];
     migrateModels?: string[];
   }): ValueOrPromise<Array<IRepository>> {
@@ -324,7 +310,7 @@ export class BaseApplication implements IApplication {
     return [];
   }
 
-  migrateModels(opts: {
+  migrateModels(_opts: {
     existingSchema: string;
     ignoreModels?: string[];
     migrateModels?: string[];
@@ -369,8 +355,9 @@ export class BaseApplication implements IApplication {
         port,
         hostname: host,
       },
-      (info) => {
-        console.log(`Server started at ${this.getServerAddress()}`);
+      info => {
+        console.log('Server started at %s', this.getServerAddress());
+        console.log('[serve] Info: ', info);
       },
     );
   }
@@ -380,7 +367,7 @@ export class BaseApplication implements IApplication {
    */
   async stop(): Promise<void> {
     // Cleanup logic
-    console.log("Server stopped");
+    console.log('Server stopped');
   }
 }
 

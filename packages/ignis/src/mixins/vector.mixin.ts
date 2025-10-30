@@ -1,5 +1,6 @@
 import { property } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
+import type { MixinTarget } from '@/common/types';
+import { BaseEntity } from '@/base';
 
 /**
  * Vector mixin - adds embedding fields for vector similarity search
@@ -16,7 +17,7 @@ import type { ClassType } from '@/common/types';
  * }
  * ```
  */
-export function VectorMixin<T extends ClassType<any>>(
+export function VectorMixin<T extends MixinTarget<BaseEntity>>(
   Base: T,
   options?: {
     dimension?: number;

@@ -1,6 +1,6 @@
-import type { BaseEntity, TBaseIdEntity, TBaseTzEntity } from "@/base/models";
-import type { AbstractTzRepository } from "@/base/repositories";
-import type { Context } from "hono";
+import type { BaseEntity, TBaseIdEntity, TBaseTzEntity } from '@/base/models';
+import type { AbstractTzRepository } from '@/base/repositories';
+import type { Context } from 'hono';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Basic Types
@@ -16,51 +16,41 @@ export type AnyObject = Record<string | symbol | number, any>;
 export type ValueOrPromise<T> = T | Promise<T>;
 export type ValueOf<T> = T[keyof T];
 
-export type ValueOptional<T, K extends keyof T> = Omit<T, K> &
-  Partial<Pick<T, K>>;
-export type ValueOptionalExcept<T, K extends keyof T> = Pick<T, K> &
-  Partial<Omit<T, K>>;
+export type ValueOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+export type ValueOptionalExcept<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
 
 export type ClassProps<T> = ValueOf<T>;
-export type ClassType<T> = Function & { prototype: T };
 
-export type TStringConstValue<T extends ClassType<any>> = Extract<
-  ValueOf<T>,
-  string
->;
-export type TNumberConstValue<T extends ClassType<any>> = Extract<
-  ValueOf<T>,
-  number
->;
-export type TConstValue<T extends ClassType<any>> = Extract<
-  ValueOf<T>,
-  string | number
->;
+export type Constructor<T> = new (...args: any[]) => T;
+export interface ClassType<T> {
+  new (...args: any[]): T;
+
+  [property: string]: any;
+}
+
+export type MixinTarget<T> = Constructor<{
+  [P in keyof T]: T[P];
+}>;
+
+export type TStringConstValue<T extends ClassType<any>> = Extract<ValueOf<T>, string>;
+export type TNumberConstValue<T extends ClassType<any>> = Extract<ValueOf<T>, number>;
+export type TConstValue<T extends ClassType<any>> = Extract<ValueOf<T>, string | number>;
 
 export type TPrettify<T> = { [K in keyof T]: T[K] } & {};
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Domain Types
 // ----------------------------------------------------------------------------------------------------------------------------------------
-export type TRelationType =
-  | "belongsTo"
-  | "hasOne"
-  | "hasMany"
-  | "hasManyThrough";
+export type TRelationType = 'belongsTo' | 'hasOne' | 'hasMany' | 'hasManyThrough';
 
-export type TBullQueueRole = "queue" | "worker";
+export type TBullQueueRole = 'queue' | 'worker';
 
-export type TPermissionEffect = "allow" | "deny";
+export type TPermissionEffect = 'allow' | 'deny';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Field Mapping Types
 // ----------------------------------------------------------------------------------------------------------------------------------------
-export type TFieldMappingDataType =
-  | "string"
-  | "number"
-  | "strings"
-  | "numbers"
-  | "boolean";
+export type TFieldMappingDataType = 'string' | 'number' | 'strings' | 'numbers' | 'boolean';
 export interface IFieldMapping {
   name: string;
   type: TFieldMappingDataType;
@@ -69,8 +59,8 @@ export interface IFieldMapping {
 
 export type TFieldMappingNames<T extends Array<IFieldMapping>> = Extract<
   T[number],
-  { type: Exclude<T[number]["type"], undefined> }
->["name"];
+  { type: Exclude<T[number]['type'], undefined> }
+>['name'];
 
 export type TObjectFromFieldMappings<
   T extends readonly {
@@ -79,21 +69,21 @@ export type TObjectFromFieldMappings<
     [extra: string | symbol]: any;
   }[],
 > = {
-  [K in T[number]["name"]]: T extends {
+  [K in T[number]['name']]: T extends {
     name: K;
-    type: "string";
+    type: 'string';
     [extra: string | symbol]: any;
   }
     ? string
-    : T extends { name: K; type: "number"; [extra: string | symbol]: any }
+    : T extends { name: K; type: 'number'; [extra: string | symbol]: any }
       ? number
-      : T extends { name: K; type: "boolean"; [extra: string | symbol]: any }
+      : T extends { name: K; type: 'boolean'; [extra: string | symbol]: any }
         ? boolean
-        : T extends { name: K; type: "strings"; [extra: string | symbol]: any }
+        : T extends { name: K; type: 'strings'; [extra: string | symbol]: any }
           ? string[]
           : T extends {
                 name: K;
-                type: "numbers";
+                type: 'numbers';
                 [extra: string | symbol]: any;
               }
             ? number[]
@@ -106,15 +96,12 @@ export type TObjectFromFieldMappings<
 export interface IApplication {
   models: Set<string>;
 
-  initialize(opts?: { sequence?: ClassType<any> }): ValueOrPromise<void>;
+  initialize(): ValueOrPromise<void>;
 
   staticConfigure(): void;
   getProjectRoot(): string;
   preConfigure(): ValueOrPromise<void>;
   postConfigure(): ValueOrPromise<void>;
-
-  controller<T>(ctor: ClassType<T>, nameOrOptions?: string | any): any;
-  component<T>(ctor: ClassType<T>): void;
 
   getServerHost(): string;
   getServerPort(): number;
@@ -171,9 +158,10 @@ export interface Filter<T = any> {
 }
 
 export type Where<T = any> = {
+  [key in keyof T]: any;
+} & {
   and?: Where<T>[];
   or?: Where<T>[];
-  [key: string]: any;
 };
 
 export type Fields<T = any> = {
@@ -193,8 +181,7 @@ export type DataObject<T> = Partial<T>;
 
 export interface IRepository {}
 
-export interface IPersistableRepository<E extends TBaseIdEntity>
-  extends IRepository {
+export interface IPersistableRepository<E extends TBaseIdEntity> extends IRepository {
   findOne(filter?: Filter<E>, options?: AnyObject): Promise<E | null>;
 
   existsWith(where?: Where<any>, options?: AnyObject): Promise<boolean>;
@@ -203,40 +190,16 @@ export interface IPersistableRepository<E extends TBaseIdEntity>
   createAll(datum: DataObject<E>[], options?: AnyObject): Promise<E[]>;
   createWithReturn(data: DataObject<E>, options?: AnyObject): Promise<E>;
 
-  updateById(
-    id: IdType,
-    data: DataObject<E>,
-    options?: AnyObject,
-  ): Promise<void>;
-  updateWithReturn(
-    id: IdType,
-    data: DataObject<E>,
-    options?: AnyObject,
-  ): Promise<E>;
-  updateAll(
-    data: DataObject<E>,
-    where?: Where<any>,
-    options?: AnyObject,
-  ): Promise<Count>;
+  updateById(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<void>;
+  updateWithReturn(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<E>;
+  updateAll(data: DataObject<E>, where?: Where<any>, options?: AnyObject): Promise<Count>;
 
-  upsertWith(
-    data: DataObject<E>,
-    where: Where<any>,
-    options?: AnyObject,
-  ): Promise<E | null>;
-  replaceById(
-    id: IdType,
-    data: DataObject<E>,
-    options?: AnyObject,
-  ): Promise<void>;
+  upsertWith(data: DataObject<E>, where: Where<any>, options?: AnyObject): Promise<E | null>;
+  replaceById(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<void>;
 }
 
-export interface ITzRepository<E extends TBaseTzEntity>
-  extends IPersistableRepository<E> {
-  mixTimestamp(
-    entity: DataObject<E>,
-    options?: { newInstance: boolean },
-  ): DataObject<E>;
+export interface ITzRepository<E extends TBaseTzEntity> extends IPersistableRepository<E> {
+  mixTimestamp(entity: DataObject<E>, options?: { newInstance: boolean }): DataObject<E>;
   mixUserAudit(
     entity: DataObject<E>,
     options?: { newInstance: boolean; authorId: IdType },
@@ -264,33 +227,19 @@ export interface ICrudService<E extends TBaseTzEntity> extends IService {
   repository: AbstractTzRepository<E, EntityRelationType>;
 
   // Read
-  find(
-    filter: Filter<E>,
-    options: ICrudMethodOptions,
-  ): Promise<Array<E & EntityRelationType>>;
+  find(filter: Filter<E>, options: ICrudMethodOptions): Promise<Array<E & EntityRelationType>>;
   findById(
     id: IdType,
     filter: Filter<E>,
     options: ICrudMethodOptions,
   ): Promise<E & EntityRelationType>;
-  findOne(
-    filter: Filter<E>,
-    options: ICrudMethodOptions,
-  ): Promise<(E & EntityRelationType) | null>;
+  findOne(filter: Filter<E>, options: ICrudMethodOptions): Promise<(E & EntityRelationType) | null>;
   count(where: Where<E>, options: ICrudMethodOptions): Promise<Count>;
 
   // Create, Update, Delete
-  create(data: Omit<E, "id">, options: ICrudMethodOptions): Promise<E>;
-  updateAll(
-    data: Partial<E>,
-    where: Where<E>,
-    options: ICrudMethodOptions,
-  ): Promise<Count>;
-  updateWithReturn(
-    id: IdType,
-    data: Partial<E>,
-    options: ICrudMethodOptions,
-  ): Promise<E>;
+  create(data: Omit<E, 'id'>, options: ICrudMethodOptions): Promise<E>;
+  updateAll(data: Partial<E>, where: Where<E>, options: ICrudMethodOptions): Promise<Count>;
+  updateWithReturn(id: IdType, data: Partial<E>, options: ICrudMethodOptions): Promise<E>;
   replaceById(id: IdType, data: E, options: ICrudMethodOptions): Promise<E>;
   deleteById(id: IdType, options: ICrudMethodOptions): Promise<{ id: IdType }>;
 }

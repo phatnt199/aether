@@ -1,10 +1,11 @@
+import { BaseEntity } from '@/base';
+import type { MixinTarget } from '@/common/types';
 import { property } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
 
 /**
  * ID mixin for numeric ID
  */
-export function IdMixin<T extends ClassType<any>>(Base: T) {
+export function IdMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class IdModel extends Base {
     @property({
       type: 'number',
@@ -21,7 +22,7 @@ export function IdMixin<T extends ClassType<any>>(Base: T) {
 /**
  * String ID mixin
  */
-export function StringIdMixin<T extends ClassType<any>>(Base: T) {
+export function StringIdMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class StringIdModel extends Base {
     @property({
       type: 'string',

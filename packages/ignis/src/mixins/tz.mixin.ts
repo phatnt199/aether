@@ -1,9 +1,9 @@
+import { BaseEntity } from '@/base';
+import type { MixinTarget } from '@/common/types';
 import { property } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
 
 /**
  * Timestamp mixin - adds createdAt, modifiedAt, deletedAt fields
- * Matches Loopback 4's TzMixin
  *
  * @param Base - Base class to extend
  * @returns Extended class with timestamp fields
@@ -15,7 +15,7 @@ import type { ClassType } from '@/common/types';
  * }
  * ```
  */
-export function TzMixin<T extends ClassType<any>>(Base: T) {
+export function TzMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class TzModel extends Base {
     @property({
       type: 'date',

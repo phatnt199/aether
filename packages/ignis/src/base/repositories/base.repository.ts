@@ -1,16 +1,16 @@
+import type { TBaseIdEntity, TBaseTzEntity } from '@/base/models';
 import type {
-  IRepository,
-  IPersistableRepository,
-  ITzRepository,
-  Filter,
-  Where,
+  AnyObject,
   Count,
   DataObject,
-  IdType,
   EntityClassType,
-  AnyObject
+  Filter,
+  IdType,
+  IPersistableRepository,
+  IRepository,
+  ITzRepository,
+  Where,
 } from '@/common/types';
-import type { TBaseIdEntity, TBaseTzEntity } from '@/base/models';
 
 /**
  * Base repository class
@@ -38,72 +38,87 @@ export abstract class BaseRepository<E extends TBaseIdEntity> implements IReposi
   protected buildWhereClause(where?: Where<E>): AnyObject {
     if (!where) return {};
 
-    // Handle Loopback-style where clauses
     const result: AnyObject = {};
 
-    for (const [key, value] of Object.entries(where)) {
-      if (key === 'and') {
-        // Handle AND conditions
-        result.$and = (value as Where<E>[]).map(w => this.buildWhereClause(w));
-      } else if (key === 'or') {
-        // Handle OR conditions
-        result.$or = (value as Where<E>[]).map(w => this.buildWhereClause(w));
-      } else if (typeof value === 'object' && value !== null) {
-        // Handle operators like { gt: 5, lt: 10 }
-        result[key] = this.buildOperators(value);
-      } else {
-        // Direct equality
-        result[key] = value;
+    for (const key in where) {
+      const value = where[key];
+      switch (key) {
+        case 'and': {
+          result.$and = (value as Where<E>[]).map(w => this.buildWhereClause(w));
+          break;
+        }
+        case 'or': {
+          result.$or = (value as Where<E>[]).map(w => this.buildWhereClause(w));
+          break;
+        }
+        default: {
+          if (typeof value === 'object' && value !== null) {
+            result[key] = this.buildOperators(value);
+            break;
+          }
+
+          result[key] = value;
+          break;
+        }
       }
     }
 
     return result;
   }
 
-  /**
-   * Convert Loopback operators to SQL operators
-   */
   protected buildOperators(operators: AnyObject): AnyObject {
     const result: AnyObject = {};
 
     for (const [op, value] of Object.entries(operators)) {
       switch (op) {
-        case 'eq':
-          return value; // Direct equality
+        case 'eq': {
+          return value;
+        }
         case 'neq':
-        case 'ne':
+        case 'ne': {
           result.$ne = value;
           break;
-        case 'gt':
+        }
+        case 'gt': {
           result.$gt = value;
           break;
-        case 'gte':
+        }
+        case 'gte': {
           result.$gte = value;
           break;
-        case 'lt':
+        }
+        case 'lt': {
           result.$lt = value;
           break;
-        case 'lte':
+        }
+        case 'lte': {
           result.$lte = value;
           break;
-        case 'like':
+        }
+        case 'like': {
           result.$like = value;
           break;
-        case 'ilike':
+        }
+        case 'ilike': {
           result.$ilike = value;
           break;
-        case 'regexp':
+        }
+        case 'regexp': {
           result.$regexp = value;
           break;
-        case 'in':
+        }
+        case 'in': {
           result.$in = value;
           break;
-        case 'nin':
+        }
+        case 'nin': {
           result.$nin = value;
           break;
-        case 'between':
+        }
+        case 'between': {
           result.$between = value;
           break;
+        }
         default:
           result[op] = value;
       }
@@ -145,13 +160,16 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
   extends BaseRepository<E>
   implements IPersistableRepository<E>
 {
-  async find(filter?: Filter<E>, options?: AnyObject): Promise<(E & Relations)[]> {
+  async find(_filter?: Filter<E>, _options?: AnyObject): Promise<(E & Relations)[]> {
     // To be implemented with Drizzle query builder
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
 
   async findById(id: IdType, filter?: Filter<E>, options?: AnyObject): Promise<E & Relations> {
-    const result = await this.findOne({ ...filter, where: { ...filter?.where, id } as any }, options);
+    const result = await this.findOne(
+      { ...filter, where: { ...filter?.where, id } as any },
+      options,
+    );
     if (!result) {
       throw new Error(`Entity not found: ${this.modelName} with id ${id}`);
     }
@@ -163,12 +181,12 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
     return results[0] || null;
   }
 
-  async count(where?: Where<E>, options?: AnyObject): Promise<Count> {
+  async count(_where?: Where<E>, _options?: AnyObject): Promise<Count> {
     // To be implemented with Drizzle
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
 
-  async create(data: DataObject<E>, options?: AnyObject): Promise<E> {
+  async create(_data: DataObject<E>, _options?: AnyObject): Promise<E> {
     // To be implemented with Drizzle
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
@@ -181,7 +199,7 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
     return this.create(data, options);
   }
 
-  async updateById(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<void> {
+  async updateById(_id: IdType, _data: DataObject<E>, _options?: AnyObject): Promise<void> {
     // To be implemented with Drizzle
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
@@ -191,7 +209,7 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
     return this.findById(id, undefined, options);
   }
 
-  async updateAll(data: DataObject<E>, where?: Where<E>, options?: AnyObject): Promise<Count> {
+  async updateAll(_data: DataObject<E>, _where?: Where<E>, _options?: AnyObject): Promise<Count> {
     // To be implemented with Drizzle
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
@@ -209,7 +227,7 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
     return this.updateById(id, data, options);
   }
 
-  async deleteById(id: IdType, options?: AnyObject): Promise<void> {
+  async deleteById(_id: IdType, _options?: AnyObject): Promise<void> {
     // To be implemented with Drizzle
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
@@ -281,7 +299,7 @@ export abstract class AbstractTzRepository<E extends TBaseTzEntity, Relations ex
     if (options?.authorId) {
       enrichedData = this.mixUserAudit(enrichedData, {
         newInstance: true,
-        authorId: options.authorId
+        authorId: options.authorId,
       });
     }
 
@@ -294,7 +312,7 @@ export abstract class AbstractTzRepository<E extends TBaseTzEntity, Relations ex
     if (options?.authorId) {
       enrichedData = this.mixUserAudit(enrichedData, {
         newInstance: false,
-        authorId: options.authorId
+        authorId: options.authorId,
       });
     }
 
@@ -311,7 +329,7 @@ export abstract class AbstractTzRepository<E extends TBaseTzEntity, Relations ex
     if (options?.authorId) {
       enrichedData = this.mixUserAudit(enrichedData, {
         newInstance: false,
-        authorId: options.authorId
+        authorId: options.authorId,
       });
     }
 

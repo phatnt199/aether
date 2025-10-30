@@ -1,18 +1,18 @@
+import { BaseEntity } from '@/base';
+import type { MixinTarget } from '@/common/types';
 import { property } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
 
 /**
  * Soft persistent mixin - adds isPersistent flag
- * Matches Loopback 4's SoftPersistentMixin
  */
-export function SoftPersistentMixin<T extends ClassType<any>>(Base: T) {
+export function SoftPersistentMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class SoftPersistentModel extends Base {
     @property({
-      type: 'boolean',
+      type: 'number',
       default: false,
       description: 'Persistent flag to indicate if record should be kept',
     })
-    isPersistent?: boolean;
+    persistentState?: number; // This number can describe state value more than just deleted or not
   }
 
   return SoftPersistentModel;

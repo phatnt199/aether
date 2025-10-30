@@ -1,11 +1,11 @@
 import { property } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
+import type { MixinTarget } from '@/common/types';
+import { BaseEntity } from '@/base';
 
 /**
  * Object search mixin - adds JSONB search field
- * Matches Loopback 4's ObjectSearchMixin
  */
-export function ObjectSearchMixin<T extends ClassType<any>>(Base: T) {
+export function ObjectSearchMixin<T extends MixinTarget<BaseEntity>>(Base: T) {
   class ObjectSearchModel extends Base {
     @property({
       type: 'object',

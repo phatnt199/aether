@@ -62,7 +62,7 @@
       },
     },
     "packages/ignis": {
-      "name": "@minimaltech/hono-infra",
+      "name": "@minimaltech/ignis",
       "version": "0.1.0",
       "dependencies": {
         "@grpc/grpc-js": "^1.14.0",
@@ -78,11 +78,10 @@
         "dayjs": "^1.11.18",
         "dotenv-flow": "^4.1.0",
         "drizzle-orm": "^0.36.4",
-        "ejs": "^3.1.10",
+        "drizzle-zod": "^0.8.3",
         "hono": "^4.6.14",
         "ioredis": "^5.7.0",
         "jose": "^5.9.6",
-        "knex": "^3.1.0",
         "lodash": "^4.17.21",
         "minio": "^8.0.6",
         "mqtt": "^5.14.1",
@@ -99,14 +98,12 @@
       },
       "devDependencies": {
         "@minimaltech/eslint-node": "^0.2.1",
-        "@types/express": "4.17.21",
         "@types/lodash": "^4.17.20",
         "@types/multer": "^2.0.0",
         "@types/node": "^24.7.2",
         "drizzle-kit": "^0.28.1",
         "eslint": "^9.36.0",
         "prettier": "^3.6.2",
-        "ts-node": "^10.9.2",
         "tsc-alias": "^1.8.16",
         "tsconfig-paths": "^4.2.0",
         "tsx": "^4.19.2",
@@ -175,7 +172,7 @@
     },
     "packages/ra-core-infra": {
       "name": "@minimaltech/ra-core-infra",
-      "version": "0.0.1",
+      "version": "0.0.2-0",
       "dependencies": {
         "@reduxjs/toolkit": "^2.9.1",
         "ra-i18n-polyglot": "^5.12.1",
@@ -512,7 +509,7 @@
 
     "@minimaltech/eslint-react": ["@minimaltech/eslint-react@0.2.1-0", "", { "dependencies": { "@eslint/js": "^9.32.0", "@minimaltech/eslint-common": "latest", "@typescript-eslint/utils": "^8.44.0", "eslint-plugin-react": "^7.37.5", "eslint-plugin-react-hooks": "^5.2.0", "eslint-plugin-react-refresh": "^0.4.20", "typescript": "5.8.3", "typescript-eslint": "^8.44.0" } }, "sha512-xBNWPXX3tVewdAAlK0MH08vWOfHX9u7YE6CZeL3n9bRqParhC8a5ZQE/JM06AobUOuHdmKexxUhU335kerYW8w=="],
 
-    "@minimaltech/hono-infra": ["@minimaltech/hono-infra@workspace:packages/ignis"],
+    "@minimaltech/ignis": ["@minimaltech/ignis@workspace:packages/ignis"],
 
     "@minimaltech/node-infra": ["@minimaltech/node-infra@workspace:packages/node-infra"],
 
@@ -1265,6 +1262,8 @@
     "drizzle-kit": ["drizzle-kit@0.28.1", "", { "dependencies": { "@drizzle-team/brocli": "^0.10.2", "@esbuild-kit/esm-loader": "^2.5.5", "esbuild": "^0.19.7", "esbuild-register": "^3.5.0" }, "bin": { "drizzle-kit": "bin.cjs" } }, "sha512-JimOV+ystXTWMgZkLHYHf2w3oS28hxiH1FR0dkmJLc7GHzdGJoJAQtQS5DRppnabsRZwE2U1F6CuezVBgmsBBQ=="],
 
     "drizzle-orm": ["drizzle-orm@0.36.4", "", { "peerDependencies": { "@aws-sdk/client-rds-data": ">=3", "@cloudflare/workers-types": ">=3", "@electric-sql/pglite": ">=0.2.0", "@libsql/client": ">=0.10.0", "@libsql/client-wasm": ">=0.10.0", "@neondatabase/serverless": ">=0.10.0", "@op-engineering/op-sqlite": ">=2", "@opentelemetry/api": "^1.4.1", "@planetscale/database": ">=1", "@prisma/client": "*", "@tidbcloud/serverless": "*", "@types/better-sqlite3": "*", "@types/pg": "*", "@types/react": ">=18", "@types/sql.js": "*", "@vercel/postgres": ">=0.8.0", "@xata.io/client": "*", "better-sqlite3": ">=7", "bun-types": "*", "expo-sqlite": ">=14.0.0", "knex": "*", "kysely": "*", "mysql2": ">=2", "pg": ">=8", "postgres": ">=3", "react": ">=18", "sql.js": ">=1", "sqlite3": ">=5" }, "optionalPeers": ["@aws-sdk/client-rds-data", "@cloudflare/workers-types", "@electric-sql/pglite", "@libsql/client", "@libsql/client-wasm", "@neondatabase/serverless", "@op-engineering/op-sqlite", "@opentelemetry/api", "@planetscale/database", "@prisma/client", "@tidbcloud/serverless", "@types/better-sqlite3", "@types/pg", "@types/react", "@types/sql.js", "@vercel/postgres", "@xata.io/client", "better-sqlite3", "bun-types", "expo-sqlite", "knex", "kysely", "mysql2", "pg", "postgres", "react", "sql.js", "sqlite3"] }, "sha512-1OZY3PXD7BR00Gl61UUOFihslDldfH4NFRH2MbP54Yxi0G/PKn4HfO65JYZ7c16DeP3SpM3Aw+VXVG9j6CRSXA=="],
+
+    "drizzle-zod": ["drizzle-zod@0.8.3", "", { "peerDependencies": { "drizzle-orm": ">=0.36.0", "zod": "^3.25.0 || ^4.0.0" } }, "sha512-66yVOuvGhKJnTdiqj1/Xaaz9/qzOdRJADpDa68enqS6g3t0kpNkwNYjUuaeXgZfO/UWuIM9HIhSlJ6C5ZraMww=="],
 
     "dunder-proto": ["dunder-proto@1.0.1", "", { "dependencies": { "call-bind-apply-helpers": "^1.0.1", "es-errors": "^1.3.0", "gopd": "^1.2.0" } }, "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A=="],
 

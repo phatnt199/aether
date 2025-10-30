@@ -1,8 +1,8 @@
 import { ParameterType } from '@/core/metadata/constants';
 import { MetadataRegistry } from '@/core/metadata/registry';
-import type { ParameterMetadata } from '@/core/metadata/types';
+import type { IParameterMetadata } from '@/core/metadata/types';
 import type { Context } from 'hono';
-import type { AnyObject, ClassType, Filter, Where } from '@/common/types';
+import type { AnyObject, ClassType } from '@/common/types';
 
 /**
  * Parameter decorator factory
@@ -17,7 +17,7 @@ function createParameterDecorator(
   },
 ) {
   return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
-    const metadata: ParameterMetadata = {
+    const metadata: IParameterMetadata = {
       index: parameterIndex,
       type,
       name,
@@ -38,7 +38,7 @@ export const param = Object.assign(
   function (options?: { name?: string; in?: string; required?: boolean; schema?: AnyObject }) {
     return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
       const paramType = options?.in === 'query' ? ParameterType.QUERY : ParameterType.PATH;
-      const metadata: ParameterMetadata = {
+      const metadata: IParameterMetadata = {
         index: parameterIndex,
         type: paramType,
         name: options?.name,
@@ -134,9 +134,9 @@ export const param = Object.assign(
      * Special filter decorator matching Loopback 4
      * @example @param.filter(User)
      */
-    filter<T>(modelClass: ClassType<T>) {
+    filter<T>(_modelClass: ClassType<T>) {
       return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
-        const metadata: ParameterMetadata = {
+        const metadata: IParameterMetadata = {
           index: parameterIndex,
           type: ParameterType.QUERY,
           name: 'filter',
@@ -159,9 +159,9 @@ export const param = Object.assign(
     /**
      * Where clause decorator matching Loopback 4
      */
-    where<T>(modelClass?: ClassType<T>) {
+    where<T>(_modelClass?: ClassType<T>) {
       return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
-        const metadata: ParameterMetadata = {
+        const metadata: IParameterMetadata = {
           index: parameterIndex,
           type: ParameterType.QUERY,
           name: 'where',
@@ -210,7 +210,7 @@ export function requestBody(options?: {
   content?: AnyObject;
 }) {
   return function (target: any, propertyKey: string | symbol, parameterIndex: number) {
-    const metadata: ParameterMetadata = {
+    const metadata: IParameterMetadata = {
       index: parameterIndex,
       type: ParameterType.BODY,
       required: options?.required !== false, // default to required

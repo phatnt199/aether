@@ -1,5 +1,6 @@
-import { property, belongsTo } from '@/decorators/model.decorators';
-import type { ClassType } from '@/common/types';
+import { BaseEntity } from '@/base';
+import type { ClassType, MixinTarget } from '@/common/types';
+import { belongsTo, property } from '@/decorators/model.decorators';
 
 /**
  * User audit mixin - adds createdBy and modifiedBy fields
@@ -16,12 +17,12 @@ import type { ClassType } from '@/common/types';
  * }
  * ```
  */
-export function UserAuditMixin<T extends ClassType<any>>(
+export function UserAuditMixin<T extends MixinTarget<BaseEntity>>(
   Base: T,
   options?: {
     createdByField?: string;
     modifiedByField?: string;
-    userModel?: string | ClassType<any>;
+    // userModel?: string | ClassType<any>;
   },
 ) {
   const createdByField = options?.createdByField || 'createdBy';
@@ -48,10 +49,10 @@ export function UserAuditMixin<T extends ClassType<any>>(
  * User audit mixin with relations - includes user relations
  * Matches Loopback 4's UserAuditMixin with relations
  */
-export function UserAuditWithRelationsMixin<T extends ClassType<any>>(
+export function UserAuditWithRelationsMixin<T extends MixinTarget<any>>(
   Base: T,
   options: {
-    userModel: string | ClassType<any> | (() => ClassType<any>);
+    userModel: () => ClassType<any>;
     createdByField?: string;
     modifiedByField?: string;
   },
@@ -61,16 +62,22 @@ export function UserAuditWithRelationsMixin<T extends ClassType<any>>(
   const userModel = options.userModel;
 
   class UserAuditWithRelationsModel extends Base {
-    @belongsTo(() => (typeof userModel === 'function' && userModel.length === 0 ? userModel() : userModel), {
-      keyFrom: createdByField,
-      keyTo: 'id',
-    })
+    @belongsTo(
+      () => (typeof userModel === 'function' && userModel.length === 0 ? userModel() : userModel),
+      {
+        keyFrom: createdByField,
+        keyTo: 'id',
+      },
+    )
     [createdByField]?: number;
 
-    @belongsTo(() => (typeof userModel === 'function' && userModel.length === 0 ? userModel() : userModel), {
-      keyFrom: modifiedByField,
-      keyTo: 'id',
-    })
+    @belongsTo(
+      () => (typeof userModel === 'function' && userModel.length === 0 ? userModel() : userModel),
+      {
+        keyFrom: modifiedByField,
+        keyTo: 'id',
+      },
+    )
     [modifiedByField]?: number;
 
     // Accessor properties for relations

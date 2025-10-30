@@ -1,6 +1,6 @@
 import { HttpMethod } from '@/core/metadata/constants';
 import { MetadataRegistry } from '@/core/metadata/registry';
-import type { RouteMetadata, ControllerMetadata } from '@/core/metadata/types';
+import type { IRouteMetadata, IControllerMetadata } from '@/core/metadata/types';
 import type { AnyObject } from '@/common/types';
 
 /**
@@ -33,7 +33,7 @@ export interface RouteOptions {
  */
 export function api(options: { basePath?: string; tags?: string[]; description?: string } = {}) {
   return function (target: Function) {
-    const metadata: ControllerMetadata = {
+    const metadata: IControllerMetadata = {
       basePath: options.basePath || '/',
       tags: options.tags,
       description: options.description,
@@ -53,7 +53,7 @@ function createHttpMethodDecorator(method: HttpMethod) {
       propertyKey: string | symbol,
       descriptor: PropertyDescriptor,
     ) {
-      const metadata: RouteMetadata = {
+      const metadata: IRouteMetadata = {
         path,
         method,
         methodName: propertyKey,

@@ -1,16 +1,13 @@
-import {
-  injectable as tsyringeInjectable,
-  inject as tsyringeInject,
-} from "tsyringe";
-import { MetadataRegistry } from "@/core/metadata/registry";
-import type { InjectMetadata, InjectableMetadata } from "@/core/metadata/types";
-import { BindingScope } from "@/core/metadata/constants";
+import { injectable as tsyringeInjectable, inject as tsyringeInject } from 'tsyringe';
+import { MetadataRegistry } from '@/core/metadata/registry';
+import type { InjectMetadata, InjectableMetadata } from '@/core/metadata/types';
+import { BindingScope } from '@/core/metadata/constants';
 
 /**
  * Options for @injectable decorator
  */
 export interface InjectableOptions {
-  scope?: "Singleton" | "Transient" | "Request";
+  scope?: 'Singleton' | 'Transient' | 'Request';
   tags?: Record<string, any>;
 }
 
@@ -23,8 +20,6 @@ export interface InjectOptions {
 
 /**
  * @injectable decorator - marks a class as injectable
- * Matches Loopback 4's @injectable()
- *
  * @param options - Injectable options
  *
  * @example
@@ -55,8 +50,6 @@ export function injectable(options: InjectableOptions = {}) {
 
 /**
  * @inject decorator - injects a dependency by key
- * Matches Loopback 4's @inject()
- *
  * @param key - The binding key or token
  * @param options - Injection options
  *
@@ -72,11 +65,7 @@ export function injectable(options: InjectableOptions = {}) {
  * ```
  */
 export function inject(key: string | symbol, options?: InjectOptions) {
-  return function (
-    target: any,
-    propertyKey: string | symbol | undefined,
-    parameterIndex: number,
-  ) {
+  return function (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) {
     // Store metadata
     const metadata: InjectMetadata = {
       key,
@@ -87,11 +76,7 @@ export function inject(key: string | symbol, options?: InjectOptions) {
     MetadataRegistry.addInjectMetadata(target, parameterIndex, metadata);
 
     // Apply TSyringe's inject
-    return tsyringeInject(key as any)(
-      target,
-      propertyKey as any,
-      parameterIndex,
-    );
+    return tsyringeInject(key as any)(target, propertyKey as any, parameterIndex);
   };
 }
 
@@ -114,8 +99,5 @@ export namespace Inject {
   }
 }
 
-/**
- * Binding scope constants matching Loopback 4
- */
 export { BindingScope };
 export const BINDING_SCOPE = BindingScope;

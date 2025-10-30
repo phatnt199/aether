@@ -2,12 +2,12 @@
 
 provision_opt=$1
 case "$provision_opt" in
-  "no-version")
-    echo "No versioning for current build!"
-    ;;
-  *)
-    npm version $provision_opt
-    ;;
+"no-version")
+  echo "No versioning for current build!"
+  ;;
+*)
+  npm version $provision_opt
+  ;;
 esac
 
 echo "\nCleaning up resources ..."

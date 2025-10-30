@@ -1,11 +1,12 @@
+import { Entity } from '@/base';
+import type { AnyObject, ClassType } from '@/common/types';
 import type { Context } from 'hono';
 import type { HttpMethod, ParameterType } from './constants';
-import type { AnyObject, ClassType } from '@/common/types';
 
 /**
  * Route metadata stored on controller methods
  */
-export interface RouteMetadata {
+export interface IRouteMetadata {
   path: string;
   method: HttpMethod;
   methodName: string | symbol;
@@ -20,20 +21,20 @@ export interface RouteMetadata {
 /**
  * Parameter metadata stored on controller method parameters
  */
-export interface ParameterMetadata {
+export interface IParameterMetadata<T = any> {
   index: number;
   type: ParameterType;
   name?: string;
   required?: boolean;
   schema?: AnyObject;
   description?: string;
-  extractor?: (ctx: Context) => any;
+  extractor?: (context: Context) => T;
 }
 
 /**
  * Controller metadata
  */
-export interface ControllerMetadata {
+export interface IControllerMetadata {
   basePath?: string;
   tags?: string[];
   description?: string;
@@ -42,12 +43,12 @@ export interface ControllerMetadata {
 /**
  * Model property metadata
  */
-export interface PropertyMetadata {
-  type?: string | Function;
+export interface IPropertyMetadata {
+  type?: string;
   required?: boolean;
   id?: boolean;
   generated?: boolean;
-  default?: any;
+  default?: () => any;
   description?: string;
   jsonSchema?: AnyObject;
   [key: string]: any;
@@ -56,6 +57,14 @@ export interface PropertyMetadata {
 /**
  * Model relation metadata
  */
+export interface IBelongsToRelationMetadata {
+  type: 'belongsTo';
+  target: () => ClassType<Entity>;
+  foreignKey?: string;
+  keyFrom?: string;
+  keyTo?: string;
+}
+
 export interface RelationMetadata {
   type: 'belongsTo' | 'hasOne' | 'hasMany' | 'hasManyThrough';
   target: string | ClassType<any>;
