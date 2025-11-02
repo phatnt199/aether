@@ -1,4 +1,4 @@
-name: "[node-infra] Dispatch NPM Release"
+name: "[node-infra] NPM Release"
 
 on:
   workflow_dispatch:

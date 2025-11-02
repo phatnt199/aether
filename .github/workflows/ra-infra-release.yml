@@ -1,4 +1,4 @@
-name: '[ra-infra] Dispatch NPM Release'
+name: '[ra-infra] NPM Release'
 
 on:
   workflow_dispatch:

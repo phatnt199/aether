@@ -1,4 +1,4 @@
-name: '[electron-infra] Dispatch NPM Release'
+name: '[electron-infra] NPM Release'
 
 on:
   workflow_dispatch:

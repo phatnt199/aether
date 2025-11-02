@@ -1,4 +1,4 @@
-name: "[agent-infra] Dispatch NPM Release"
+name: "[agent-infra] NPM Release"
 
 on:
   workflow_dispatch:
