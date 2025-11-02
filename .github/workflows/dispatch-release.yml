@@ -88,6 +88,6 @@ jobs:
       - name: Publish package on Registry 📦
         run: |
           cd packages/$MODULE
-          bun publish --no-git-checks
+          npm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
