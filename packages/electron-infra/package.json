@@ -98,7 +98,7 @@
     "@types/lodash": "^4.17.13",
     "@types/node": "^20.17.9",
     "@types/ws": "^8.5.13",
-    "electron": "^33.2.1",
+    "electron": "^35.7.5",
     "eslint": "^9.32.0",
     "prettier": "^3.4.1",
     "source-map-support": "^0.5.21",
