@@ -28,11 +28,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '22.17.1'
-          registry-url: 'https://registry.npmjs.org'
+          bun-version: 1.3.0
 
       - name: Setup Git
         run: |
@@ -45,23 +44,21 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install -g pnpm
-          pnpm install
+          bun install
 
       - name: Linting application source
         run: |
-          pnpm --filter "{packages/$MODULE}" run lint
-
+          bun run --filter "./packages/$MODULE" lint
 
       - name: Building + Versioning application artifact
         run: |
           echo "Module: $MODULE | Build mode: $BUILD_MODE"
 
           echo "Cleaning up release folder"
-          pnpm --filter "{packages/$MODULE}" run clean 
+          bun run --filter "./packages/$MODULE" clean
 
           echo "Compiling $MODULE"
-          pnpm --filter "{packages/$MODULE}" run rebuild:$BUILD_MODE
+          bun run --filter "./packages/$MODULE" rebuild:$BUILD_MODE
 
       - name: Push latest version to repository
         run: |
@@ -80,9 +77,9 @@ jobs:
           git merge --allow-unrelated-histories develop
           git push origin main
 
-      - name: Publish package on NPM 📦
+      - name: Publish package on Registry 📦
         run: |
           cd packages/$MODULE
-          pnpm publish --no-git-checks
+          bun publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
