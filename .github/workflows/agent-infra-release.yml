@@ -87,6 +87,12 @@ jobs:
       - name: Publish package on NPM 📦
         run: |
           cd packages/$MODULE
-          npm publish --no-git-checks
+
+          npm_tag=$(case $BUILD_MODE in
+            patch|minor|major) echo "latest" ;;
+            prepatch|preminor|premajor|prerelease) echo "next" ;;
+          esac)
+
+          bun publish --access public --tag $npm_tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
