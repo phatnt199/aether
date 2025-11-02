@@ -43,6 +43,7 @@ export interface IAuthenticateOAuth2RestOptions {
   tokenPath?: string;
   authorizePath?: string;
   oauth2ServiceKey?: string;
+  useImplicitGrant?: boolean;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -150,7 +151,7 @@ export class SignUpRequest {
 
 // -------------------------------------------------------------------
 @model({
-  name: 'OAuth2Request',
+  name: 'OAuth2PathRequest',
   jsonSchema: {
     required: ['clientId', 'clientSecret', 'redirectUrl'],
     examples: [
@@ -162,7 +163,7 @@ export class SignUpRequest {
     ],
   },
 })
-export class OAuth2Request {
+export class OAuth2PathRequest {
   @property({ type: 'string' })
   clientId: string;
 
@@ -171,6 +172,39 @@ export class OAuth2Request {
 
   @property({ type: 'string' })
   redirectUrl: string;
+}
+
+// -------------------------------------------------------------------
+@model({
+  name: 'OAuth2TokenRequest',
+  jsonSchema: {
+    required: ['clientId', 'clientSecret', 'authorizationCode', 'redirectUrl', 'grantType'],
+    examples: [
+      {
+        clientId: 'example_id',
+        clientSecret: 'example_secret',
+        authorizationCode: 'example_code',
+        redirectUrl: 'example_redirect_url',
+        grantType: 'example_grant_type',
+      },
+    ],
+  },
+})
+export class OAuth2AuthorizationCodeRequest {
+  @property({ type: 'string' })
+  clientId: string;
+
+  @property({ type: 'string' })
+  clientSecret: string;
+
+  @property({ type: 'string' })
+  authorizationCode: string;
+
+  @property({ type: 'string' })
+  redirectUrl: string;
+
+  @property({ type: 'string' })
+  grantType: string;
 }
 
 // -------------------------------------------------------------------

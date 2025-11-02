@@ -200,9 +200,13 @@ export class OAuth2Service extends BaseService {
   }
 
   // --------------------------------------------------------------------------------
-  async doClientCallback(opts: { c: string; oauth2Token: Token }) {
-    const { c, accessToken, authorizationCode, accessTokenExpiresAt, client, user } =
-      opts.oauth2Token;
+  async doClientCallback(opts: {
+    clientToken: string;
+    oauth2Token: Token;
+    useImplicitGrant: boolean;
+  }) {
+    const { clientToken, oauth2Token, useImplicitGrant } = opts;
+    const { accessToken, authorizationCode, accessTokenExpiresAt, client, user } = oauth2Token;
 
     if (!client) {
       this.logger.error('[doClientCallback] Invalid client | Client: %j', client);
@@ -216,13 +220,15 @@ export class OAuth2Service extends BaseService {
     }
 
     const payload = {
-      c,
-      accessToken,
+      c: clientToken,
       authorizationCode,
       accessTokenExpiresAt,
       provider: client.provider,
       user,
     };
+    if (useImplicitGrant) {
+      Object.assign(payload, { accessToken });
+    }
 
     const tasks = callbackUrls.map(callbackUrl => {
       return () => {
