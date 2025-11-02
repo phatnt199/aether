@@ -82,7 +82,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@minimaltech/node-infra": "workspace:*",
+    "@minimaltech/node-infra": "latest",
     "@reduxjs/toolkit": "^2.5.0",
     "dotenv-flow": "^4.0.1",
     "electron-updater": "^6.6.2",
