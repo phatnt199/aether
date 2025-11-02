@@ -49,9 +49,7 @@
     "rebuild:premajor": "sh ./scripts/rebuild.sh premajor",
     "rebuild:preminor": "sh ./scripts/rebuild.sh preminor",
     "rebuild:prepatch": "sh ./scripts/rebuild.sh prepatch",
-    "rebuild:prerelease": "sh ./scripts/rebuild.sh prerelease",
-    "test": "vitest",
-    "test:ui": "vitest --ui"
+    "rebuild:prerelease": "sh ./scripts/rebuild.sh prerelease"
   },
   "repository": {
     "type": "git",
@@ -104,18 +102,17 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@minimaltech/eslint-node": "^0.2.1",
     "@types/lodash": "^4.17.20",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.7.2",
-    "@minimaltech/eslint-node": "^0.2.1",
     "drizzle-kit": "^0.28.1",
     "eslint": "^9.36.0",
     "prettier": "^3.6.2",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.19.2",
-    "typescript": "~5.9.3",
-    "vitest": "^2.1.8"
+    "typescript": "~5.9.3"
   },
   "sideEffects": false
 }

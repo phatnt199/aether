@@ -1,47 +1,49 @@
-import { CoreBindings } from '@/common/bindings';
+import { BindingKeys, BindingNamespaces } from '@/common/bindings';
 import { App as AppConstants } from '@/common/constants';
 import type {
   IApplication,
   IClass,
-  IController,
   IDataSource,
+  IEnvironmentValidationResult,
   IRepository,
   IService,
   ValueOrPromise,
 } from '@/common/types';
+import { applicationEnvironment } from '@/helpers/env';
+import { Container, IRouteMetadata, MetadataRegistry } from '@/helpers/inversion';
+import { getError } from '@/utilities/error.utility';
+import { toBoolean } from '@/utilities/parse.utility';
 import { serve } from '@hono/node-server';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
-import { BaseHelper } from '../base.helper';
+import isEmpty from 'lodash/isEmpty';
+import { IApplicationConfig } from './types';
 
-/**
- * Application configuration
- */
-export interface ApplicationConfig {
-  scope: string;
-  port?: number;
-  host?: string;
-  basePath?: string;
-  cors?: boolean;
-  [key: string]: any;
-}
+const {
+  NODE_ENV,
+  RUN_MODE,
+  ALLOW_EMPTY_ENV_VALUE = false,
+  APPLICATION_ENV_PREFIX = 'APP_ENV',
 
-// export const global = new Container({ scope: 'global' });
+  APP_ENV_APPLICATION_NAME = 'PNT',
+  APP_ENV_APPLICATION_TIMEZONE = 'Asia/Ho_Chi_Minh',
+  APP_ENV_DS_MIGRATION = 'postgres',
+  APP_ENV_DS_AUTHORIZE = 'postgres',
+  APP_ENV_LOGGER_FOLDER_PATH = './',
+} = process.env;
 
-export class BaseApplication extends BaseHelper implements IApplication {
-  protected hono: Hono;
+export abstract class BaseApplication extends Container implements IApplication {
+  protected servers: Array<Hono>;
 
-  protected config: ApplicationConfig;
+  protected config: IApplicationConfig;
+  protected projectRoot: string;
 
-  models: Set<string> = new Set();
+  protected models: Set<string>;
 
-  protected controllers: Set<IClass<IController>> = new Set();
-  protected components: Set<IClass<IService>> = new Set();
-
-  protected datasources: Map<string, IDataSource> = new Map();
-
-  constructor(config: ApplicationConfig) {
-    super({ scope: config.scope });
+  // ------------------------------------------------------------------------------
+  constructor(opts: { scope: string; config: IApplicationConfig }) {
+    const { scope, config } = opts;
+    super({ scope });
 
     this.config = {
       port: config.port || AppConstants.PORT,
@@ -50,202 +52,82 @@ export class BaseApplication extends BaseHelper implements IApplication {
       ...config,
     };
 
-    this.hono = new Hono();
+    const server = new Hono().basePath(this.config.basePath);
+    this.servers = [server];
   }
 
-  controller<T>(ctor: IClass<T>, _nameOrOptions?: string): any {
-    this.controllers.add(ctor);
+  // ------------------------------------------------------------------------------
+  abstract staticConfigure(): void;
+  abstract declareModels(): Set<string>;
+  abstract preConfigure(): ValueOrPromise<void>;
+  abstract postConfigure(): ValueOrPromise<void>;
 
-    // Register controller in DI container
-    // const name = typeof nameOrOptions === 'string' ? nameOrOptions : ctor.name;
-    // this.register(`controllers.${name}`, ctor);
+  // ------------------------------------------------------------------------------
+  validateEnv(): IEnvironmentValidationResult {
+    const rs = { result: true, message: '' };
+    const envKeys = applicationEnvironment.keys();
 
+    for (const argKey of envKeys) {
+      const argValue = applicationEnvironment.get<string | number>(argKey);
+
+      if (toBoolean(process.env.ALLOW_EMPTY_ENV_VALUE) || !isEmpty(argValue)) {
+        continue;
+      }
+
+      rs.result = false;
+      rs.message = `Invalid Application Environment! Key: ${argKey} | Value: ${argValue}`;
+    }
+
+    return rs;
+  }
+
+  // ------------------------------------------------------------------------------
+  controller<T>(ctor: IClass<T>): any {
+    this.bind<T>(
+      BindingKeys.build({
+        namespace: BindingNamespaces.CONTROLLER,
+        key: ctor.name,
+      }),
+    ).toClass(ctor);
+    this.registerController(ctor);
     return this;
   }
 
-  component<T>(ctor: IClass<T>): void {
-    this.components.add(ctor);
-
-    // Instantiate and initialize component
+  /* component<T>(ctor: IClass<T>): void {
     const instance = this.resolve(ctor);
     if (typeof (instance as any).init === 'function') {
       (instance as any).init(this);
     }
-  }
+  } */
 
   repository<T extends IRepository>(ctor: IClass<T>): void {
-    this.register(`repositories.${ctor.name}`, ctor);
+    this.bind(
+      BindingKeys.build({
+        namespace: BindingNamespaces.REPOSITORY,
+        key: ctor.name,
+      }),
+    ).toClass(ctor);
   }
 
   service<T extends IService>(ctor: IClass<T>): void {
-    this.register(`services.${ctor.name}`, ctor);
+    this.bind(
+      BindingKeys.build({
+        namespace: BindingNamespaces.SERVICE,
+        key: ctor.name,
+      }),
+    ).toClass(ctor);
   }
 
-  dataSource(ds: IDataSource): void {
-    this.datasources.set(ds.name, ds);
-    this.registerValue(`datasources.${ds.name}`, ds);
+  dataSource<T extends IDataSource>(ctor: IClass<T>): void {
+    this.bind(
+      BindingKeys.build({
+        namespace: BindingNamespaces.DATASOURCE,
+        key: ctor.name,
+      }),
+    ).toClass(ctor);
   }
 
-  getSync<T>(key: string | symbol): T {
-    return this.getSync<T>(key);
-  }
-
-  bind<T>(key: string | symbol) {
-    return this.bind<T>(key);
-  }
-
-  async initialize(): Promise<void> {
-    await this.preConfigure();
-
-    // Register all controllers and their routes
-    for (const controllerClass of this.controllers) {
-      this.registerController(controllerClass);
-    }
-
-    await this.postConfigure();
-  }
-
-  protected registerController(controllerClass: IClass<any>): void {
-    // Get controller metadata
-    const controllerMetadata = MetadataRegistry.getControllerMetadata(controllerClass);
-    const basePath = controllerMetadata?.basePath || '/';
-
-    // Get all route metadata
-    const routes = MetadataRegistry.getRouteMetadata(controllerClass);
-
-    if (!routes || routes.length === 0) {
-      return;
-    }
-
-    // Create controller instance
-    const controllerInstance = this.resolve(controllerClass);
-
-    // Register each route
-    for (const route of routes) {
-      this.registerRoute(controllerInstance, route, basePath);
-    }
-  }
-
-  /**
-   * Register a single route
-   */
-  protected registerRoute(controllerInstance: any, route: IRouteMetadata, basePath: string): void {
-    const fullPath = this.normalizePath(basePath, route.path);
-    const method = route.method.toLowerCase();
-    const methodName = route.methodName;
-
-    // Get parameter metadata
-    const paramMetadata =
-      MetadataRegistry.getParameterMetadata(controllerInstance, methodName) || [];
-
-    // Sort parameters by index
-    paramMetadata.sort((a, b) => a.index - b.index);
-
-    // Create route handler
-    const handler = async (c: Context) => {
-      try {
-        // Bind context to container
-        c.set('container', this.container);
-        c.set('application', this);
-
-        // Extract parameters
-        const args = await this.extractParameters(c, paramMetadata);
-
-        // Call controller method
-        const result = await controllerInstance[methodName](...args);
-
-        // Return response
-        return c.json(result);
-      } catch (error: any) {
-        return c.json(
-          {
-            error: {
-              message: error.message || 'Internal Server Error',
-              statusCode: error.statusCode || 500,
-            },
-          },
-          error.statusCode || 500,
-        );
-      }
-    };
-
-    // Register with Hono
-    (this.hono as any)[method](fullPath, handler);
-
-    console.log(`Registered route: ${route.method} ${fullPath} -> ${String(methodName)}`);
-  }
-
-  /**
-   * Extract parameters from context based on metadata
-   */
-  protected async extractParameters(
-    ctx: Context,
-    paramMetadata: IParameterMetadata[],
-  ): Promise<any[]> {
-    const args: any[] = [];
-
-    for (const param of paramMetadata) {
-      if (param.extractor) {
-        args[param.index] = await param.extractor(ctx);
-      } else {
-        switch (param.type) {
-          case ParameterType.PATH:
-            args[param.index] = param.name ? ctx.req.param(param.name) : ctx.req.param();
-            break;
-          case ParameterType.QUERY:
-            args[param.index] = param.name ? ctx.req.query(param.name) : ctx.req.query();
-            break;
-          case ParameterType.HEADER:
-            args[param.index] = param.name ? ctx.req.header(param.name) : ctx.req.header();
-            break;
-          case ParameterType.BODY:
-            try {
-              args[param.index] = await ctx.req.json();
-            } catch {
-              args[param.index] = await ctx.req.parseBody();
-            }
-            break;
-          case ParameterType.REQUEST:
-            args[param.index] = ctx.req;
-            break;
-          case ParameterType.RESPONSE:
-            args[param.index] = ctx;
-            break;
-          case ParameterType.CONTEXT:
-            args[param.index] = ctx;
-            break;
-          default:
-            args[param.index] = undefined;
-        }
-      }
-    }
-
-    return args;
-  }
-
-  /**
-   * Normalize path segments
-   */
-  protected normalizePath(...segments: string[]): string {
-    const joined = segments.join('/').replace(/\/+/g, '/').replace(/\/$/, '');
-    return joined || '/';
-  }
-
-  /**
-   * Lifecycle hooks
-   */
-  staticConfigure(): void {
-    // Override in subclass
-  }
-
-  async preConfigure(): Promise<void> {
-    // Override in subclass
-  }
-
-  async postConfigure(): Promise<void> {
-    // Override in subclass
-  }
-
+  // ------------------------------------------------------------------------------
   getProjectRoot(): string {
     return process.cwd();
   }
@@ -266,44 +148,144 @@ export class BaseApplication extends BaseHelper implements IApplication {
     // To be implemented
   }
 
-  getServerHost(): string {
+  getServerHost() {
     return this.config.host || AppConstants.HOST;
   }
 
-  getServerPort(): number {
+  getServerPort() {
     return this.config.port || AppConstants.PORT;
   }
 
-  getServerAddress(): string {
-    return `http://${this.getServerHost()}:${this.getServerPort()}`;
+  getServerAddress() {
+    return `${this.getServerHost()}:${this.getServerPort()}`;
   }
 
-  getServer(): Hono {
-    return this.hono;
+  getServer() {
+    return this.servers[0];
   }
 
-  async start(): Promise<void> {
+  // ------------------------------------------------------------------------------
+  protected normalizePath(...segments: string[]): string {
+    const joined = segments.join('/').replace(/\/+/g, '/').replace(/\/$/, '');
+    return joined || '/';
+  }
+
+  protected registerController<T>(controllerClass: IClass<T>): void {
+    const routes = MetadataRegistry.getRouteMetadata(controllerClass);
+    if (!routes || routes.length === 0) {
+      return;
+    }
+
+    const controllerInstance = this.resolve(controllerClass);
+    for (const route of routes) {
+      this.registerRoute(controllerInstance, route);
+    }
+  }
+
+  protected registerRoute(controllerInstance: any, route: IRouteMetadata): void {
+    const fullPath = this.normalizePath(route.path);
+    const method = route.method.toLowerCase();
+    const methodName = route.methodName;
+
+    // Create route handler
+    const handler = async (c: Context) => {
+      const rs = await controllerInstance[methodName](this, c);
+      return rs;
+    };
+
+    const server = this.getServer();
+    server.on(method, fullPath, handler);
+
+    this.logger.info(
+      '[registerRoute] Route | method: %s | path: %s | methodName: %s',
+      route.method,
+      fullPath,
+      String(methodName),
+    );
+  }
+
+  async initialize() {
+    this.logger.info(
+      '[initialize] ------------------------------------------------------------------------',
+    );
+    this.logger.info(
+      '[initialize] Starting application... | Name: %s | Env: %s',
+      APP_ENV_APPLICATION_NAME,
+      NODE_ENV,
+    );
+    this.logger.info(
+      '[initialize] AllowEmptyEnv: %s | Prefix: %s',
+      ALLOW_EMPTY_ENV_VALUE,
+      APPLICATION_ENV_PREFIX,
+    );
+    this.logger.info('[initialize] RunMode: %s', RUN_MODE);
+    this.logger.info('[initialize] Timezone: %s', APP_ENV_APPLICATION_TIMEZONE);
+    this.logger.info('[initialize] LogPath: %s', APP_ENV_LOGGER_FOLDER_PATH);
+    this.logger.info(
+      '[initialize] Datasource | Migration: %s | Authorize: %s',
+      APP_ENV_DS_MIGRATION,
+      APP_ENV_DS_AUTHORIZE,
+    );
+    this.logger.info(
+      '[initialize] ------------------------------------------------------------------------',
+    );
+
+    // this.bind(AuthenticateKeys.ALWAYS_ALLOW_PATHS).to([]);
+    // this.bind(BindingKeys.APPLICATION_MIDDLEWARE_OPTIONS).to(MiddlewareSequence.defaultOptions);
+    // this.sequence(sequence ?? BaseApplicationSequence);
+
+    this.staticConfigure();
+    this.projectRoot = this.getProjectRoot();
+    this.logger.info('[initialize] Project root: %s', this.projectRoot);
+    // this.component(CrudRestComponent);
+
+    this.logger.info('[initialize] Validating application environments...');
+    const envValidation = this.validateEnv();
+    if (!envValidation.result) {
+      throw getError({ message: envValidation?.message ?? 'Invalid application environment!' });
+    }
+    this.logger.info('[initialize] All application environments are valid...');
+
+    this.logger.info('[initialize] Declare application models...');
+    this.models = new Set([]);
+    this.models = this.declareModels();
+
+    // this.logger.info('[initialize] Declare application middlewares...');
+    // this.middleware(RequestBodyParserMiddleware);
+    // this.middleware(RequestSpyMiddleware);
+
+    this.logger.info('[initialize] Executing Pre-Configuration...');
+    await this.preConfigure();
+
+    this.logger.info('[initialize] Executing Post-Configuration...');
+    await this.postConfigure();
+  }
+
+  // ------------------------------------------------------------------------------
+  async start() {
     await this.initialize();
 
     const port = this.getServerPort();
     const host = this.getServerHost();
+    const server = this.getServer();
 
     serve(
       {
-        fetch: this.hono.fetch,
-        port,
+        fetch: server.fetch,
         hostname: host,
+        port,
+        autoCleanupIncoming: true,
       },
       info => {
-        console.log('Server started at %s', this.getServerAddress());
-        console.log('[serve] Info: ', info);
+        this.logger.info('[start][serve] Server is now running...', APP_ENV_APPLICATION_NAME);
+        this.logger.info('[start][serve] Server started: %s', this.getServerAddress());
+        this.logger.info('[start][serve] Info: %j', info);
+        this.logger.info('[start][serve] Log folder: %s', APP_ENV_LOGGER_FOLDER_PATH);
       },
     );
   }
 
   async stop(): Promise<void> {
-    console.log('Server stopped');
+    this.logger.info('[stop] Server STOPPED');
   }
 }
-
-export class Application extends BaseApplication {}

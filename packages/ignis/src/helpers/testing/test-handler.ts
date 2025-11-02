@@ -1,9 +1,9 @@
 import { ValueOrPromise } from '@/common';
 import { getError } from '@/utilities';
 import assert from 'node:assert';
+import { ApplicationLogger, LoggerFactory } from '../logger';
 import { TestCaseDecisions } from './common';
 import { ITestCaseHandler, ITestCaseInput, ITestContext, TTestCaseDecision } from './types';
-import { ApplicationLogger, LoggerFactory } from '../logger';
 
 export interface ITestCaseHandlerOptions<R extends object, I extends ITestCaseInput = {}> {
   scope?: string;

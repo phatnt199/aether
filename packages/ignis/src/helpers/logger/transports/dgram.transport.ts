@@ -1,4 +1,4 @@
-import { ResultCodes } from '@/common';
+import { HTTP } from '@/common';
 import { getError } from '@/utilities';
 import dgram from 'node:dgram';
 import Transport from 'winston-transport';
@@ -55,7 +55,7 @@ export class DgramTransport extends Transport {
       this.client = null;
 
       throw getError({
-        statusCode: ResultCodes.RS_5.InternalServerError,
+        statusCode: HTTP.ResultCodes.RS_5.InternalServerError,
         message: `[DgramTransport][error] Error: ${error.message}`,
       });
     });

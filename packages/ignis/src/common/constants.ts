@@ -1,5 +1,7 @@
+import { ValueOf } from './types';
+
 export class App {
-  static readonly ENV = process.env.APP_ENV ?? process.env.NODE_ENV ?? 'development';
+  static readonly APPLICATION_NAME = process.env.APP_ENV_APPLICATION_NAME ?? 'APP';
 
   static readonly PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
   static readonly HOST = process.env.HOST ?? 'localhost';
@@ -12,53 +14,65 @@ export class App {
   static readonly DS_REDIS = 'redis';
 }
 
-export class HttpHeaders {
-  static readonly AUTHORIZATION = 'authorization';
-  static readonly REQUEST_TRACING_ID = 'x-request-id';
+export class HTTP {
+  static readonly Headers = {
+    AUTHORIZATION: 'authorization',
+    REQUEST_TRACING_ID: 'x-request-id',
+  } as const;
+
+  static readonly Methods = {
+    GET: 'GET',
+    POST: 'POST',
+    PUT: 'PUT',
+    PATCH: 'PATCH',
+    DELETE: 'DELETE',
+    HEAD: 'HEAD',
+    OPTIONS: 'OPTIONS',
+  } as const;
+
+  static readonly ResultCodes = {
+    RS_FAIL: 0,
+    RS_SUCCESS: 1,
+    RS_UNKNOWN_ERROR: -199,
+
+    // 2xx successful – the request was successfully received, understood, and accepted
+    RS_2: {
+      Ok: 200,
+      Created: 201,
+      Accepted: 202,
+      NonAuthoritativeInformation: 203,
+      NoContent: 204,
+      ResetContent: 205,
+      PartialContent: 206,
+    },
+
+    // 4xx client error – the request contains bad syntax or cannot be fulfilled
+    RS_4: {
+      BadRequest: 400,
+      Unauthorized: 401,
+      PaymentRequired: 402,
+      Forbidden: 403,
+      NotFound: 404,
+      MethodNotAllowed: 405,
+      RequestTimeout: 408,
+      UnsupportedMediaType: 415,
+      UnprocessableEntity: 422,
+    },
+
+    // 5xx server error – the server failed to fulfil an apparently valid request
+    RS_5: {
+      InternalServerError: 500,
+      NotImplemented: 501,
+    },
+  } as const;
 }
 
-export class ResultCodes {
-  static readonly RS_FAIL = 0;
-  static readonly RS_SUCCESS = 1;
-  static readonly RS_UNKNOWN_ERROR = -199;
+export type THttpMethod = ValueOf<typeof HTTP.Methods>;
+export type THttpResultCode = ValueOf<typeof HTTP.ResultCodes>;
 
-  // 2xx successful – the request was successfully received, understood, and accepted
-  static readonly RS_2 = {
-    Ok: 200,
-    Created: 201,
-    Accepted: 202,
-    NonAuthoritativeInformation: 203,
-    NoContent: 204,
-    ResetContent: 205,
-    PartialContent: 206,
-  };
-
-  // 4xx client error – the request contains bad syntax or cannot be fulfilled
-  static readonly RS_4 = {
-    BadRequest: 400,
-    Unauthorized: 401,
-    PaymentRequired: 402,
-    Forbidden: 403,
-    NotFound: 404,
-    MethodNotAllowed: 405,
-    RequestTimeout: 408,
-    UnsupportedMediaType: 415,
-    UnprocessableEntity: 422,
-  };
-
-  // 5xx server error – the server failed to fulfil an apparently valid request
-  static readonly RS_5 = {
-    InternalServerError: 500,
-    NotImplemented: 501,
-  };
-}
-
-export class HttpMethods {
-  static readonly GET = 'GET';
-  static readonly POST = 'POST';
-  static readonly PUT = 'PUT';
-  static readonly PATCH = 'PATCH';
-  static readonly DELETE = 'DELETE';
-  static readonly HEAD = 'HEAD';
-  static readonly OPTIONS = 'OPTIONS';
+export class MimeTypes {
+  static readonly UNKNOWN = 'unknown';
+  static readonly IMAGE = 'image';
+  static readonly VIDEO = 'video';
+  static readonly TEXT = 'text';
 }

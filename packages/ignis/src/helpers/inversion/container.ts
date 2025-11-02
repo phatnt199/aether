@@ -1,12 +1,16 @@
 import { BaseHelper } from '@/base/base.helper';
-import { BindingScopes, type IClass, type TBindingScope } from '@/common/types';
+import { type IClass } from '@/common/types';
 import { getError } from '@/utilities';
 import { MetadataRegistry } from './registry';
+import { BindingScopes, BindingValueTypes, TBindingScope } from './types';
 
 // -------------------------------------------------------------------------------------
-export class Binding<T = any> {
-  private scope: TBindingScope = 'singleton';
-  private tags: Set<string> = new Set();
+export class Binding<T = any> extends BaseHelper {
+  private scope: TBindingScope = BindingScopes.SINGLETON;
+
+  public key: string;
+  private tags: Set<string>;
+
   private resolver:
     | { type: 'class'; value: IClass<T> }
     | { type: 'value'; value: T }
@@ -14,29 +18,40 @@ export class Binding<T = any> {
 
   private cachedInstance?: T;
 
-  constructor(public readonly key: string | symbol) {}
+  constructor(opts: { key: string; namespace?: string }) {
+    super({ scope: opts.key });
+    this.tags = new Set([]);
+
+    this.key = opts.key;
+
+    const keyParts = opts.key.split('.');
+    if (keyParts.length > 1) {
+      const [namespace] = keyParts;
+      this.setTags(namespace);
+    }
+  }
 
   toClass(value: IClass<T>): this {
-    this.resolver = { type: 'class', value };
+    this.resolver = { type: BindingValueTypes.CLASS, value };
     return this;
   }
 
   toValue(value: T): this {
-    this.resolver = { type: 'value', value };
+    this.resolver = { type: BindingValueTypes.VALUE, value };
     return this;
   }
 
   toProvider(value: (container: Container) => T): this {
-    this.resolver = { type: 'provider', value };
+    this.resolver = { type: BindingValueTypes.PROVIDER, value };
     return this;
   }
 
-  inScope(scope: TBindingScope): this {
+  setScope(scope: TBindingScope): this {
     this.scope = scope;
     return this;
   }
 
-  tag(...tags: string[]): this {
+  setTags(...tags: string[]): this {
     tags.forEach(t => this.tags.add(t));
     return this;
   }
@@ -60,17 +75,17 @@ export class Binding<T = any> {
 
     let instance: T;
 
-    const resolverType = this.resolver.type;
+    const { type: resolverType } = this.resolver;
     switch (resolverType) {
-      case 'value': {
+      case BindingValueTypes.VALUE: {
         instance = this.resolver.value;
         break;
       }
-      case 'provider': {
+      case BindingValueTypes.PROVIDER: {
         instance = this.resolver.value(container);
         break;
       }
-      case 'class': {
+      case BindingValueTypes.CLASS: {
         instance = container.instantiate(this.resolver.value);
         break;
       }
@@ -103,7 +118,7 @@ export class Container extends BaseHelper {
 
   bind<T>(key: string | symbol): Binding<T> {
     const keyStr = String(key);
-    const binding = new Binding<T>(key);
+    const binding = new Binding<T>({ key: keyStr });
     this.bindings.set(keyStr, binding as Binding);
     return binding;
   }
@@ -113,21 +128,23 @@ export class Container extends BaseHelper {
     return this.bindings.has(keyStr);
   }
 
-  getBinding<T>(key: string | symbol): Binding<T> | undefined {
-    const keyStr = String(key);
-    const binding = this.bindings.get(keyStr);
+  getBinding<T>(opts: { key: string | symbol }): Binding<T> | undefined {
+    const key = String(opts.key);
+    const binding = this.bindings.get(key);
     return binding;
   }
 
-  unbind(key: string | symbol): boolean {
-    const keyStr = String(key);
-    return this.bindings.delete(keyStr);
+  unbind(opts: { key: string | symbol }): boolean {
+    const key = String(opts.key);
+    return this.bindings.delete(key);
   }
 
-  get<T>(key: string | symbol): T {
-    const binding = this.getBinding<T>(key);
+  get<T>(opts: { key: string | symbol }): T {
+    const binding = this.getBinding<T>(opts);
     if (!binding) {
-      throw new Error(`No binding found for key: ${String(key)}`);
+      throw getError({
+        message: `No binding found for key: ${opts.key.toString()}`,
+      });
     }
 
     return binding.getValue(this);
@@ -143,13 +160,12 @@ export class Container extends BaseHelper {
       return new cls();
     }
 
-    // Resolve dependencies
     const dependencies: any[] = [];
-    const sorted = [...injectMetadata].sort((a, b) => a.index - b.index);
+    const sortedDeps = [...injectMetadata].sort((a, b) => a.index - b.index);
 
-    for (const meta of sorted) {
+    for (const meta of sortedDeps) {
       try {
-        const dep = this.get(meta.key);
+        const dep = this.get(meta);
         dependencies[meta.index] = dep;
       } catch (error) {
         if (meta.optional) {
@@ -164,18 +180,21 @@ export class Container extends BaseHelper {
     return new cls(...dependencies);
   }
 
-  findByTag(tag: string): Binding[] {
-    const results: Binding[] = [];
+  findByTag(opts: { tag: string }): Binding[] {
+    const rs: Binding[] = [];
     for (const [_k, binding] of this.bindings) {
-      if (binding.hasTag(tag)) {
-        results.push(binding);
+      if (!binding.hasTag(opts.tag)) {
+        continue;
       }
+
+      rs.push(binding);
     }
-    return results;
+
+    return rs;
   }
 
-  getAllByTag<T>(tag: string): T[] {
-    const bindings = this.findByTag(tag);
+  getAllByTag<T>(opts: { tag: string }): T[] {
+    const bindings = this.findByTag(opts);
     return bindings.map(b => b.getValue(this) as T);
   }
 

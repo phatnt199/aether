@@ -1,7 +1,7 @@
 import type { BaseEntity, TBaseIdEntity, TBaseTzEntity } from '@/base/models';
 import type { AbstractTzRepository } from '@/base/repositories';
 import type { Context as HonoContext } from 'hono';
-import { AnyObject, IClass, IdType, TConstValue, ValueOrPromise } from './basic';
+import { AnyObject, IdType, ValueOrPromise } from './basic';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Domain Types
@@ -16,8 +16,6 @@ export type TPermissionEffect = 'allow' | 'deny';
 // Application Interface
 // ----------------------------------------------------------------------------------------------------------------------------------------
 export interface IApplication {
-  models: Set<string>;
-
   initialize(): ValueOrPromise<void>;
 
   staticConfigure(): void;
@@ -28,10 +26,6 @@ export interface IApplication {
   getServerHost(): string;
   getServerPort(): number;
   getServerAddress(): string;
-
-  getDatasourceSync<T extends IDataSource>(dsName: string): T;
-  getRepositorySync<T extends IRepository>(c: IClass<T>): T;
-  getServiceSync<T extends IService>(c: IClass<T>): T;
 
   getMigrateModels(opts: {
     ignoreModels?: string[];
@@ -217,16 +211,9 @@ export interface IRequestedRemark {
 // ----------------------------------------------------------------------------------------------------------------------------------------
 export type TInjectionGetter = <T>(key: string | symbol) => T;
 
-export class BindingScopes {
-  static readonly SINGLETON = 'singleton';
-  static readonly TRANSIENT = 'transient';
-}
-export type TBindingScope = TConstValue<typeof BindingScopes>;
-
-export interface IBindingTag {
-  [name: string]: any;
-}
-
+// ----------------------------------------------------------------------------------------------------------------------------------------
+// Provider
+// ----------------------------------------------------------------------------------------------------------------------------------------
 export interface IProvider<T> {
   value(): ValueOrPromise<T>;
 }

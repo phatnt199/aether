@@ -1,5 +1,5 @@
+import { AnyObject } from '@/common/types';
 import { getError } from '@/utilities';
-import { AnyObject } from '@loopback/repository';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import { TestCaseHandler } from './test-handler';

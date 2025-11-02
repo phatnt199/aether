@@ -1,6 +1,7 @@
 export * from './cron';
 export * from './crypto';
 export * from './env';
+export * from './inversion';
 export * from './logger';
 export * from './network';
 export * from './queue';

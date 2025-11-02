@@ -1,3 +1,4 @@
+import { it } from 'node:test';
 import { ITestCase, ITestHooks, ITestPlan, ITestPlanOptions } from '../types';
 import { ApplicationLogger, LoggerFactory } from './../../logger';
 import { DIContainerHelper } from './../../storage';
