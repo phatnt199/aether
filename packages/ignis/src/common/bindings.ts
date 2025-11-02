@@ -1,9 +1,3 @@
-export class BindingScopes {
-  static readonly SINGLETON = 'singleton';
-  static readonly TRANSIENT = 'transient';
-  static readonly REQUEST = 'request';
-}
-
 export class BindingKeys {
   static readonly APPLICATION_ENVIRONMENTS = Symbol.for('@app/application/environments');
   static readonly APPLICATION_MIDDLEWARE_OPTIONS = Symbol.for(
@@ -28,14 +22,6 @@ export class BindingKeys {
 
 export class SecurityBindings {
   static readonly USER = Symbol.for('@security/user');
-}
-
-export class RestBindings {
-  static readonly Http = {
-    REQUEST: BindingKeys.HTTP_REQUEST,
-    RESPONSE: BindingKeys.HTTP_RESPONSE,
-    CONTEXT: BindingKeys.REQUEST_CONTEXT,
-  };
 }
 
 export class CoreBindings {

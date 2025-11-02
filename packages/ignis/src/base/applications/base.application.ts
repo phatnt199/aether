@@ -1,25 +1,24 @@
-import { App as AppConstants } from '@/common/constants';
 import { CoreBindings } from '@/common/bindings';
+import { App as AppConstants } from '@/common/constants';
 import type {
-  ClassType,
   IApplication,
+  IClass,
+  IController,
   IDataSource,
   IRepository,
   IService,
   ValueOrPromise,
 } from '@/common/types';
-import { Container, globalContainer } from '@/core/container';
-import { MetadataRegistry } from '@/core/metadata';
-import { ParameterType } from '@/core/metadata/constants';
-import type { IParameterMetadata, IRouteMetadata } from '@/core/metadata/types';
 import { serve } from '@hono/node-server';
 import type { Context } from 'hono';
 import { Hono } from 'hono';
+import { BaseHelper } from '../base.helper';
 
 /**
  * Application configuration
  */
 export interface ApplicationConfig {
+  scope: string;
   port?: number;
   host?: string;
   basePath?: string;
@@ -27,17 +26,23 @@ export interface ApplicationConfig {
   [key: string]: any;
 }
 
-export class BaseApplication implements IApplication {
+// export const global = new Container({ scope: 'global' });
+
+export class BaseApplication extends BaseHelper implements IApplication {
   protected hono: Hono;
-  protected container: Container;
+
   protected config: ApplicationConfig;
-  protected controllers: Set<ClassType<any>> = new Set();
-  protected components: Set<ClassType<any>> = new Set();
+
+  models: Set<string> = new Set();
+
+  protected controllers: Set<IClass<IController>> = new Set();
+  protected components: Set<IClass<IService>> = new Set();
+
   protected datasources: Map<string, IDataSource> = new Map();
 
-  public models: Set<string> = new Set();
+  constructor(config: ApplicationConfig) {
+    super({ scope: config.scope });
 
-  constructor(config: ApplicationConfig = {}) {
     this.config = {
       port: config.port || AppConstants.PORT,
       host: config.host || AppConstants.HOST,
@@ -46,103 +51,49 @@ export class BaseApplication implements IApplication {
     };
 
     this.hono = new Hono();
-    this.container = globalContainer.createChild();
-
-    // Bind self to container
-    this.container.registerValue(CoreBindings.APPLICATION_INSTANCE, this);
-    this.container.registerValue(CoreBindings.APPLICATION_CONFIG, this.config);
   }
 
-  /**
-   * Register a controller class
-   */
-  controller<T>(ctor: ClassType<T>, nameOrOptions?: string | any): any {
+  controller<T>(ctor: IClass<T>, _nameOrOptions?: string): any {
     this.controllers.add(ctor);
 
     // Register controller in DI container
-    const name = typeof nameOrOptions === 'string' ? nameOrOptions : ctor.name;
-    this.container.register(`controllers.${name}`, ctor);
+    // const name = typeof nameOrOptions === 'string' ? nameOrOptions : ctor.name;
+    // this.register(`controllers.${name}`, ctor);
 
     return this;
   }
 
-  /**
-   * Register a component
-   */
-  component<T>(ctor: ClassType<T>): void {
+  component<T>(ctor: IClass<T>): void {
     this.components.add(ctor);
 
     // Instantiate and initialize component
-    const instance = this.container.resolve(ctor);
+    const instance = this.resolve(ctor);
     if (typeof (instance as any).init === 'function') {
       (instance as any).init(this);
     }
   }
 
-  /**
-   * Register a repository
-   */
-  repository<T extends IRepository>(ctor: ClassType<T>): void {
-    this.container.register(`repositories.${ctor.name}`, ctor);
+  repository<T extends IRepository>(ctor: IClass<T>): void {
+    this.register(`repositories.${ctor.name}`, ctor);
   }
 
-  /**
-   * Register a service
-   */
-  service<T extends IService>(ctor: ClassType<T>): void {
-    this.container.register(`services.${ctor.name}`, ctor);
+  service<T extends IService>(ctor: IClass<T>): void {
+    this.register(`services.${ctor.name}`, ctor);
   }
 
-  /**
-   * Register a datasource
-   */
   dataSource(ds: IDataSource): void {
     this.datasources.set(ds.name, ds);
-    this.container.registerValue(`datasources.${ds.name}`, ds);
+    this.registerValue(`datasources.${ds.name}`, ds);
   }
 
-  /**
-   * Get datasource synchronously
-   */
-  getDatasourceSync<T extends IDataSource>(dsName: string): T {
-    const ds = this.datasources.get(dsName);
-    if (!ds) {
-      throw new Error(`Datasource not found: ${dsName}`);
-    }
-    return ds as T;
-  }
-
-  /**
-   * Get repository synchronously
-   */
-  getRepositorySync<T extends IRepository>(c: ClassType<T>): T {
-    return this.container.getSync<T>(`repositories.${c.name}`);
-  }
-
-  /**
-   * Get service synchronously
-   */
-  getServiceSync<T extends IService>(c: ClassType<T>): T {
-    return this.container.getSync<T>(`services.${c.name}`);
-  }
-
-  /**
-   * Get from container by key
-   */
   getSync<T>(key: string | symbol): T {
-    return this.container.getSync<T>(key);
+    return this.getSync<T>(key);
   }
 
-  /**
-   * Bind a value to the container
-   */
   bind<T>(key: string | symbol) {
-    return this.container.bind<T>(key);
+    return this.bind<T>(key);
   }
 
-  /**
-   * Initialize application
-   */
   async initialize(): Promise<void> {
     await this.preConfigure();
 
@@ -154,10 +105,7 @@ export class BaseApplication implements IApplication {
     await this.postConfigure();
   }
 
-  /**
-   * Register controller and generate routes
-   */
-  protected registerController(controllerClass: ClassType<any>): void {
+  protected registerController(controllerClass: IClass<any>): void {
     // Get controller metadata
     const controllerMetadata = MetadataRegistry.getControllerMetadata(controllerClass);
     const basePath = controllerMetadata?.basePath || '/';
@@ -170,7 +118,7 @@ export class BaseApplication implements IApplication {
     }
 
     // Create controller instance
-    const controllerInstance = this.container.resolve(controllerClass);
+    const controllerInstance = this.resolve(controllerClass);
 
     // Register each route
     for (const route of routes) {
@@ -318,9 +266,6 @@ export class BaseApplication implements IApplication {
     // To be implemented
   }
 
-  /**
-   * Get server configuration
-   */
   getServerHost(): string {
     return this.config.host || AppConstants.HOST;
   }
@@ -333,16 +278,10 @@ export class BaseApplication implements IApplication {
     return `http://${this.getServerHost()}:${this.getServerPort()}`;
   }
 
-  /**
-   * Get underlying Hono instance
-   */
-  getHono(): Hono {
+  getServer(): Hono {
     return this.hono;
   }
 
-  /**
-   * Start the application
-   */
   async start(): Promise<void> {
     await this.initialize();
 
@@ -362,16 +301,9 @@ export class BaseApplication implements IApplication {
     );
   }
 
-  /**
-   * Stop the application
-   */
   async stop(): Promise<void> {
-    // Cleanup logic
     console.log('Server stopped');
   }
 }
 
-/**
- * Application class alias
- */
 export class Application extends BaseApplication {}

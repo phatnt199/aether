@@ -1,20 +1,12 @@
 import type { IService } from '@/common/types';
+import { BaseHelper } from '../base.helper';
 
 /**
  * Base service class
  * All services should extend this
  */
-export abstract class BaseService implements IService {
-  protected scope: string;
-
-  constructor(options: { scope: string }) {
-    this.scope = options.scope;
-  }
-
-  /**
-   * Get service scope/name
-   */
-  getScope(): string {
-    return this.scope;
+export abstract class BaseService extends BaseHelper implements IService {
+  constructor(opts: { scope: string }) {
+    super({ scope: opts.scope });
   }
 }

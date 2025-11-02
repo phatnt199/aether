@@ -1,5 +1,5 @@
 import { BaseEntity } from '@/base';
-import type { ClassType, MixinTarget } from '@/common/types';
+import type { IClass, MixinTarget } from '@/common/types';
 import { belongsTo, property } from '@/decorators/model.decorators';
 
 /**
@@ -52,7 +52,7 @@ export function UserAuditMixin<T extends MixinTarget<BaseEntity>>(
 export function UserAuditWithRelationsMixin<T extends MixinTarget<any>>(
   Base: T,
   options: {
-    userModel: () => ClassType<any>;
+    userModel: () => IClass<any>;
     createdByField?: string;
     modifiedByField?: string;
   },
