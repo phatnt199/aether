@@ -132,4 +132,27 @@ export class MQTTClientHelper extends BaseHelper {
       });
     });
   }
+
+  // -------------------------------------------------------------------------------
+  disconnect(opts: { isForce?: boolean; options?: Partial<mqtt.IDisconnectPacket> }) {
+    const { isForce = false, options = {} } = opts;
+
+    return new Promise((resolve, reject) => {
+      if (!this.client?.connected) {
+        reject(
+          getError({
+            statusCode: 400,
+            message: `[disconnect][${this.identifier}] MQTT Client is not connected!`,
+          }),
+        );
+      }
+
+      this.client.end(isForce, options, error => {
+        if (error) {
+          reject(error);
+        }
+        resolve(true);
+      });
+    });
+  }
 }

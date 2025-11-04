@@ -89,6 +89,10 @@ export abstract class DefaultCrudRepository<
   abstract createWithReturn(data: DataObject<E>, options?: TDBAction): Promise<E>;
   abstract updateWithReturn(id: IdType, data: DataObject<E>, options?: TDBAction): Promise<E>;
   abstract upsertWith(data: DataObject<E>, where: Where<E>, options?: TDBAction): Promise<E | null>;
+  abstract deleteWithReturn(
+    where: Where<E>,
+    options?: TDBAction,
+  ): Promise<{ count: Count; data: E[] }>;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -277,6 +281,16 @@ export abstract class ViewRepository<
     _where: Where<E>,
     _options?: TDBAction,
   ): Promise<E | null> {
+    throw getError({
+      statusCode: 500,
+      message: 'Cannot manipulate entity with view repository!',
+    });
+  }
+
+  override deleteWithReturn(
+    _where: Where<E>,
+    _options?: TDBAction,
+  ): Promise<{ count: Count; data: E[] }> {
     throw getError({
       statusCode: 500,
       message: 'Cannot manipulate entity with view repository!',
