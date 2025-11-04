@@ -5,7 +5,6 @@ import {
   serial,
   text,
   timestamp,
-  varchar,
   type PgTableWithColumns,
 } from 'drizzle-orm/pg-core';
 
@@ -60,19 +59,6 @@ export abstract class BaseEntity<ID extends IdType = IdType> extends Entity {
 // Number ID Entity
 // -------------------------------------------------------------------------------------------
 export abstract class BaseNumberIdEntity extends BaseEntity<NumberIdType> {
-  override id!: number;
-
-  /**
-   * Helper to create a table with serial primary key
-   * Usage in child class:
-   * ```
-   * getTable() {
-   *   return this.createTableWithSerial('users', {
-   *     // additional columns
-   *   });
-   * }
-   * ```
-   */
   protected createTableWithSerial<T extends Record<string, any>>(
     tableName: string,
     columns: T,
@@ -82,50 +68,18 @@ export abstract class BaseNumberIdEntity extends BaseEntity<NumberIdType> {
       ...columns,
     });
   }
-
-  /**
-   * Helper to create a table with integer primary key
-   */
-  protected createTableWithIntegerId<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: integer('id').primaryKey(),
-      ...columns,
-    });
-  }
 }
 
 // -------------------------------------------------------------------------------------------
 // String ID Entity
 // -------------------------------------------------------------------------------------------
 export abstract class BaseStringIdEntity extends BaseEntity<StringIdType> {
-  override id!: string;
-
-  /**
-   * Helper to create a table with text primary key
-   */
   protected createTableWithTextId<T extends Record<string, any>>(
     tableName: string,
     columns: T,
   ): PgTableWithColumns<any> {
     return pgTable(tableName, {
       id: text('id').primaryKey(),
-      ...columns,
-    });
-  }
-
-  /**
-   * Helper to create a table with varchar primary key
-   */
-  protected createTableWithVarcharId<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-    length: number = 255,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: varchar('id', { length }).primaryKey(),
       ...columns,
     });
   }

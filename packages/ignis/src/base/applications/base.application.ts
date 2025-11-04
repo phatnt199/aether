@@ -93,13 +93,6 @@ export abstract class BaseApplication extends Container implements IApplication 
     return this;
   }
 
-  /* component<T>(ctor: IClass<T>): void {
-    const instance = this.resolve(ctor);
-    if (typeof (instance as any).init === 'function') {
-      (instance as any).init(this);
-    }
-  } */
-
   repository<T extends IRepository>(ctor: IClass<T>): void {
     this.bind(
       BindingKeys.build({
