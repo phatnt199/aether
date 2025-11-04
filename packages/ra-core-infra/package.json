@@ -40,10 +40,10 @@
     "test": "ts-node ./src/__test__/index.ts",
     "clean": "sh ./scripts/clean.sh",
     "eslint": "eslint --report-unused-disable-directives .",
-    "lint": "pnpm eslint && pnpm prettier:cli",
-    "lint:fix": "pnpm eslint --fix && pnpm prettier:fix",
+    "lint": "bun run eslint && bun run prettier:cli",
+    "lint:fix": "bun run eslint --fix && bun run prettier:fix",
     "prettier:cli": "prettier \"**/*.{js,ts}\" -l",
-    "prettier:fix": "pnpm prettier:cli --write",
+    "prettier:fix": "bun run prettier:cli --write",
     "rebuild": "sh ./scripts/rebuild.sh no-version",
     "rebuild:major": "sh ./scripts/rebuild.sh major",
     "rebuild:minor": "sh ./scripts/rebuild.sh minor",
@@ -52,7 +52,7 @@
     "rebuild:preminor": "sh ./scripts/rebuild.sh preminor",
     "rebuild:prepatch": "sh ./scripts/rebuild.sh prepatch",
     "rebuild:prerelease": "sh ./scripts/rebuild.sh prerelease",
-    "pretest:dev": "pnpm run rebuild"
+    "pretest:dev": "bun run rebuild"
   },
   "repository": {
     "type": "git",

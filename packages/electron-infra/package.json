@@ -45,10 +45,10 @@
     "build": "sh ./scripts/build.sh",
     "clean": "sh ./scripts/clean.sh",
     "eslint": "eslint --report-unused-disable-directives .",
-    "lint": "pnpm eslint && pnpm prettier:cli",
-    "lint:fix": "pnpm eslint --fix && pnpm prettier:fix",
+    "lint": "bun run eslint && bun run prettier:cli",
+    "lint:fix": "bun run eslint --fix && bun run prettier:fix",
     "prettier:cli": "prettier \"**/*.{js,ts}\" -l",
-    "prettier:fix": "pnpm prettier:cli --write",
+    "prettier:fix": "bun run prettier:cli --write",
     "rebuild": "sh ./scripts/rebuild.sh no-version",
     "rebuild:major": "sh ./scripts/rebuild.sh major",
     "rebuild:minor": "sh ./scripts/rebuild.sh minor",
@@ -57,7 +57,7 @@
     "rebuild:preminor": "sh ./scripts/rebuild.sh preminor",
     "rebuild:prepatch": "sh ./scripts/rebuild.sh prepatch",
     "rebuild:prerelease": "sh ./scripts/rebuild.sh prerelease",
-    "pretest:dev": "pnpm run rebuild",
+    "pretest:dev": "bun run rebuild",
     "test:dev": "NODE_ENV=development mocha -r dotenv-flow/config -r source-map-support/register --timeout 60000 --exit dist/__tests__/index.js"
   },
   "repository": {
@@ -82,7 +82,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@minimaltech/node-infra": "workspace:*",
+    "@minimaltech/node-infra": "latest",
     "@reduxjs/toolkit": "^2.5.0",
     "dotenv-flow": "^4.0.1",
     "electron-updater": "^6.6.2",
@@ -98,7 +98,7 @@
     "@types/lodash": "^4.17.13",
     "@types/node": "^20.17.9",
     "@types/ws": "^8.5.13",
-    "electron": "^33.2.1",
+    "electron": "^35.7.5",
     "eslint": "^9.32.0",
     "prettier": "^3.4.1",
     "source-map-support": "^0.5.21",

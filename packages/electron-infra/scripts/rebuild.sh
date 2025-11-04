@@ -6,14 +6,14 @@ case "$provision_opt" in
     echo "No versioning for current build!"
     ;;
   *)
-    pnpm version $provision_opt
+    npm version $provision_opt
     ;;
 esac
 
 echo "\nCleaning up resources ..."
-pnpm clean
+bun run clean
 
 echo "\nBuilding latest release..."
-pnpm build
+bun run build
 
 echo "\nPLEASE PUSH LATEST BUILT FOR ANY CHANGE(S)"

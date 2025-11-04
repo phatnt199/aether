@@ -1,6 +1,6 @@
 import { BaseApplication } from '@/base/applications';
 import { EnvironmentKeys } from '@/common';
-import { AES, applicationEnvironment } from '@/helpers';
+import { AES, applicationEnvironment, AxiosNetworkRequest } from '@/helpers';
 import { executePromiseWithLimit, getError } from '@/utilities';
 import { CoreBindings, inject } from '@loopback/core';
 import { RequestContext } from '@loopback/rest';
@@ -13,6 +13,7 @@ import { OAuth2ClientRepository } from '../repositories';
 
 export class OAuth2Service extends BaseService {
   private aes = AES.withAlgorithm('aes-256-cbc');
+  protected networkRequest: AxiosNetworkRequest;
 
   constructor(
     @inject(CoreBindings.APPLICATION_INSTANCE)
@@ -22,6 +23,11 @@ export class OAuth2Service extends BaseService {
     private oauth2ClientRepository: OAuth2ClientRepository,
   ) {
     super({ scope: OAuth2Service.name });
+
+    this.networkRequest = new AxiosNetworkRequest({
+      name: 'OAuth2Request',
+      networkOptions: {},
+    });
   }
 
   // --------------------------------------------------------------------------------
@@ -224,23 +230,28 @@ export class OAuth2Service extends BaseService {
       authorizationCode,
       accessTokenExpiresAt,
       provider: client.provider,
-      user,
+      user: Object.assign({}, user),
     };
     if (useImplicitGrant) {
       Object.assign(payload, { accessToken });
     }
 
+    const networkService = this.networkRequest.getNetworkService();
+
     const tasks = callbackUrls.map(callbackUrl => {
       return () => {
         return new Promise((resolve, reject) => {
-          fetch(callbackUrl, {
-            method: 'POST',
-            body: JSON.stringify(payload),
-            headers: { ['content-type']: 'application/x-www-form-urlencoded' },
-          })
+          const body = Object.assign({}, payload);
+          networkService
+            .send({
+              method: 'POST',
+              url: callbackUrl,
+              body,
+              headers: { ['content-type']: 'application/x-www-form-urlencoded' },
+            })
             .then(rs => {
               this.logger.info('[doClientCallback] Successfull to callback | Url: %s', callbackUrl);
-              resolve(rs);
+              resolve(rs.data);
             })
             .catch(error => {
               this.logger.error(
