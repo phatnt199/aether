@@ -50,6 +50,7 @@ export interface ICrudControllerOptions<E extends BaseEntity> {
     deleteById?: SchemaRef;
   };
   doInjectCurrentUser?: boolean;
+  doDeleteWithReturn?: boolean;
 }
 
 // --------------------------------------------------------------------------------------------------------------
@@ -60,6 +61,7 @@ export const defineCrudController = <E extends BaseEntity>(opts: ICrudController
     controller: controllerOptions,
     schema: schemaOptions,
     doInjectCurrentUser,
+    doDeleteWithReturn,
   } = opts;
 
   const idPathParam: ParameterObject = {
@@ -381,12 +383,21 @@ export const defineCrudController = <E extends BaseEntity>(opts: ICrudController
     })
     deleteById(@param(idPathParam) id: IdType): Promise<{ id: IdType }> {
       return new Promise((resolve, reject) => {
-        this.repository
-          .deleteById(id)
-          .then(() => {
-            resolve({ id });
-          })
-          .catch(reject);
+        if (doDeleteWithReturn) {
+          this.repository
+            .deleteWithReturn({ id } as Where<E>)
+            .then(() => {
+              resolve({ id });
+            })
+            .catch(reject);
+        } else {
+          this.repository
+            .deleteById(id)
+            .then(() => {
+              resolve({ id });
+            })
+            .catch(reject);
+        }
       });
     }
   }
