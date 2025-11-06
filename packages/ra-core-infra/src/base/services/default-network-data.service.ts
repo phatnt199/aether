@@ -13,12 +13,15 @@ import {
   TRequestType,
 } from '@/common';
 import { getError } from '@/utilities';
-import { BaseNetworkRequestService } from './base-network-request.service';
+import { NodeFetchNetworkRequest } from '@/helpers';
+import { BaseService } from './base.service';
 
-export class DefaultNetworkRequestService extends BaseNetworkRequestService {
+export class DefaultNetworkRequestService extends BaseService {
   protected authToken?: { type?: string; value: string };
   protected noAuthPaths?: string[];
   protected headers?: HeadersInit;
+  protected networkRequest: NodeFetchNetworkRequest;
+  protected baseUrl: string;
 
   constructor(opts: {
     name: string;
@@ -26,11 +29,16 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
     headers?: HeadersInit;
     noAuthPaths?: string[];
   }) {
-    const { name, baseUrl, headers, noAuthPaths } = opts;
-    super({ name, scope: DefaultNetworkRequestService.name, baseUrl });
+    super({ scope: DefaultNetworkRequestService.name });
+    const { name, baseUrl = '', headers = {}, noAuthPaths } = opts;
 
     this.headers = headers;
     this.noAuthPaths = noAuthPaths;
+    this.baseUrl = baseUrl;
+    this.networkRequest = new NodeFetchNetworkRequest({
+      name,
+      networkOptions: { baseUrl, headers },
+    });
   }
 
   //-------------------------------------------------------------
@@ -184,9 +192,9 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
       });
     }
 
-    const url = this.getRequestUrl({ baseUrl, paths });
+    const url = this.networkRequest.getRequestUrl({ baseUrl: this.baseUrl, paths });
 
-    const rs = await this.networkService.send({
+    const rs = await this.networkRequest.getNetworkService().send({
       url,
       method,
       params: query,
