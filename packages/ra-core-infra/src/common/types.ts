@@ -241,3 +241,34 @@ export interface ICoreRaApplication {
   // ------------------------------------------------------------------------------
   start(): ValueOrPromise<void>;
 }
+
+// --------------------------------------------------
+type TDeepPath = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+// --------------------------------------------------
+export type TPaths<T, DeepLevel extends number = 10> = DeepLevel extends never
+  ? never
+  : T extends Array<infer U>
+    ? TPaths<U>
+    : T extends object
+      ? {
+          [K in keyof T]-?: K extends string | number
+            ? `${K}` | `${K}.${TPaths<T[K], TDeepPath[DeepLevel]>}`
+            : never;
+        }[keyof T]
+      : never;
+
+// --------------------------------------------------
+export type TFullPaths<T, DeepLevel extends number = 10> = DeepLevel extends never
+  ? never
+  : T extends Array<infer U>
+    ? TFullPaths<U>
+    : T extends object
+      ? {
+          [K in keyof T]-?: K extends string | number
+            ? T[K] extends Array<any> | object
+              ? `${K}.${TFullPaths<T[K], TDeepPath[DeepLevel]>}`
+              : `${K}`
+            : never;
+        }[keyof T]
+      : never;

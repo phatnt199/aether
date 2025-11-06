@@ -7,4 +7,5 @@ export * from './use-debounce';
 export * from './use-document-title';
 export * from './use-injectable';
 export * from './use-sizer';
+export * from './use-translate';
 export * from './use-window-dimensions';
