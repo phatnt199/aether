@@ -7,17 +7,18 @@ import {
   IdType,
   RequestMethods,
 } from '@/common';
-import { Logger } from '@/helpers';
+import { BaseService } from './base.service';
 
 export interface ICrudServiceOptions {
   basePath: string;
 }
 
 export class BaseCrudService<
-  E extends { id: IdType; [extra: string | symbol]: any } = any,
-> implements ICrudService<E>
+    E extends { id: IdType; [extra: string | symbol]: any } = any,
+  >
+  extends BaseService
+  implements ICrudService<E>
 {
-  protected logger: Logger;
   protected dataProvider: IDataProvider;
   protected serviceOptions: ICrudServiceOptions;
 
@@ -26,7 +27,7 @@ export class BaseCrudService<
     dataProvider: IDataProvider;
     serviceOptions: ICrudServiceOptions;
   }) {
-    this.logger = Logger.getInstance({ scope: opts.scope });
+    super({ scope: opts.scope });
     this.dataProvider = opts.dataProvider;
     this.serviceOptions = opts.serviceOptions;
   }
