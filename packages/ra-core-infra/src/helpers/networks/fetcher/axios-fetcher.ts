@@ -34,7 +34,7 @@ export class AxiosFetcher extends AbstractNetworkFetchableHelper<
       url,
       method,
       params,
-      data,
+      data: data instanceof FormData ? data : JSON.stringify(data),
       headers,
       paramsSerializer: { serialize: p => stringify(p) },
       ...rest,
