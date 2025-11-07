@@ -1,4 +1,5 @@
 import { getError } from '@/utilities';
+import { after, afterEach, before, beforeEach, describe } from 'node:test';
 import { ApplicationLogger, LoggerFactory } from '../logger';
 import { ITestPlan } from './types';
 
@@ -50,4 +51,4 @@ export class TestDescribe<R extends object> {
   }
 }
 
-export class MochaTestDescribe<R extends object> extends TestDescribe<R> {}
+export class AppTestDescribe<R extends object> extends TestDescribe<R> {}

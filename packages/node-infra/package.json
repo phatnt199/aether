@@ -84,7 +84,7 @@
     "rebuild:prepatch": "sh ./scripts/rebuild.sh prepatch",
     "rebuild:prerelease": "sh ./scripts/rebuild.sh prerelease",
     "pretest:develop": "bun run rebuild",
-    "test:develop": "NODE_ENV=development mocha -r dotenv-flow/config -r source-map-support/register --timeout 60000 --exit dist/__tests__/index.js"
+    "test:develop": "NODE_ENV=development node --test -r dotenv-flow/config -r source-map-support/register --timeout 60000 --exit dist/__tests__/index.js"
   },
   "repository": {
     "type": "git",
@@ -147,17 +147,11 @@
     "winston-daily-rotate-file": "^5.0.0",
     "winston-transport": "^4.9.0"
   },
-  "peerDependenciesMeta": {
-    "mocha": {
-      "optional": true
-    }
-  },
   "devDependencies": {
     "@minimaltech/eslint-node": "^0.2.1",
     "@types/express": "4.17.21",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/lodash": "^4.17.20",
-    "@types/mocha": "^10.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.7.2",
     "eslint": "^9.36.0",

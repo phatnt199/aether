@@ -51,4 +51,4 @@ export class TestDescribe<R extends object> {
   }
 }
 
-export class MochaTestDescribe<R extends object> extends TestDescribe<R> {}
+export class AppTestDescribe<R extends object> extends TestDescribe<R> {}

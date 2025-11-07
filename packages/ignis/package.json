@@ -1,7 +1,7 @@
 {
   "name": "@minimaltech/ignis",
-  "version": "0.1.0",
-  "description": "Minimal Technology - NodeJS Infrastructure - Hono Framework (Class-based with Decorators)",
+  "version": "0.0.1",
+  "description": "Minimal Technology - Infrastructure - Hono Framework",
   "keywords": [
     "web",
     "restful",
