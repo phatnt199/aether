@@ -170,7 +170,7 @@
     },
     "packages/ra-core-infra": {
       "name": "@minimaltech/ra-core-infra",
-      "version": "0.0.2-0",
+      "version": "0.0.2-2",
       "dependencies": {
         "@reduxjs/toolkit": "^2.9.1",
         "ra-i18n-polyglot": "^5.12.1",
@@ -246,6 +246,7 @@
         "@loopback/filter": "^6.0.2",
         "@mui/icons-material": ">=5",
         "@mui/material": ">=5",
+        "axios": "^1.13.2",
         "react": ">=18.0",
         "react-admin": ">=5.12.0",
         "react-dom": ">=18.0",
