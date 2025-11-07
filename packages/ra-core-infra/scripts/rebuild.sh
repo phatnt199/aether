@@ -16,4 +16,7 @@ bun run clean
 echo "\nBuilding latest release..."
 bun run build
 
+echo "\nCalculating bundle size..."
+bun run size
+
 echo "\nPLEASE PUSH LATEST BUILT FOR ANY CHANGE(S)"
