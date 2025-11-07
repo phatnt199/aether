@@ -3,27 +3,21 @@
   "version": "0.0.1",
   "description": "Minimal Technology Project Infrastructure",
   "scripts": {
-    "clean": "pnpm --filter {packages/*} run clean",
-    "build": "pnpm --filter {packages/*} run build",
-    "rebuild": "pnpm run clean && pnpm run build",
-    "rebuild:common": "pnpm --filter {packages/common} run rebuild",
-    "rebuild:node-infra": "pnpm --filter {packages/node-infra} run rebuild",
-    "rebuild:agent-infra": "pnpm --filter {packages/agent-infra} run rebuild",
-    "rebuild:ra-core-infra": "pnpm --filter {packages/ra-core-infra} run rebuild",
-    "rebuild:ra-infra": "pnpm --filter {packages/ra-infra} run rebuild",
-    "rebuild:electron-infra": "pnpm --filter {packages/electron-infra} run rebuild",
-    "postinstall": "pnpm run rebuild:common"
+    "clean": "bun run --filter \"./packages/*\" clean",
+    "build": "bun run --filter \"./packages/*\" build",
+    "rebuild": "bun run clean && bun run build",
+    "rebuild:node-infra": "bun run --filter \"./packages/node-infra\" rebuild",
+    "rebuild:agent-infra": "bun run --filter \"./packages/agent-infra\" rebuild",
+    "rebuild:ra-core-infra": "bun run --filter \"./packages/ra-core-infra\" rebuild",
+    "rebuild:ra-infra": "bun run --filter \"./packages/ra-infra\" rebuild",
+    "rebuild:electron-infra": "bun run --filter \"./packages/electron-infra\" rebuild",
+    "rebuild:ignis": "bun run --filter \"./packages/ignis\" rebuild"
   },
   "author": "Phat Nguyen <tanphat199@gmail.com>",
   "private": true,
   "license": "MIT",
   "engines": {
-    "node": ">=18",
-    "pnpm": ">=10"
-  },
-  "overrides": {
-    "zod": "^4.1.12",
-    "ai": "^5.0.0"
+    "node": ">=18"
   },
   "workspaces": [
     "packages/*"

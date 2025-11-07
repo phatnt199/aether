@@ -27,6 +27,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "noImplicitOverride": true,
+    "strictPropertyInitialization": false,
 
     /* Paths */
     "baseUrl": ".",

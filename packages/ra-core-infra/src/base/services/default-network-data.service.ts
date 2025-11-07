@@ -13,12 +13,15 @@ import {
   TRequestType,
 } from '@/common';
 import { getError } from '@/utilities';
-import { BaseNetworkRequestService } from './base-network-request.service';
+import { NodeFetchNetworkRequest } from '@/helpers';
+import { BaseService } from './base.service';
 
-export class DefaultNetworkRequestService extends BaseNetworkRequestService {
+export class DefaultNetworkRequestService extends BaseService {
   protected authToken?: { type?: string; value: string };
   protected noAuthPaths?: string[];
   protected headers?: HeadersInit;
+  protected networkRequest: NodeFetchNetworkRequest;
+  protected baseUrl: string;
 
   constructor(opts: {
     name: string;
@@ -26,18 +29,22 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
     headers?: HeadersInit;
     noAuthPaths?: string[];
   }) {
-    const { name, baseUrl, headers, noAuthPaths } = opts;
-    super({ name, scope: DefaultNetworkRequestService.name, baseUrl });
+    super({ scope: DefaultNetworkRequestService.name });
+    const { name, baseUrl = '', headers = {}, noAuthPaths } = opts;
 
     this.headers = headers;
     this.noAuthPaths = noAuthPaths;
+    this.baseUrl = baseUrl;
+    this.networkRequest = new NodeFetchNetworkRequest({
+      name,
+      networkOptions: { baseUrl, headers },
+    });
   }
 
   //-------------------------------------------------------------
   getRequestAuthorizationHeader() {
     const authToken =
-      this.authToken ||
-      JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_TOKEN) || '{}');
+      this.authToken || JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_TOKEN) || '{}');
 
     if (!authToken?.value) {
       throw getError({
@@ -152,8 +159,7 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
         // content-range: <unit> <range-start>-<range-end>/<size>
         // TODO: Handle content range not use `getListVariant`
         const contentRange =
-          (headers?.get('content-range') || headers?.get['Content-Range']) ??
-          _data.length;
+          (headers?.get('content-range') || headers?.get['Content-Range']) ?? _data.length;
 
         return {
           data: _data as TData,
@@ -184,9 +190,9 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
       });
     }
 
-    const url = this.getRequestUrl({ baseUrl, paths });
+    const url = this.networkRequest.getRequestUrl({ baseUrl: this.baseUrl, paths });
 
-    const rs = await this.networkService.send({
+    const rs = await this.networkRequest.getNetworkService().send({
       url,
       method,
       params: query,

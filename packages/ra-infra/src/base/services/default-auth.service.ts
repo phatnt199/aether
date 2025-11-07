@@ -1,4 +1,4 @@
-import { LocalStorageKeys } from '@/common';
+import { IdType, LocalStorageKeys } from '@/common';
 
 export class DefaultAuthService {
   getUser() {
@@ -6,9 +6,7 @@ export class DefaultAuthService {
   }
 
   getRoles() {
-    const roles = JSON.parse(
-      localStorage.getItem(LocalStorageKeys.KEY_AUTH_PERMISSION) || '[]',
-    );
+    const roles = JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_PERMISSION) || '[]');
     return new Set<string>(roles);
   }
 
@@ -23,30 +21,21 @@ export class DefaultAuthService {
 
   saveAuth(opts: {
     userId: number | string;
-    username: string;
-    token: { value: string; type: string };
-  }) {
-    const { token, userId, username } = opts;
-    localStorage.setItem(LocalStorageKeys.KEY_AUTH_TOKEN, JSON.stringify(token));
-    localStorage.setItem(
-      LocalStorageKeys.KEY_AUTH_IDENTITY,
-      JSON.stringify({ userId, username }),
-    );
-  }
 
-  saveOAuth2(opts: {
-    userId: number | string;
-    provider: string;
+    username?: string;
+    provider?: string;
+    referenceId?: IdType;
+
     token: { value: string; type: string };
   }) {
-    const { token, provider, userId } = opts;
+    const { token, userId, username = '', provider = '', referenceId = '' } = opts;
     localStorage.setItem(
       LocalStorageKeys.KEY_AUTH_TOKEN,
       JSON.stringify(Object.assign({}, token, { provider })),
     );
     localStorage.setItem(
       LocalStorageKeys.KEY_AUTH_IDENTITY,
-      JSON.stringify({ userId, provider }),
+      JSON.stringify({ userId, username, referenceId, provider }),
     );
   }
 

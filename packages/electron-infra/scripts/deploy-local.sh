@@ -1,4 +1,4 @@
-pnpm run rebuild
+bun run rebuild
 echo "Rebuilt sources"
 path_project=$1
 

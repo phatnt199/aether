@@ -2,12 +2,7 @@ import { inject } from '@loopback/context';
 import { I18nProvider } from 'ra-core';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 
-import {
-  CoreBindings,
-  englishMessages,
-  II18nProviderOptions,
-  ValueOrPromise,
-} from '@/common';
+import { CoreBindings, englishMessages, II18nProviderOptions, ValueOrPromise } from '@/common';
 import { BaseProvider } from './base.provider';
 
 const [language] = (navigator?.language || 'en-US').split('-');
