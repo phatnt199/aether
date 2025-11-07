@@ -1,8 +1,6 @@
 import React from 'react';
 
-export const useSizer = (props: {
-  containerId: string;
-}): { width: number; height: number } => {
+export const useSizer = (props: { containerId: string }): { width: number; height: number } => {
   const [width, setWidth] = React.useState<number>(0);
   const [height, setHeight] = React.useState<number>(0);
 

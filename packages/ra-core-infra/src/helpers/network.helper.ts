@@ -25,10 +25,7 @@ export class NetworkHelper {
     this.name = name;
     this.logger = logger;
 
-    this.logger?.info(
-      'Creating new network request worker instance! Name: %s',
-      this.name,
-    );
+    this.logger?.info('Creating new network request worker instance! Name: %s', this.name);
   }
 
   getProtocol(url: string) {

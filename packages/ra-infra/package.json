@@ -82,7 +82,7 @@
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
-    "@minimaltech/eslint-react": "^0.2.1-0",
+    "@minimaltech/eslint-react": "^0.2.1-2",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "@size-limit/preset-small-lib": "^11.2.0",

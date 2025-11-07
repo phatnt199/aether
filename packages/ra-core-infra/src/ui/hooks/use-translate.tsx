@@ -8,9 +8,7 @@ export interface IUseTranslateKeysOverrides {}
 
 export type TUseTranslateKeysDefault = TFullPaths<typeof englishMessages>;
 
-export type TUseTranslateKeys =
-  | TUseTranslateKeysDefault
-  | keyof IUseTranslateKeysOverrides;
+export type TUseTranslateKeys = TUseTranslateKeysDefault | keyof IUseTranslateKeysOverrides;
 
 export const useTranslate = () => {
   // --------------------------------------------------

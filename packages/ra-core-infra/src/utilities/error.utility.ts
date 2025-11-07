@@ -3,12 +3,7 @@ export class ApplicationError extends Error {
   messageCode?: string;
   payload?: any;
 
-  constructor(opts: {
-    statusCode?: number;
-    messageCode?: string;
-    message: string;
-    payload?: any;
-  }) {
+  constructor(opts: { statusCode?: number; messageCode?: string; message: string; payload?: any }) {
     const { message, messageCode, statusCode = 400, payload } = opts;
     super(message);
 

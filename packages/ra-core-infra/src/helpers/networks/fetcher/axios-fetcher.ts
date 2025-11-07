@@ -21,10 +21,7 @@ export class AxiosFetcher extends AbstractNetworkFetchableHelper<
   constructor(opts: { name: string; defaultConfigs: AxiosRequestConfig; logger?: any }) {
     super({ name: opts.name, variant: 'axios' });
     const { defaultConfigs } = opts;
-    opts?.logger?.info(
-      'Creating new network request worker instance! Name: %s',
-      this.name,
-    );
+    opts?.logger?.info('Creating new network request worker instance! Name: %s', this.name);
 
     this.worker = axios.create({ ...defaultConfigs });
   }

@@ -25,9 +25,7 @@ export interface IUseAutosaveParams<TData, TReturn> {
   disabled?: boolean;
 }
 
-export const useAutosave = <TData, TReturn>(
-  params: IUseAutosaveParams<TData, TReturn>,
-) => {
+export const useAutosave = <TData, TReturn>(params: IUseAutosaveParams<TData, TReturn>) => {
   const { data, onSave, interval = 2000, enableSaveOnUnmount, disabled } = params;
 
   //---------------------------------------------------------------------------
