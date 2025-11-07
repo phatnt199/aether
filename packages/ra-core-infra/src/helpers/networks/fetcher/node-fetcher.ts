@@ -43,7 +43,7 @@ export class NodeFetcher extends AbstractNetworkFetchableHelper<
       ...this.defaultConfigs,
       ...rest,
       method,
-      body,
+      body: body instanceof FormData ? body : JSON.stringify(body),
       headers,
       signal: abortController?.signal ?? signal,
     };
