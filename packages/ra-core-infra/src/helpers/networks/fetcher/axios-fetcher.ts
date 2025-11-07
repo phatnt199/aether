@@ -1,7 +1,6 @@
 import { AnyObject } from '@/common';
 import { stringify } from '@/utilities/url.utility';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import https from 'node:https';
 import { AbstractNetworkFetchableHelper, IRequestOptions } from './base-fetcher';
 
 export interface IAxiosRequestOptions extends AxiosRequestConfig, IRequestOptions {
@@ -41,12 +40,12 @@ export class AxiosFetcher extends AbstractNetworkFetchableHelper<
       ...rest,
     };
 
-    const protocol = this.getProtocol(url);
+    /* const protocol = this.getProtocol(url);
     if (protocol === 'https') {
       props.httpsAgent = new https.Agent({
         rejectUnauthorized: false,
       });
-    }
+    } */
 
     logger?.info('[send] URL: %s | Props: %o', url, props);
     return this.worker.request<T>(props);
