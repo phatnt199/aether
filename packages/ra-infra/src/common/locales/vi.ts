@@ -104,8 +104,7 @@ export const vietnameseMessages: TranslationMessages = {
       no: 'Không',
       not_found: 'Bạn đã nhập một URL sai hoặc bạn đã làm theo một liên kết không đúng.',
       yes: 'Có',
-      unsaved_changes:
-        'Một vài thay đổi của bạn chưa được lưu. Bạn có chắc là muốn bỏ qua chúng?',
+      unsaved_changes: 'Một vài thay đổi của bạn chưa được lưu. Bạn có chắc là muốn bỏ qua chúng?',
       access_denied:
         'Bạn không có quyền truy cập vào trang này. Hãy liên hệ với quản trị viên của bạn để biết thêm thông tin.',
       authentication_error: 'Xác thực không thành công. Vui lòng thử lại.',

@@ -33,8 +33,7 @@ export class DefaultAuthProvider<
     return new Promise((resolve, reject) => {
       this.restDataProvider
         .send({
-          resource: (this.authProviderOptions.paths?.signIn ??
-            '/auth/login') as TResource,
+          resource: (this.authProviderOptions.paths?.signIn ?? '/auth/login') as TResource,
           params: { method: RequestMethods.POST, body: params },
         })
         .then(rs => {

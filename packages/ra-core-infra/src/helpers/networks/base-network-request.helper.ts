@@ -66,8 +66,7 @@ export class BaseNetworkRequest<T extends TFetcherVariant> extends BaseHelper {
     if (!baseUrl || isEmpty(baseUrl)) {
       throw getError({
         statusCode: 500,
-        message:
-          '[getRequestUrl] Invalid configuration for third party request base url!',
+        message: '[getRequestUrl] Invalid configuration for third party request base url!',
       });
     }
 

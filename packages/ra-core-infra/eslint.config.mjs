@@ -5,9 +5,12 @@ const configs = [
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
+  {
+    files: ['**/*/*.ts'],
+    rules: {
       'react-hooks/exhaustive-deps': 'warn',
-      '@typescript-eslint/no-floating-promises': 'off',
-      '@typescript-eslint/no-unused-expressions': 'off',
     },
   },
   {

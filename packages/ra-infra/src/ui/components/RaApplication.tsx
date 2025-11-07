@@ -56,15 +56,9 @@ export const RaApplication: React.FC<IApplication> = (props: IApplication) => {
 
   // -------------------------------------------------------------------------------
   const adminProps = React.useMemo(() => {
-    const dataProvider = context.getSync<IDataProvider>(
-      CoreBindings.DEFAULT_REST_DATA_PROVIDER,
-    );
-    const authProvider = context.getSync<IAuthProvider>(
-      CoreBindings.DEFAULT_AUTH_PROVIDER,
-    );
-    const i18nProvider = context.getSync<I18nProvider>(
-      CoreBindings.DEFAULT_I18N_PROVIDER,
-    );
+    const dataProvider = context.getSync<IDataProvider>(CoreBindings.DEFAULT_REST_DATA_PROVIDER);
+    const authProvider = context.getSync<IAuthProvider>(CoreBindings.DEFAULT_AUTH_PROVIDER);
+    const i18nProvider = context.getSync<I18nProvider>(CoreBindings.DEFAULT_I18N_PROVIDER);
 
     return { dataProvider, authProvider, i18nProvider, ...raProps };
   }, [context, raProps]);

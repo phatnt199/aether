@@ -1,21 +1,13 @@
 import { Filter, Where } from '@loopback/filter';
 
-import {
-  EntityRelationType,
-  ICrudService,
-  IDataProvider,
-  IdType,
-  RequestMethods,
-} from '@/common';
+import { EntityRelationType, ICrudService, IDataProvider, IdType, RequestMethods } from '@/common';
 import { BaseService } from './base.service';
 
 export interface ICrudServiceOptions {
   basePath: string;
 }
 
-export class BaseCrudService<
-    E extends { id: IdType; [extra: string | symbol]: any } = any,
-  >
+export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: any } = any>
   extends BaseService
   implements ICrudService<E>
 {

@@ -36,8 +36,7 @@ export abstract class BaseNetworkRequestService {
     if (!baseUrl || isEmpty(baseUrl)) {
       throw getError({
         statusCode: 500,
-        message:
-          '[getRequestUrl] Invalid configuration for third party request base url!',
+        message: '[getRequestUrl] Invalid configuration for third party request base url!',
       });
     }
 

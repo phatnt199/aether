@@ -35,8 +35,7 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
   //-------------------------------------------------------------
   getRequestAuthorizationHeader() {
     const authToken =
-      this.authToken ||
-      JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_TOKEN) || '{}');
+      this.authToken || JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_TOKEN) || '{}');
 
     if (!authToken?.value) {
       throw getError({
@@ -151,8 +150,7 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
         // content-range: <unit> <range-start>-<range-end>/<size>
         // TODO: Handle content range not use `getListVariant`
         const contentRange =
-          (headers?.get('content-range') || headers?.get['Content-Range']) ??
-          _data.length;
+          (headers?.get('content-range') || headers?.get['Content-Range']) ?? _data.length;
 
         return {
           data: _data as TData,

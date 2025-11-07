@@ -42,9 +42,9 @@ import {
 import { getError } from '@/utilities';
 import { BaseProvider } from './base.provider';
 
-export class DefaultRestDataProvider<
-  TResource extends string = string,
-> extends BaseProvider<IDataProvider<TResource>> {
+export class DefaultRestDataProvider<TResource extends string = string> extends BaseProvider<
+  IDataProvider<TResource>
+> {
   protected networkService: DefaultNetworkRequestService;
 
   constructor(
@@ -382,10 +382,7 @@ export class DefaultRestDataProvider<
   create<
     RecordType extends Omit<RaRecord, 'id'> = AnyType,
     ResultRecordType extends RaRecord = RecordType & { id: Identifier },
-  >(opts: {
-    resource: TResource;
-    params: CreateParams;
-  }): Promise<CreateResult<ResultRecordType>> {
+  >(opts: { resource: TResource; params: CreateParams }): Promise<CreateResult<ResultRecordType>> {
     const { resource, params } = opts;
 
     const request = this.networkService.getRequestProps({ resource, body: params.data });
