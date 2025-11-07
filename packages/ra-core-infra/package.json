@@ -77,7 +77,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.1",
-    "axios": "^1.13.2",
     "ra-i18n-polyglot": "^5.12.1",
     "react-router-dom": "^7.9.4"
   },
@@ -104,8 +103,9 @@
   "peerDependencies": {
     "@loopback/context": "^8.0.2",
     "@loopback/filter": "^6.0.2",
-    "react": ">=18.0",
+    "axios": "^1.13.2",
     "ra-core": ">=5.12.2",
+    "react": ">=18.0",
     "react-dom": ">=18.0",
     "react-redux": "^9.1.2"
   },
