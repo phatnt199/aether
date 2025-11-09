@@ -12,7 +12,7 @@ import {
 // Base Entity with Drizzle ORM support
 // -------------------------------------------------------------------------------------------
 export abstract class Entity {
-  protected ormProvider: 'drizzle-orm' = 'drizzle-orm';
+  protected ormProvider: 'drizzle-orm' = 'drizzle-orm' as const;
   protected _table?: PgTableWithColumns<any>;
 
   /**

@@ -81,6 +81,7 @@ export abstract class BaseApplication extends AbstractApplication {
           const { serveStatic } = require('@hono/node-server/serve-static');
           server.use(restPath, serveStatic({ root: folderPath }));
         } catch (error) {
+          this.logger.error('[static] Failed to serve static file | Error: %s', error);
           throw getError({
             message: `[static] @hono/node-server is required for Node.js runtime. Please install '@hono/node-server'`,
           });

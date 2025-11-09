@@ -40,7 +40,10 @@ export abstract class BaseCrudService<E extends TBaseTzEntity>
     this.repository = repository;
   }
 
-  async find(filter: Filter<E>, _options: ICrudMethodOptions): Promise<Array<E & EntityRelationType>> {
+  async find(
+    filter: Filter<E>,
+    _options: ICrudMethodOptions,
+  ): Promise<Array<E & EntityRelationType>> {
     return this.repository.find(applyLimit(filter));
   }
 

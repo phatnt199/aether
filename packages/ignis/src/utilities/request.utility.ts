@@ -6,13 +6,13 @@ import path from 'node:path';
 import { getError } from './error.utility';
 
 // -------------------------------------------------------------------------
-interface ParseMultipartOptions {
+interface IParseMultipartOptions {
   storage?: 'memory' | 'disk';
   uploadDir?: string;
   context: Context;
 }
 
-interface ParsedFile {
+interface IParsedFile {
   fieldname: string;
   originalname: string;
   encoding: string;
@@ -23,7 +23,7 @@ interface ParsedFile {
   path?: string;
 }
 
-export const parseMultipartBody = async (opts: ParseMultipartOptions): Promise<ParsedFile[]> => {
+export const parseMultipartBody = async (opts: IParseMultipartOptions): Promise<IParsedFile[]> => {
   const { storage = 'memory', uploadDir = './uploads', context } = opts;
 
   if (storage === 'disk' && !fs.existsSync(uploadDir)) {
@@ -31,7 +31,7 @@ export const parseMultipartBody = async (opts: ParseMultipartOptions): Promise<P
   }
 
   const formData = await context.req.formData();
-  const files: ParsedFile[] = [];
+  const files: IParsedFile[] = [];
 
   for (const [fieldname, value] of formData.entries()) {
     if (typeof value === 'string') {
@@ -42,7 +42,7 @@ export const parseMultipartBody = async (opts: ParseMultipartOptions): Promise<P
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const parsedFile: ParsedFile = {
+    const parsedFile: IParsedFile = {
       fieldname,
       originalname: file.name,
       encoding: 'utf8', // Default encoding

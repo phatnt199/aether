@@ -37,9 +37,9 @@ export interface IRouteMetadata {
   [key: string]: any;
 }
 
-export type RouteMetadata = IRouteMetadata;
-export type ControllerMetadata = IControllerMetadata;
-export type PropertyMetadata = IPropertyMetadata;
+export type TRouteMetadata = IRouteMetadata;
+export type TControllerMetadata = IControllerMetadata;
+export type TPropertyMetadata = IPropertyMetadata;
 
 export interface IControllerMetadata {
   basePath?: string;
@@ -58,23 +58,23 @@ export interface IPropertyMetadata {
   [key: string]: any;
 }
 
-export interface InjectMetadata {
+export interface IInjectMetadata {
   key: string | symbol;
   index: number;
   optional?: boolean;
 }
 
-export interface InjectableMetadata {
+export interface IInjectableMetadata {
   scope?: TBindingScope;
   tags?: Record<string, any>;
 }
 
-export interface MiddlewareMetadata {
+export interface IMiddlewareMetadata {
   handler: Function;
   priority?: number;
 }
 
-export interface InterceptorMetadata {
+export interface IInterceptorMetadata {
   handler: Function;
   group?: string;
 }

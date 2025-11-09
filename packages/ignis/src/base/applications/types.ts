@@ -22,20 +22,23 @@ export interface ICORSOptions {
 // ------------------------------------------------------------------------------
 // CSRF Options
 // ------------------------------------------------------------------------------
-type IsAllowedOriginHandler = (origin: string, context: Context) => boolean;
-declare const secFetchSiteValues: readonly ['same-origin', 'same-site', 'none', 'cross-site'];
-type SecFetchSite = (typeof secFetchSiteValues)[number];
-type IsAllowedSecFetchSiteHandler = (secFetchSite: SecFetchSite, context: Context) => boolean;
+export type TIsAllowedOriginHandler = (origin: string, context: Context) => boolean;
+export const SecFetchSiteValues = ['same-origin', 'same-site', 'none', 'cross-site'];
+export type TSecFetchSite = (typeof SecFetchSiteValues)[number];
+export type TIsAllowedSecFetchSiteHandler = (
+  secFetchSite: TSecFetchSite,
+  context: Context,
+) => boolean;
 
 export interface ICSRFOptions {
-  origin?: string | string[] | IsAllowedOriginHandler;
-  secFetchSite?: SecFetchSite | SecFetchSite[] | IsAllowedSecFetchSiteHandler;
+  origin?: string | string[] | TIsAllowedOriginHandler;
+  secFetchSite?: TSecFetchSite | TSecFetchSite[] | TIsAllowedSecFetchSiteHandler;
 }
 
 // ------------------------------------------------------------------------------
 // Body Limit Options
 // ------------------------------------------------------------------------------
-export interface TBodyLimitOptions {
+export interface IBodyLimitOptions {
   maxSize: number;
   onError?: (c: Context) => Response | Promise<Response>;
 }
@@ -56,7 +59,7 @@ export interface IApplicationConfig {
 
   cors?: ICORSOptions;
   csrf?: ICSRFOptions;
-  bodyLimit?: TBodyLimitOptions;
+  bodyLimit?: IBodyLimitOptions;
 
   ipRestriction?: IIPRestrictionRules;
 

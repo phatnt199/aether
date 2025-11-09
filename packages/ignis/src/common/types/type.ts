@@ -57,33 +57,33 @@ export type EntityRelationType = Record<string, any>;
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Repository Interfaces
 // ----------------------------------------------------------------------------------------------------------------------------------------
-export interface Filter<T = any> {
-  where?: Where<T>;
-  fields?: Fields<T>;
-  include?: Inclusion[];
+export interface IFilter<T = any> {
+  where?: TWhere<T>;
+  fields?: TFields<T>;
+  include?: IInclusion[];
   order?: string | string[];
   limit?: number;
   offset?: number;
   skip?: number;
 }
 
-export type Where<T = any> = {
+export type TWhere<T = any> = {
   [key in keyof T]: any;
 } & {
-  and?: Where<T>[];
-  or?: Where<T>[];
+  and?: TWhere<T>[];
+  or?: TWhere<T>[];
 };
 
-export type Fields<T = any> = {
+export type TFields<T = any> = {
   [K in keyof T]?: boolean;
 };
 
-export interface Inclusion {
+export interface IInclusion {
   relation: string;
-  scope?: Filter;
+  scope?: IFilter;
 }
 
-export interface Count {
+export interface ICount {
   count: number;
 }
 
@@ -92,9 +92,9 @@ export type DataObject<T> = Partial<T>;
 export interface IRepository {}
 
 export interface IPersistableRepository<E extends TBaseIdEntity> extends IRepository {
-  findOne(filter?: Filter<E>, options?: AnyObject): Promise<E | null>;
+  findOne(filter?: IFilter<E>, options?: AnyObject): Promise<E | null>;
 
-  existsWith(where?: Where<any>, options?: AnyObject): Promise<boolean>;
+  existsWith(where?: TWhere<any>, options?: AnyObject): Promise<boolean>;
 
   create(data: DataObject<E>, options?: AnyObject): Promise<E>;
   createAll(datum: DataObject<E>[], options?: AnyObject): Promise<E[]>;
@@ -102,9 +102,9 @@ export interface IPersistableRepository<E extends TBaseIdEntity> extends IReposi
 
   updateById(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<void>;
   updateWithReturn(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<E>;
-  updateAll(data: DataObject<E>, where?: Where<any>, options?: AnyObject): Promise<Count>;
+  updateAll(data: DataObject<E>, where?: TWhere<any>, options?: AnyObject): Promise<ICount>;
 
-  upsertWith(data: DataObject<E>, where: Where<any>, options?: AnyObject): Promise<E | null>;
+  upsertWith(data: DataObject<E>, where: TWhere<any>, options?: AnyObject): Promise<E | null>;
   replaceById(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<void>;
 }
 
@@ -137,18 +137,21 @@ export interface ICrudService<E extends TBaseTzEntity> extends IService {
   repository: AbstractTzRepository<E, EntityRelationType>;
 
   // Read
-  find(filter: Filter<E>, options: ICrudMethodOptions): Promise<Array<E & EntityRelationType>>;
+  find(filter: IFilter<E>, options: ICrudMethodOptions): Promise<Array<E & EntityRelationType>>;
   findById(
     id: IdType,
-    filter: Filter<E>,
+    filter: IFilter<E>,
     options: ICrudMethodOptions,
   ): Promise<E & EntityRelationType>;
-  findOne(filter: Filter<E>, options: ICrudMethodOptions): Promise<(E & EntityRelationType) | null>;
-  count(where: Where<E>, options: ICrudMethodOptions): Promise<Count>;
+  findOne(
+    filter: IFilter<E>,
+    options: ICrudMethodOptions,
+  ): Promise<(E & EntityRelationType) | null>;
+  count(where: TWhere<E>, options: ICrudMethodOptions): Promise<ICount>;
 
   // Create, Update, Delete
   create(data: Omit<E, 'id'>, options: ICrudMethodOptions): Promise<E>;
-  updateAll(data: Partial<E>, where: Where<E>, options: ICrudMethodOptions): Promise<Count>;
+  updateAll(data: Partial<E>, where: TWhere<E>, options: ICrudMethodOptions): Promise<ICount>;
   updateWithReturn(id: IdType, data: Partial<E>, options: ICrudMethodOptions): Promise<E>;
   replaceById(id: IdType, data: E, options: ICrudMethodOptions): Promise<E>;
   deleteById(id: IdType, options: ICrudMethodOptions): Promise<{ id: IdType }>;
