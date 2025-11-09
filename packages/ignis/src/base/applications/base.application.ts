@@ -1,23 +1,10 @@
 import { BindingKeys, BindingNamespaces } from '@/common/bindings';
-import { App as AppConstants } from '@/common/constants';
-import type {
-  IApplication,
-  IClass,
-  IDataSource,
-  IEnvironmentValidationResult,
-  IRepository,
-  IService,
-  ValueOrPromise,
-} from '@/common/types';
-import { applicationEnvironment } from '@/helpers/env';
-import { Container, IRouteMetadata, MetadataRegistry } from '@/helpers/inversion';
+import { RuntimeModules } from '@/common/constants';
+import type { IClass, IDataSource, IRepository, IService, ValueOrPromise } from '@/common/types';
+import { IRouteMetadata, MetadataRegistry } from '@/helpers/inversion';
 import { getError } from '@/utilities/error.utility';
-import { toBoolean } from '@/utilities/parse.utility';
-import { serve } from '@hono/node-server';
 import type { Context } from 'hono';
-import { Hono } from 'hono';
-import isEmpty from 'lodash/isEmpty';
-import { IApplicationConfig } from './types';
+import { AbstractApplication } from './abstract.application';
 
 const {
   NODE_ENV,
@@ -32,64 +19,22 @@ const {
   APP_ENV_LOGGER_FOLDER_PATH = './',
 } = process.env;
 
-export abstract class BaseApplication extends Container implements IApplication {
-  protected servers: Array<Hono>;
-
-  protected config: IApplicationConfig;
-  protected projectRoot: string;
-
-  protected models: Set<string>;
+// ------------------------------------------------------------------------------
+export abstract class BaseApplication extends AbstractApplication {
+  // ------------------------------------------------------------------------------
+  abstract override staticConfigure(): void;
+  abstract override preConfigure(): ValueOrPromise<void>;
+  abstract override postConfigure(): ValueOrPromise<void>;
 
   // ------------------------------------------------------------------------------
-  constructor(opts: { scope: string; config: IApplicationConfig }) {
-    const { scope, config } = opts;
-    super({ scope });
-
-    this.config = {
-      port: config.port || AppConstants.PORT,
-      host: config.host || AppConstants.HOST,
-      basePath: config.basePath || '/',
-      ...config,
-    };
-
-    const server = new Hono().basePath(this.config.basePath);
-    this.servers = [server];
-  }
-
-  // ------------------------------------------------------------------------------
-  abstract staticConfigure(): void;
-  abstract declareModels(): Set<string>;
-  abstract preConfigure(): ValueOrPromise<void>;
-  abstract postConfigure(): ValueOrPromise<void>;
-
-  // ------------------------------------------------------------------------------
-  validateEnv(): IEnvironmentValidationResult {
-    const rs = { result: true, message: '' };
-    const envKeys = applicationEnvironment.keys();
-
-    for (const argKey of envKeys) {
-      const argValue = applicationEnvironment.get<string | number>(argKey);
-
-      if (toBoolean(process.env.ALLOW_EMPTY_ENV_VALUE) || !isEmpty(argValue)) {
-        continue;
-      }
-
-      rs.result = false;
-      rs.message = `Invalid Application Environment! Key: ${argKey} | Value: ${argValue}`;
-    }
-
-    return rs;
-  }
-
-  // ------------------------------------------------------------------------------
-  controller<T>(ctor: IClass<T>): any {
+  controller<T>(controllerClass: IClass<T>): any {
     this.bind<T>(
       BindingKeys.build({
         namespace: BindingNamespaces.CONTROLLER,
-        key: ctor.name,
+        key: controllerClass.name,
       }),
-    ).toClass(ctor);
-    this.registerController(ctor);
+    ).toClass(controllerClass);
+    this.registerController({ controllerClass });
     return this;
   }
 
@@ -121,40 +66,40 @@ export abstract class BaseApplication extends Container implements IApplication 
   }
 
   // ------------------------------------------------------------------------------
-  getProjectRoot(): string {
-    return process.cwd();
-  }
+  static(opts: { restPath?: string; folderPath: string }) {
+    const { restPath = '*', folderPath } = opts;
+    const server = this.getServer();
 
-  getMigrateModels(_opts: {
-    ignoreModels?: string[];
-    migrateModels?: string[];
-  }): ValueOrPromise<Array<IRepository>> {
-    // To be implemented
-    return [];
-  }
+    switch (this.server.runtime) {
+      case RuntimeModules.BUN: {
+        const { serveStatic } = require('hono/bun');
+        server.use(restPath, serveStatic({ root: folderPath }));
+        break;
+      }
+      case RuntimeModules.NODE: {
+        try {
+          const { serveStatic } = require('@hono/node-server/serve-static');
+          server.use(restPath, serveStatic({ root: folderPath }));
+        } catch (error) {
+          throw getError({
+            message: `[static] @hono/node-server is required for Node.js runtime. Please install '@hono/node-server'`,
+          });
+        }
+        break;
+      }
+      default: {
+        throw getError({
+          message: '[static] Invalid server runtime to config static loader!',
+        });
+      }
+    }
 
-  migrateModels(_opts: {
-    existingSchema: string;
-    ignoreModels?: string[];
-    migrateModels?: string[];
-  }): ValueOrPromise<void> {
-    // To be implemented
-  }
-
-  getServerHost() {
-    return this.config.host || AppConstants.HOST;
-  }
-
-  getServerPort() {
-    return this.config.port || AppConstants.PORT;
-  }
-
-  getServerAddress() {
-    return `${this.getServerHost()}:${this.getServerPort()}`;
-  }
-
-  getServer() {
-    return this.servers[0];
+    this.logger.debug(
+      '[static] Registered static files | runtime: %s | path: %s | folder: %s',
+      this.server.runtime,
+      restPath,
+      folderPath,
+    );
   }
 
   // ------------------------------------------------------------------------------
@@ -163,19 +108,30 @@ export abstract class BaseApplication extends Container implements IApplication 
     return joined || '/';
   }
 
-  protected registerController<T>(controllerClass: IClass<T>): void {
+  protected registerController<T>(opts: { controllerClass: IClass<T> }): void {
+    const { controllerClass } = opts;
     const routes = MetadataRegistry.getRouteMetadata(controllerClass);
-    if (!routes || routes.length === 0) {
+    const totalRoute = routes?.length ?? 0;
+
+    if (!totalRoute) {
+      this.logger.debug(
+        '[registerController] Skip register controller | totalRoute: %s',
+        totalRoute,
+      );
       return;
     }
 
     const controllerInstance = this.resolve(controllerClass);
-    for (const route of routes) {
-      this.registerRoute(controllerInstance, route);
+    for (let index = 0; index < totalRoute; index++) {
+      const route = routes[index];
+      this.registerRoute({ controllerInstance, route });
     }
+
+    this.logger.debug('[registerController] Registered controllers | totalRoute: %s', totalRoute);
   }
 
-  protected registerRoute(controllerInstance: any, route: IRouteMetadata): void {
+  protected registerRoute(opts: { controllerInstance: any; route: IRouteMetadata }): void {
+    const { controllerInstance, route } = opts;
     const fullPath = this.normalizePath(route.path);
     const method = route.method.toLowerCase();
     const methodName = route.methodName;
@@ -197,14 +153,15 @@ export abstract class BaseApplication extends Container implements IApplication 
     );
   }
 
-  async initialize() {
+  override async initialize() {
     this.logger.info(
       '[initialize] ------------------------------------------------------------------------',
     );
     this.logger.info(
-      '[initialize] Starting application... | Name: %s | Env: %s',
+      '[initialize] Starting application... | Name: %s | Env: %s | Runtime: %s',
       APP_ENV_APPLICATION_NAME,
       NODE_ENV,
+      this.server.runtime,
     );
     this.logger.info(
       '[initialize] AllowEmptyEnv: %s | Prefix: %s',
@@ -224,61 +181,19 @@ export abstract class BaseApplication extends Container implements IApplication 
     );
 
     // this.bind(AuthenticateKeys.ALWAYS_ALLOW_PATHS).to([]);
-    // this.bind(BindingKeys.APPLICATION_MIDDLEWARE_OPTIONS).to(MiddlewareSequence.defaultOptions);
-    // this.sequence(sequence ?? BaseApplicationSequence);
 
     this.staticConfigure();
     this.projectRoot = this.getProjectRoot();
     this.logger.info('[initialize] Project root: %s', this.projectRoot);
-    // this.component(CrudRestComponent);
 
-    this.logger.info('[initialize] Validating application environments...');
-    const envValidation = this.validateEnv();
-    if (!envValidation.result) {
-      throw getError({ message: envValidation?.message ?? 'Invalid application environment!' });
-    }
-    this.logger.info('[initialize] All application environments are valid...');
+    this.validateEnvs();
 
     this.logger.info('[initialize] Declare application models...');
-    this.models = new Set([]);
-    this.models = this.declareModels();
-
-    // this.logger.info('[initialize] Declare application middlewares...');
-    // this.middleware(RequestBodyParserMiddleware);
-    // this.middleware(RequestSpyMiddleware);
 
     this.logger.info('[initialize] Executing Pre-Configuration...');
     await this.preConfigure();
 
     this.logger.info('[initialize] Executing Post-Configuration...');
     await this.postConfigure();
-  }
-
-  // ------------------------------------------------------------------------------
-  async start() {
-    await this.initialize();
-
-    const port = this.getServerPort();
-    const host = this.getServerHost();
-    const server = this.getServer();
-
-    serve(
-      {
-        fetch: server.fetch,
-        hostname: host,
-        port,
-        autoCleanupIncoming: true,
-      },
-      info => {
-        this.logger.info('[start][serve] Server is now running...', APP_ENV_APPLICATION_NAME);
-        this.logger.info('[start][serve] Server started: %s', this.getServerAddress());
-        this.logger.info('[start][serve] Info: %j', info);
-        this.logger.info('[start][serve] Log folder: %s', APP_ENV_LOGGER_FOLDER_PATH);
-      },
-    );
-  }
-
-  async stop(): Promise<void> {
-    this.logger.info('[stop] Server STOPPED');
   }
 }

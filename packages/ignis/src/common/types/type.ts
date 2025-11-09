@@ -1,3 +1,4 @@
+import { IApplicationConfig } from '@/base/applications/types';
 import type { BaseEntity, TBaseIdEntity, TBaseTzEntity } from '@/base/models';
 import type { AbstractTzRepository } from '@/base/repositories';
 import type { Context as HonoContext } from 'hono';
@@ -19,24 +20,17 @@ export interface IApplication {
   initialize(): ValueOrPromise<void>;
 
   staticConfigure(): void;
-  getProjectRoot(): string;
   preConfigure(): ValueOrPromise<void>;
   postConfigure(): ValueOrPromise<void>;
 
+  getProjectConfigs(): IApplicationConfig;
+  getProjectRoot(): string;
   getServerHost(): string;
   getServerPort(): number;
   getServerAddress(): string;
 
-  getMigrateModels(opts: {
-    ignoreModels?: string[];
-    migrateModels?: string[];
-  }): ValueOrPromise<Array<IRepository>>;
-
-  migrateModels(opts: {
-    existingSchema: string;
-    ignoreModels?: string[];
-    migrateModels?: string[];
-  }): ValueOrPromise<void>;
+  start(): ValueOrPromise<void>;
+  stop(): ValueOrPromise<void>;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -179,11 +173,6 @@ export interface ICrudController extends IController {
 export interface IApplicationEnvironment {
   get<ReturnType>(key: string): ReturnType;
   set<ValueType>(key: string, value: ValueType): any;
-}
-
-export interface IEnvironmentValidationResult {
-  result: boolean;
-  message?: string;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
