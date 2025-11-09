@@ -1,4 +1,4 @@
-import { ApplicationLogger, LoggerFactory } from '@/helpers';
+import { ApplicationLogger, LoggerFactory } from '@/helpers/logger';
 
 export class BaseHelper {
   protected identifier: string;

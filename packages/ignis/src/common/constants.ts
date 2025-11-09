@@ -1,10 +1,8 @@
-import { ValueOf } from './types';
+import { TConstValue, ValueOf } from './types';
 
+// ------------------------------------------------------------------------------
 export class App {
   static readonly APPLICATION_NAME = process.env.APP_ENV_APPLICATION_NAME ?? 'APP';
-
-  static readonly PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
-  static readonly HOST = process.env.HOST ?? 'localhost';
 
   static readonly DEFAULT_QUERY_LIMIT = 50;
   static readonly DEFAULT_QUERY_OFFSET = 0;
@@ -14,6 +12,7 @@ export class App {
   static readonly DS_REDIS = 'redis';
 }
 
+// ------------------------------------------------------------------------------
 export class HTTP {
   static readonly Headers = {
     AUTHORIZATION: 'authorization',
@@ -70,9 +69,18 @@ export class HTTP {
 export type THttpMethod = ValueOf<typeof HTTP.Methods>;
 export type THttpResultCode = ValueOf<typeof HTTP.ResultCodes>;
 
+// ------------------------------------------------------------------------------
 export class MimeTypes {
   static readonly UNKNOWN = 'unknown';
   static readonly IMAGE = 'image';
   static readonly VIDEO = 'video';
   static readonly TEXT = 'text';
 }
+export type TMimeTypes = TConstValue<typeof MimeTypes>;
+
+// ------------------------------------------------------------------------------
+export class RuntimeModules {
+  static readonly NODE = 'node';
+  static readonly BUN = 'bun';
+}
+export type TRuntimeModule = TConstValue<typeof RuntimeModules>;

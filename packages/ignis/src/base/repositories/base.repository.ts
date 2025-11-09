@@ -36,7 +36,9 @@ export abstract class BaseRepository<E extends TBaseIdEntity> implements IReposi
    * Convert Filter to SQL WHERE clause
    */
   protected buildWhereClause(where?: Where<E>): AnyObject {
-    if (!where) return {};
+    if (!where) {
+      return {};
+    }
 
     const result: AnyObject = {};
 
@@ -277,7 +279,9 @@ export abstract class AbstractTzRepository<E extends TBaseTzEntity, Relations ex
     entity: DataObject<E>,
     options?: { newInstance: boolean; authorId: IdType },
   ): DataObject<E> {
-    if (!options?.authorId) return entity;
+    if (!options?.authorId) {
+      return entity;
+    }
 
     if (options.newInstance) {
       return {

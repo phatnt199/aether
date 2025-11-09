@@ -3,15 +3,16 @@ import { Context } from 'hono';
 import get from 'lodash/get';
 import fs from 'node:fs';
 import path from 'node:path';
+import { getError } from './error.utility';
 
 // -------------------------------------------------------------------------
-interface ParseMultipartOptions {
+interface IParseMultipartOptions {
   storage?: 'memory' | 'disk';
   uploadDir?: string;
   context: Context;
 }
 
-interface ParsedFile {
+interface IParsedFile {
   fieldname: string;
   originalname: string;
   encoding: string;
@@ -22,47 +23,58 @@ interface ParsedFile {
   path?: string;
 }
 
-export const parseMultipartBody = async (opts: ParseMultipartOptions): Promise<ParsedFile[]> => {
+export const parseMultipartBody = async (opts: IParseMultipartOptions): Promise<IParsedFile[]> => {
   const { storage = 'memory', uploadDir = './uploads', context } = opts;
-
-  const formData = await context.req.formData();
-  const files: ParsedFile[] = [];
 
   if (storage === 'disk' && !fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
+  const formData = await context.req.formData();
+  const files: IParsedFile[] = [];
+
   for (const [fieldname, value] of formData.entries()) {
-    if (!(value instanceof File)) {
+    if (typeof value === 'string') {
       continue;
     }
 
-    const file = value;
+    const file = value as File;
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const parsedFile: ParsedFile = {
+    const parsedFile: IParsedFile = {
       fieldname,
       originalname: file.name,
-      encoding: '7bit', // Default encoding
+      encoding: 'utf8', // Default encoding
       mimetype: file.type,
       size: file.size,
     };
 
-    if (storage === 'memory') {
-      // Store in memory (like multer.memoryStorage())
-      parsedFile.buffer = buffer;
-    } else if (storage === 'disk') {
-      // Store on disk (like multer.diskStorage())
-      const timestamp = Date.now();
-      const randomString = Math.random().toString(36).substring(7);
-      const filename = `${timestamp}-${randomString}-${file.name}`;
-      const filepath = path.join(uploadDir, filename);
+    switch (storage) {
+      case 'memory': {
+        parsedFile.buffer = buffer;
+        break;
+      }
+      case 'disk': {
+        // Store on disk (like multer.diskStorage())
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(7);
+        // Sanitize filename to prevent path traversal
+        const sanitizedName = path.basename(file.name).replace(/[^a-zA-Z0-9._-]/g, '_');
+        const filename = `${timestamp}-${randomString}-${sanitizedName}`;
+        const filepath = path.join(uploadDir, filename);
 
-      fs.writeFileSync(filepath, buffer);
+        fs.writeFileSync(filepath, buffer);
 
-      parsedFile.filename = filename;
-      parsedFile.path = filepath;
+        parsedFile.filename = filename;
+        parsedFile.path = filepath;
+        break;
+      }
+      default: {
+        throw getError({
+          message: `[parseMultipartBody] storage: ${storage} | Invalid storage type | Valids: ['memory', 'disk']`,
+        });
+      }
     }
 
     files.push(parsedFile);

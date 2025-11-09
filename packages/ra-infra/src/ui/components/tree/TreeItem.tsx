@@ -104,9 +104,7 @@ export const TreeItem = (props: IProps) => {
       {hasChild && (
         <Collapse in={isOpen} unmountOnExit>
           {data.children?.map(item => {
-            return (
-              <TreeItem key={item.id} data={item} level={level + 1} {...restProps} />
-            );
+            return <TreeItem key={item.id} data={item} level={level + 1} {...restProps} />;
           })}
         </Collapse>
       )}

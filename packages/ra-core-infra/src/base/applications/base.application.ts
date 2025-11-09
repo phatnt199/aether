@@ -1,17 +1,9 @@
-import {
-  BindingTag,
-  Constructor,
-  Context,
-  DynamicValueProviderClass,
-} from '@loopback/context';
+import { BindingTag, Constructor, Context, DynamicValueProviderClass } from '@loopback/context';
 
 import { ICoreRaApplication, ValueOrPromise } from '@/common';
 
 // --------------------------------------------------------------------------------
-export abstract class AbstractRaApplication
-  extends Context
-  implements ICoreRaApplication
-{
+export abstract class AbstractRaApplication extends Context implements ICoreRaApplication {
   abstract bindContext(): ValueOrPromise<void>;
 
   // ------------------------------------------------------------------------------

@@ -9,11 +9,13 @@
     "useDefineForClassFields": false,
 
     /* Modules */
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "Node16",
+    "moduleResolution": "node16",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "isolatedModules": false,
+    "forceConsistentCasingInFileNames": true,
 
     /* Emit */
     "declaration": true,
@@ -23,11 +25,6 @@
     "importHelpers": false,
     "downlevelIteration": true,
     "preserveConstEnums": true,
-
-    /* Interop Constraints */
-    "isolatedModules": false,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
 
     /* Type Checking - Strict Mode (Balanced for Production) */
     "strict": true,

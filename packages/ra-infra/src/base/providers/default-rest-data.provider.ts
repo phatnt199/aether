@@ -1,3 +1,4 @@
+import { DefaultFetchNetworkRequestService } from '@/base/services';
 import {
   AnyType,
   CoreBindings,
@@ -12,7 +13,6 @@ import {
   TRequestType,
   ValueOrPromise,
 } from '@/common';
-import { DefaultNetworkRequestService } from '@/base/services';
 import { getError } from '@/utilities';
 import { inject } from '@loopback/context';
 import omit from 'lodash/omit';
@@ -41,10 +41,10 @@ import {
 } from 'react-admin';
 import { BaseProvider } from './base.provider';
 
-export class DefaultRestDataProvider<
-  TResource extends string = string,
-> extends BaseProvider<IDataProvider<TResource>> {
-  protected networkService: DefaultNetworkRequestService;
+export class DefaultRestDataProvider<TResource extends string = string> extends BaseProvider<
+  IDataProvider<TResource>
+> {
+  protected networkService: DefaultFetchNetworkRequestService;
 
   constructor(
     @inject(CoreBindings.REST_DATA_PROVIDER_OPTIONS)
@@ -52,7 +52,7 @@ export class DefaultRestDataProvider<
   ) {
     super({ scope: DefaultRestDataProvider.name });
 
-    this.networkService = new DefaultNetworkRequestService({
+    this.networkService = new DefaultFetchNetworkRequestService({
       name: 'default-application-network-service',
       baseUrl: this.restDataProviderOptions.url,
       noAuthPaths: this.restDataProviderOptions.noAuthPaths,
@@ -381,10 +381,7 @@ export class DefaultRestDataProvider<
   create<
     RecordType extends Omit<RaRecord, 'id'> = AnyType,
     ResultRecordType extends RaRecord = RecordType & { id: Identifier },
-  >(opts: {
-    resource: TResource;
-    params: CreateParams;
-  }): Promise<CreateResult<ResultRecordType>> {
+  >(opts: { resource: TResource; params: CreateParams }): Promise<CreateResult<ResultRecordType>> {
     const { resource, params } = opts;
 
     const request = this.networkService.getRequestProps({ resource, body: params.data });

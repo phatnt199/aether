@@ -64,10 +64,30 @@ If you're using TypeScript, you'll need to specify your new keys, using [module 
 
 ```typescript
 declare module '@minimaltech/ra-core-infra' {
+  interface IUseTranslateKeysOverrides
+    extends Record<TFullPaths<typeof yourEnglishMessages>, unknown> {}
+
   interface IUseInjectableKeysOverrides {
     ['services.yourServices']: true;
   }
 }
+```
+
+#### `useTranslate`
+
+If you're need to `useTranslate` with key suggestion from your language files.
+
+```typescript
+declare module '@minimaltech/ra-core-infra' {
+  interface IUseTranslateKeysOverrides
+    extends Record<TFullPaths<typeof yourEnglishMessages>, unknown> {}
+}
+```
+
+Usage:
+
+```typescript
+import { useTranslate } from '@minimaltech/ra-core-infra';
 ```
 
 ## 📚 Documentation

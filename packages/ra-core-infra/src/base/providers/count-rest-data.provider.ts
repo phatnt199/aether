@@ -32,14 +32,12 @@ export class CountRestDataProvider<
       ...requestProps,
     });
 
-    const responseAll = Promise.all([response, responseCount]).then(
-      (responses: AnyType[]) => {
-        return {
-          data: responses?.[0]?.data,
-          total: responses?.[1]?.data?.count || 0,
-        };
-      },
-    );
+    const responseAll = Promise.all([response, responseCount]).then((responses: AnyType[]) => {
+      return {
+        data: responses?.[0]?.data,
+        total: responses?.[1]?.data?.count || 0,
+      };
+    });
 
     return responseAll;
   }

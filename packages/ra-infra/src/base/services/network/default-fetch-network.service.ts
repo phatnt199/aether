@@ -10,11 +10,11 @@ import {
   TRequestMethod,
   TRequestType,
 } from '@/common';
+import { NodeFetchNetworkRequest } from '@/helpers';
 import { getError } from '@/utilities';
 import isEmpty from 'lodash/isEmpty';
-import { BaseNetworkRequestService } from './base-network-request.service';
 
-export class DefaultNetworkRequestService extends BaseNetworkRequestService {
+export class DefaultFetchNetworkRequestService extends NodeFetchNetworkRequest {
   protected authToken?: { type?: string; value: string };
   protected noAuthPaths?: string[];
   protected headers?: HeadersInit;
@@ -26,7 +26,14 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
     noAuthPaths?: string[];
   }) {
     const { name, baseUrl, headers, noAuthPaths } = opts;
-    super({ name, scope: DefaultNetworkRequestService.name, baseUrl });
+    super({
+      name,
+      networkOptions: {
+        baseUrl,
+        headers,
+        timeout: 60 * 1000,
+      },
+    });
 
     this.headers = headers;
     this.noAuthPaths = noAuthPaths;
@@ -35,8 +42,7 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
   //-------------------------------------------------------------
   getRequestAuthorizationHeader() {
     const authToken =
-      this.authToken ||
-      JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_TOKEN) || '{}');
+      this.authToken || JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_TOKEN) || '{}');
 
     if (!authToken?.value) {
       throw getError({
@@ -151,8 +157,7 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
         // content-range: <unit> <range-start>-<range-end>/<size>
         // TODO: Handle content range not use `getListVariant`
         const contentRange =
-          (headers?.get('content-range') || headers?.get['Content-Range']) ??
-          _data.length;
+          (headers?.get('content-range') || headers?.get['Content-Range']) ?? _data.length;
 
         return {
           data: _data as TData,
@@ -185,7 +190,8 @@ export class DefaultNetworkRequestService extends BaseNetworkRequestService {
 
     const url = this.getRequestUrl({ baseUrl, paths });
 
-    const rs = await this.networkService.send({
+    const networkService = this.getNetworkService();
+    const rs = await networkService.send({
       url,
       method,
       params: query,

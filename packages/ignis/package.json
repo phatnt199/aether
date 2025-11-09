@@ -1,7 +1,7 @@
 {
   "name": "@minimaltech/ignis",
-  "version": "0.0.1",
-  "description": "Minimal Technology - Infrastructure - Hono Framework",
+  "version": "0.0.2-0",
+  "description": "JS/TS Server Infrastructure with Hono Framework",
   "keywords": [
     "web",
     "restful",
@@ -29,6 +29,7 @@
       "default": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
+    "./configs/tsconfig.common.json": "./configs/tsconfig.common.json",
     "./package.json": "./package.json"
   },
   "engines": {
@@ -71,10 +72,6 @@
     "access": "public"
   },
   "dependencies": {
-    "@grpc/grpc-js": "^1.14.0",
-    "@grpc/proto-loader": "^0.8.0",
-    "@hono/node-server": "^1.13.7",
-    "@node-oauth/oauth2-server": "^5.2.1",
     "@socket.io/redis-adapter": "^8.3.0",
     "@socket.io/redis-emitter": "^5.1.0",
     "axios": "^1.12.2",
@@ -91,7 +88,6 @@
     "lodash": "^4.17.21",
     "minio": "^8.0.6",
     "mqtt": "^5.14.1",
-    "multer": "^2.0.2",
     "postgres": "^3.4.5",
     "reflect-metadata": "^0.2.2",
     "socket.io": "^4.8.1",
@@ -101,17 +97,19 @@
     "winston-transport": "^4.9.0",
     "zod": "^3.24.1"
   },
+  "optionalDependencies": {
+    "@hono/node-server": "^1.19.6"
+  },
   "devDependencies": {
     "@minimaltech/eslint-node": "^0.2.1",
+    "@types/bun": "^1.3.2",
     "@types/lodash": "^4.17.20",
-    "@types/multer": "^2.0.0",
     "@types/node": "^24.7.2",
     "drizzle-kit": "^0.28.1",
     "eslint": "^9.36.0",
     "prettier": "^3.6.2",
     "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
-    "tsx": "^4.19.2",
     "typescript": "~5.9.3"
   },
   "sideEffects": false

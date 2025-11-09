@@ -1,9 +1,4 @@
-import {
-  CoreBindings,
-  englishMessages,
-  II18nProviderOptions,
-  ValueOrPromise,
-} from '@/common';
+import { CoreBindings, englishMessages, II18nProviderOptions, ValueOrPromise } from '@/common';
 import { inject } from '@loopback/context';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 import { I18nProvider } from 'react-admin';

@@ -1,6 +1,6 @@
 {
   "name": "@minimaltech/ra-infra",
-  "version": "0.0.8-0",
+  "version": "0.0.8-1",
   "description": "Minimal Technology - ReactJS Infrastructure",
   "keywords": [
     "web",
@@ -82,7 +82,7 @@
     "react-router-dom": "^7.9.4"
   },
   "devDependencies": {
-    "@minimaltech/eslint-react": "^0.2.1-0",
+    "@minimaltech/eslint-react": "^0.2.1-2",
     "@mui/icons-material": "^7.3.5",
     "@mui/material": "^7.3.5",
     "@size-limit/preset-small-lib": "^11.2.0",
@@ -110,6 +110,7 @@
     "@loopback/filter": "^6.0.2",
     "@mui/icons-material": ">=5",
     "@mui/material": ">=5",
+    "axios": "^1.13.2",
     "react": ">=18.0",
     "react-admin": ">=5.12.0",
     "react-dom": ">=18.0",

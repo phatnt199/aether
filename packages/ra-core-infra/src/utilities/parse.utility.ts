@@ -107,11 +107,7 @@ export const toBoolean = (input: any) => {
 };
 
 // -------------------------------------------------------------------------
-export const toStringDecimal = (
-  input: any,
-  digit = 2,
-  options = { localeFormat: true },
-) => {
+export const toStringDecimal = (input: any, digit = 2, options = { localeFormat: true }) => {
   const { localeFormat: shouldFormatWithLocale } = options;
   if (Number.isNaN(input)) {
     return 0;

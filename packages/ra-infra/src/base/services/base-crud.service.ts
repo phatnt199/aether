@@ -1,10 +1,4 @@
-import {
-  EntityRelationType,
-  ICrudService,
-  IDataProvider,
-  IdType,
-  RequestMethods,
-} from '@/common';
+import { EntityRelationType, ICrudService, IDataProvider, IdType, RequestMethods } from '@/common';
 import { Logger } from '@/helpers';
 import { Filter, Where } from '@loopback/filter';
 
@@ -12,9 +6,8 @@ export interface ICrudServiceOptions {
   basePath: string;
 }
 
-export class BaseCrudService<
-  E extends { id: IdType; [extra: string | symbol]: any } = any,
-> implements ICrudService<E>
+export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: any } = any>
+  implements ICrudService<E>
 {
   protected logger: Logger;
   protected dataProvider: IDataProvider;

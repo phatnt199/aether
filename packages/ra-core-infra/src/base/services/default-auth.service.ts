@@ -1,14 +1,17 @@
 import { IdType, LocalStorageKeys } from '@/common';
+import { BaseService } from './base.service';
 
-export class DefaultAuthService {
+export class DefaultAuthService extends BaseService {
+  constructor() {
+    super({ scope: DefaultAuthService.name });
+  }
+
   getUser() {
     return JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_IDENTITY) || '{}');
   }
 
   getRoles() {
-    const roles = JSON.parse(
-      localStorage.getItem(LocalStorageKeys.KEY_AUTH_PERMISSION) || '[]',
-    );
+    const roles = JSON.parse(localStorage.getItem(LocalStorageKeys.KEY_AUTH_PERMISSION) || '[]');
     return new Set<string>(roles);
   }
 

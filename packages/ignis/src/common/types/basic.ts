@@ -17,14 +17,14 @@ export type ValueOptionalExcept<T, K extends keyof T> = Pick<T, K> & Partial<Omi
 
 export type ClassProps<T> = ValueOf<T>;
 
-export type Constructor<T> = new (...args: any[]) => T;
+export type TConstructor<T> = new (...args: any[]) => T;
 export interface IClass<T> {
   new (...args: any[]): T;
 
   [property: string]: any;
 }
 
-export type MixinTarget<T> = Constructor<{
+export type TMixinTarget<T> = TConstructor<{
   [P in keyof T]: T[P];
 }>;
 

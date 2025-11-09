@@ -1,10 +1,5 @@
 import { IRaApplication, ValueOrPromise } from '@/common';
-import {
-  BindingTag,
-  Constructor,
-  Context,
-  DynamicValueProviderClass,
-} from '@loopback/context';
+import { BindingTag, Constructor, Context, DynamicValueProviderClass } from '@loopback/context';
 
 // --------------------------------------------------------------------------------
 export abstract class AbstractRaApplication extends Context implements IRaApplication {

@@ -9,14 +9,9 @@ export interface IUseInjectableKeysOverrides {}
 
 export type TUseInjectableKeysDefault = Extract<ValueOf<typeof CoreBindings>, string>;
 
-export type TUseInjectableKeys =
-  | TUseInjectableKeysDefault
-  | keyof IUseInjectableKeysOverrides;
+export type TUseInjectableKeys = TUseInjectableKeysDefault | keyof IUseInjectableKeysOverrides;
 
-export const useInjectable = <T,>(opts: {
-  context?: Context;
-  key: TUseInjectableKeys;
-}) => {
+export const useInjectable = <T,>(opts: { context?: Context; key: TUseInjectableKeys }) => {
   const requestContext = opts?.context;
   const applicationContext = React.useContext(ApplicationContext);
 
