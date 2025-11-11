@@ -18,6 +18,7 @@ import {
 } from './../models';
 import { TzCrudRepository } from './tz-crud.repository';
 
+import { QueueHelper, TQueueElement } from '@/helpers';
 import { buildBatchUpdateQuery, executePromiseWithLimit, getTableDefinition } from '@/utilities';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -30,15 +31,46 @@ export abstract class SearchableTzCrudRepository<
   protected readonly searchableInclusions: Inclusion[];
   protected readonly isInclusionRelations: boolean;
 
+  objectSearchQueue: QueueHelper<object>;
+
   constructor(
     entityClass: EntityClassType<E>,
     dataSource: juggler.DataSource,
-    opts: { isInclusionRelations: boolean; searchableInclusions?: Inclusion[] },
+    opts: {
+      isInclusionRelations: boolean;
+      searchableInclusions?: Inclusion[];
+
+      autoDispatchObjectSearchQueue?: boolean;
+      onMessage?: (opts: {
+        identifier: string;
+        queueElement: TQueueElement<object>;
+      }) => Promise<void>;
+    },
     scope?: string,
   ) {
     super(entityClass, dataSource, scope ?? SearchableTzCrudRepository.name);
-    this.isInclusionRelations = opts.isInclusionRelations;
-    this.searchableInclusions = opts.searchableInclusions ?? [];
+    const {
+      isInclusionRelations,
+      searchableInclusions,
+      autoDispatchObjectSearchQueue = true,
+      onMessage,
+    } = opts;
+    this.isInclusionRelations = isInclusionRelations;
+    this.searchableInclusions = searchableInclusions ?? [];
+
+    this.objectSearchQueue = new QueueHelper({
+      identifier: `${SearchableTzCrudRepository.name}_ObjectSearchQueue`,
+      autoDispatch: autoDispatchObjectSearchQueue,
+      onMessage: async ({ identifier, queueElement }) => {
+        if (onMessage) {
+          return onMessage({ identifier, queueElement });
+        }
+        const { payload } = queueElement;
+        const { id, objectSearch } = payload as AnyType;
+
+        await this.updateById(id, { objectSearch } as AnyType, { ignoreMixSearchFields: true });
+      },
+    });
   }
 
   // ----------------------------------------------------------------------------------------------------
@@ -104,7 +136,6 @@ export abstract class SearchableTzCrudRepository<
       options,
     );
 
-    const promises = [];
     switch (relationType) {
       case 'belongsTo': {
         const rs = resolved as (E & R)[];
@@ -117,16 +148,8 @@ export abstract class SearchableTzCrudRepository<
             continue;
           }
 
-          promises.push(
-            this.updateById(
-              r1.id,
-              // TODO: handle type
-              {
-                objectSearch: this.renderObjectSearch({ entity: r1 }),
-              } as AnyType,
-              { ignoreMixSearchFields: true, options },
-            ),
-          );
+          const objectSearch = this.renderObjectSearch({ entity: r1 });
+          this.objectSearchQueue.enqueue({ id: r1.id, objectSearch });
         }
         break;
       }
@@ -150,16 +173,8 @@ export abstract class SearchableTzCrudRepository<
               continue;
             }
 
-            promises.push(
-              this.updateById(
-                r2.id,
-                // TODO: handle type
-                {
-                  objectSearch: this.renderObjectSearch({ entity: r2 }),
-                } as AnyType,
-                { ignoreMixSearchFields: true, options },
-              ),
-            );
+            const objectSearch = this.renderObjectSearch({ entity: r2 });
+            this.objectSearchQueue.enqueue({ id: r2.id, objectSearch });
           }
         }
         break;
@@ -168,8 +183,6 @@ export abstract class SearchableTzCrudRepository<
         break;
       }
     }
-
-    await Promise.all(promises);
   }
 
   // ----------------------------------------------------------------------------------------------------
@@ -263,10 +276,32 @@ export abstract class SearchableTzCrudRepository<
   ): Promise<E> {
     const tmp = this.mixUserAudit(data, { newInstance: true, authorId: options?.authorId });
 
+    // TODO: problem when mixSearchField before create => id not exist
+    // So, in this.mixSearchFields, it take so long because call so many
+    // relations data to be query
+    // return new Promise((resolve, reject) => {
+    //   this.mixSearchFields(tmp, options)
+    //     .then(enriched => {
+    //       resolve(super.create(enriched, options));
+    //     })
+    //     .catch(reject);
+    // });
     return new Promise((resolve, reject) => {
-      this.mixSearchFields(tmp, options)
-        .then(enriched => {
-          resolve(super.create(enriched, options));
+      super
+        .create(tmp, options)
+        .then(created => {
+          this.mixSearchFields(created, options)
+            .then(enriched => {
+              this.logger.info('[DEBUG][create] Enriched Data: %j', enriched);
+              const objectSearch = get(enriched, 'objectSearch');
+              this.objectSearchQueue.enqueue({
+                id: created.id,
+                objectSearch,
+              });
+            })
+            .catch(reject);
+
+          resolve(created);
         })
         .catch(reject);
     });
@@ -277,16 +312,44 @@ export abstract class SearchableTzCrudRepository<
     data: DataObject<E>[],
     options?: TDBAction & { ignoreMixSearchFields?: boolean },
   ): Promise<E[]> {
+    // TODO: problem when mixSearchField before create => id not exist
+    // So, in this.mixSearchFields, it take so long because call so many
+    // relations data to be query
+    // return new Promise((resolve, reject) => {
+    //   Promise.all(
+    //     data.map(el => {
+    //       const tmp = this.mixUserAudit(el, { newInstance: true, authorId: options?.authorId });
+    //
+    //       return this.mixSearchFields(tmp, options);
+    //     }),
+    //   )
+    //     .then(enriched => {
+    //       resolve(super.createAll(enriched, options));
+    //     })
+    //     .catch(reject);
+    // });
     return new Promise((resolve, reject) => {
-      Promise.all(
-        data.map(el => {
-          const tmp = this.mixUserAudit(el, { newInstance: true, authorId: options?.authorId });
+      const audited = data.map(el =>
+        this.mixUserAudit(el, { newInstance: true, authorId: options?.authorId }),
+      );
 
-          return this.mixSearchFields(tmp, options);
-        }),
-      )
-        .then(enriched => {
-          resolve(super.createAll(enriched, options));
+      super
+        .createAll(audited, options)
+        .then(createdItems => {
+          createdItems.forEach(created => {
+            this.mixSearchFields(created, options)
+              .then(enriched => {
+                this.logger.info('[DEBUG][createAll] Enriched Data: %j', enriched);
+                const objectSearch = get(enriched, 'objectSearch');
+                this.objectSearchQueue.enqueue({
+                  id: created.id,
+                  objectSearch,
+                });
+              })
+              .catch(reject);
+          });
+
+          resolve(createdItems);
         })
         .catch(reject);
     });
