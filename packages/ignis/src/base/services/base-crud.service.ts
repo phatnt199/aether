@@ -2,14 +2,14 @@ import type { TBaseTzEntity } from '@/base/models';
 import type { AbstractTzRepository } from '@/base/repositories';
 import { App } from '@/common/constants';
 import type {
-    DataObject,
-    EntityRelationType,
-    ICount,
-    ICrudMethodOptions,
-    ICrudService,
-    IdType,
-    IFilter,
-    TWhere,
+  DataObject,
+  EntityRelationType,
+  ICount,
+  ICrudMethodOptions,
+  ICrudService,
+  IdType,
+  IFilter,
+  TWhere,
 } from '@/common/types';
 import { BaseService } from './base.service';
 
