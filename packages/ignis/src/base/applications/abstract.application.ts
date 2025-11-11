@@ -1,5 +1,5 @@
 import { RuntimeModules, TRuntimeModule } from '@/common/constants';
-import { IApplication, ValueOrPromise } from '@/common/types';
+import { ValueOrPromise } from '@/common/types';
 import { applicationEnvironment } from '@/helpers/env';
 import { Container } from '@/helpers/inversion';
 import { getError } from '@/utilities/error.utility';
@@ -7,7 +7,7 @@ import { int, toBoolean } from '@/utilities/parse.utility';
 import { Hono } from 'hono';
 import isEmpty from 'lodash/isEmpty';
 import path from 'node:path';
-import { IApplicationConfig, TBunServerInstance, TNodeServerInstance } from './types';
+import { IApplication, IApplicationConfig, TBunServerInstance, TNodeServerInstance } from './types';
 
 // ------------------------------------------------------------------------------
 export abstract class AbstractApplication extends Container implements IApplication {
@@ -25,8 +25,6 @@ export abstract class AbstractApplication extends Container implements IApplicat
   protected configs: IApplicationConfig;
   protected projectRoot: string;
 
-  protected applications: Array<AbstractApplication>;
-
   // ------------------------------------------------------------------------------
   constructor(opts: { scope: string; config: IApplicationConfig }) {
     const { scope, config } = opts;
@@ -39,6 +37,8 @@ export abstract class AbstractApplication extends Container implements IApplicat
     });
 
     this.projectRoot = this.getProjectRoot();
+    this.logger.info('[constructor] Project root: %s', this.projectRoot);
+
     this.server = {
       hono: new Hono({
         strict: this.configs.strictPath ?? true,
@@ -82,8 +82,9 @@ export abstract class AbstractApplication extends Container implements IApplicat
   }
 
   async initialize() {
-    this.staticConfigure();
     this.validateEnvs();
+    this.staticConfigure();
+
     await this.preConfigure();
     await this.postConfigure();
   }
@@ -98,6 +99,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
   }
 
   protected validateEnvs() {
+    const t = performance.now();
     const envKeys = applicationEnvironment.keys();
     this.logger.info(
       '[initialize] Envs: %s | START Validating application environments...',
@@ -117,8 +119,9 @@ export abstract class AbstractApplication extends Container implements IApplicat
     }
 
     this.logger.info(
-      '[initialize] Envs: %s | DONE Validating application environments',
+      '[validateEnvs] Envs: %s | DONE Validating application environments | Took: %s (ms)',
       envKeys.length,
+      performance.now() - t,
     );
   }
 

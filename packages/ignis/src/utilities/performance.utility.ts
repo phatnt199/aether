@@ -1,4 +1,4 @@
-import { float } from '.';
+import { float } from './parse.utility';
 
 const DEFAULT_PERFORMANCE_DECIMAL = 6;
 

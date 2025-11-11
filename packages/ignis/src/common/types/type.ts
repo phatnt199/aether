@@ -1,4 +1,3 @@
-import { IApplicationConfig } from '@/base/applications/types';
 import type { BaseEntity, TBaseIdEntity, TBaseTzEntity } from '@/base/models';
 import type { AbstractTzRepository } from '@/base/repositories';
 import type { Context as HonoContext } from 'hono';
@@ -12,26 +11,6 @@ export type TRelationType = 'belongsTo' | 'hasOne' | 'hasMany' | 'hasManyThrough
 export type TBullQueueRole = 'queue' | 'worker';
 
 export type TPermissionEffect = 'allow' | 'deny';
-
-// ----------------------------------------------------------------------------------------------------------------------------------------
-// Application Interface
-// ----------------------------------------------------------------------------------------------------------------------------------------
-export interface IApplication {
-  initialize(): ValueOrPromise<void>;
-
-  staticConfigure(): void;
-  preConfigure(): ValueOrPromise<void>;
-  postConfigure(): ValueOrPromise<void>;
-
-  getProjectConfigs(): IApplicationConfig;
-  getProjectRoot(): string;
-  getServerHost(): string;
-  getServerPort(): number;
-  getServerAddress(): string;
-
-  start(): ValueOrPromise<void>;
-  stop(): ValueOrPromise<void>;
-}
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // DataSource Interface

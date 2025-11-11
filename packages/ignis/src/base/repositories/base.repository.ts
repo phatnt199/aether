@@ -1,15 +1,15 @@
 import type { TBaseIdEntity, TBaseTzEntity } from '@/base/models';
 import type {
   AnyObject,
-  Count,
+  ICount,
   DataObject,
   EntityClassType,
-  Filter,
+  IFilter,
   IdType,
   IPersistableRepository,
   IRepository,
   ITzRepository,
-  Where,
+  TWhere,
 } from '@/common/types';
 
 /**
@@ -35,7 +35,7 @@ export abstract class BaseRepository<E extends TBaseIdEntity> implements IReposi
   /**
    * Convert Filter to SQL WHERE clause
    */
-  protected buildWhereClause(where?: Where<E>): AnyObject {
+  protected buildWhereClause(where?: TWhere<E>): AnyObject {
     if (!where) {
       return {};
     }
@@ -46,11 +46,11 @@ export abstract class BaseRepository<E extends TBaseIdEntity> implements IReposi
       const value = where[key];
       switch (key) {
         case 'and': {
-          result.$and = (value as Where<E>[]).map(w => this.buildWhereClause(w));
+          result.$and = (value as TWhere<E>[]).map(w => this.buildWhereClause(w));
           break;
         }
         case 'or': {
-          result.$or = (value as Where<E>[]).map(w => this.buildWhereClause(w));
+          result.$or = (value as TWhere<E>[]).map(w => this.buildWhereClause(w));
           break;
         }
         default: {
@@ -132,7 +132,7 @@ export abstract class BaseRepository<E extends TBaseIdEntity> implements IReposi
   /**
    * Apply limit to filter
    */
-  protected applyLimit(filter?: Filter<E>, defaultLimit: number = 50): Filter<E> {
+  protected applyLimit(filter?: IFilter<E>, defaultLimit: number = 50): IFilter<E> {
     return {
       ...filter,
       limit: filter?.limit || defaultLimit,
@@ -142,16 +142,16 @@ export abstract class BaseRepository<E extends TBaseIdEntity> implements IReposi
   /**
    * Abstract methods to be implemented by concrete repositories
    */
-  abstract find(filter?: Filter<E>, options?: AnyObject): Promise<E[]>;
-  abstract findById(id: IdType, filter?: Filter<E>, options?: AnyObject): Promise<E>;
-  abstract findOne(filter?: Filter<E>, options?: AnyObject): Promise<E | null>;
-  abstract count(where?: Where<E>, options?: AnyObject): Promise<Count>;
+  abstract find(filter?: IFilter<E>, options?: AnyObject): Promise<E[]>;
+  abstract findById(id: IdType, filter?: IFilter<E>, options?: AnyObject): Promise<E>;
+  abstract findOne(filter?: IFilter<E>, options?: AnyObject): Promise<E | null>;
+  abstract count(where?: TWhere<E>, options?: AnyObject): Promise<ICount>;
   abstract create(data: DataObject<E>, options?: AnyObject): Promise<E>;
   abstract createAll(datum: DataObject<E>[], options?: AnyObject): Promise<E[]>;
   abstract updateById(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<void>;
-  abstract updateAll(data: DataObject<E>, where?: Where<E>, options?: AnyObject): Promise<Count>;
+  abstract updateAll(data: DataObject<E>, where?: TWhere<E>, options?: AnyObject): Promise<ICount>;
   abstract deleteById(id: IdType, options?: AnyObject): Promise<void>;
-  abstract existsWith(where?: Where<E>, options?: AnyObject): Promise<boolean>;
+  abstract existsWith(where?: TWhere<E>, options?: AnyObject): Promise<boolean>;
 }
 
 /**
@@ -162,12 +162,12 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
   extends BaseRepository<E>
   implements IPersistableRepository<E>
 {
-  async find(_filter?: Filter<E>, _options?: AnyObject): Promise<(E & Relations)[]> {
+  async find(_filter?: IFilter<E>, _options?: AnyObject): Promise<(E & Relations)[]> {
     // To be implemented with Drizzle query builder
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
 
-  async findById(id: IdType, filter?: Filter<E>, options?: AnyObject): Promise<E & Relations> {
+  async findById(id: IdType, filter?: IFilter<E>, options?: AnyObject): Promise<E & Relations> {
     const result = await this.findOne(
       { ...filter, where: { ...filter?.where, id } as any },
       options,
@@ -178,12 +178,12 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
     return result as E & Relations;
   }
 
-  async findOne(filter?: Filter<E>, options?: AnyObject): Promise<(E & Relations) | null> {
+  async findOne(filter?: IFilter<E>, options?: AnyObject): Promise<(E & Relations) | null> {
     const results = await this.find({ ...filter, limit: 1 }, options);
     return results[0] || null;
   }
 
-  async count(_where?: Where<E>, _options?: AnyObject): Promise<Count> {
+  async count(_where?: TWhere<E>, _options?: AnyObject): Promise<ICount> {
     // To be implemented with Drizzle
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
@@ -211,12 +211,12 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
     return this.findById(id, undefined, options);
   }
 
-  async updateAll(_data: DataObject<E>, _where?: Where<E>, _options?: AnyObject): Promise<Count> {
+  async updateAll(_data: DataObject<E>, _where?: TWhere<E>, _options?: AnyObject): Promise<ICount> {
     // To be implemented with Drizzle
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
 
-  async upsertWith(data: DataObject<E>, where: Where<E>, options?: AnyObject): Promise<E | null> {
+  async upsertWith(data: DataObject<E>, where: TWhere<E>, options?: AnyObject): Promise<E | null> {
     const existing = await this.findOne({ where }, options);
     if (existing) {
       await this.updateById(existing.id, data, options);
@@ -234,7 +234,7 @@ export abstract class DefaultCrudRepository<E extends TBaseIdEntity, Relations e
     throw new Error('Method not implemented - connect Drizzle datasource');
   }
 
-  async existsWith(where?: Where<E>, options?: AnyObject): Promise<boolean> {
+  async existsWith(where?: TWhere<E>, options?: AnyObject): Promise<boolean> {
     const count = await this.count(where, options);
     return count.count > 0;
   }
@@ -325,9 +325,9 @@ export abstract class AbstractTzRepository<E extends TBaseTzEntity, Relations ex
 
   override async updateAll(
     data: DataObject<E>,
-    where?: Where<E>,
+    where?: TWhere<E>,
     options?: AnyObject,
-  ): Promise<Count> {
+  ): Promise<ICount> {
     let enrichedData = this.mixTimestamp(data, { newInstance: false });
 
     if (options?.authorId) {

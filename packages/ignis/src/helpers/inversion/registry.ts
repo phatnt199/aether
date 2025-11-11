@@ -1,12 +1,10 @@
 import type { IClass } from '@/common/types';
-import 'reflect-metadata';
-import { METADATA_KEY } from './keys';
+import { MetadataKeys } from './keys';
 import type {
-  ControllerMetadata,
-  InjectMetadata,
-  InjectableMetadata,
-  PropertyMetadata,
-  RouteMetadata,
+  IControllerMetadata,
+  IInjectMetadata,
+  IInjectableMetadata,
+  IPropertyMetadata,
 } from './types';
 
 /**
@@ -16,96 +14,101 @@ export class MetadataRegistry {
   // -----------------------------------------------------------------
   // Controller Metadata
   // -----------------------------------------------------------------
-  static setControllerMetadata(target: IClass<any>, metadata: ControllerMetadata): void {
-    Reflect.defineMetadata(METADATA_KEY.CONTROLLER, metadata, target);
+  static setControllerMetadata<T = any>(opts: { target: T; metadata: IControllerMetadata }): void {
+    const { target, metadata } = opts;
+    Reflect.defineMetadata(MetadataKeys.CONTROLLER, metadata, target);
   }
 
-  static getControllerMetadata(target: IClass<any>): ControllerMetadata | undefined {
-    return Reflect.getMetadata(METADATA_KEY.CONTROLLER, target);
+  static getControllerMetadata<T = any>(opts: { target: T }): IControllerMetadata | undefined {
+    const { target } = opts;
+    return Reflect.getMetadata(MetadataKeys.CONTROLLER, target);
   }
 
   // -----------------------------------------------------------------
   // Route Metadata
   // -----------------------------------------------------------------
-  static addRouteMetadata(
+  /* static addRouteMetadata(
     target: IClass<any>,
     methodName: string | symbol,
-    metadata: RouteMetadata,
+    metadata: TRouteMetadata,
   ): void {
     const routes = this.getRouteMetadata(target) || [];
     routes.push({ ...metadata, methodName });
-    Reflect.defineMetadata(METADATA_KEY.ROUTES, routes, target);
+    Reflect.defineMetadata(MetadataKeys.ROUTES, routes, target);
   }
 
-  static getRouteMetadata(target: IClass<any>): RouteMetadata[] {
-    return Reflect.getMetadata(METADATA_KEY.ROUTES, target) || [];
-  }
-
-  // -----------------------------------------------------------------
-  // Model Metadata
-  // -----------------------------------------------------------------
-  static setModelMetadata(target: IClass<any>, metadata: { name?: string; settings?: any }): void {
-    Reflect.defineMetadata(METADATA_KEY.MODEL, metadata, target);
-  }
-
-  static getModelMetadata(target: IClass<any>): { name?: string; settings?: any } | undefined {
-    return Reflect.getMetadata(METADATA_KEY.MODEL, target);
-  }
+  static getRouteMetadata(target: IClass<any>): TRouteMetadata[] {
+    return Reflect.getMetadata(MetadataKeys.ROUTES, target) || [];
+  } */
 
   // -----------------------------------------------------------------
   // Property Metadata
   // -----------------------------------------------------------------
-  static addPropertyMetadata(
-    target: any,
-    propertyName: string | symbol,
-    metadata: PropertyMetadata,
-  ): void {
-    const properties = this.getPropertiesMetadata(target) || new Map();
+  static setPropertyMetadata<T = any>(opts: {
+    target: T;
+    propertyName: string | symbol;
+    metadata: IPropertyMetadata;
+  }): void {
+    const { target, propertyName, metadata } = opts;
+
+    let properties = this.getPropertiesMetadata({ target });
+    if (!properties) {
+      properties = new Map<string | symbol, IPropertyMetadata>();
+    }
+
     properties.set(propertyName, metadata);
-    Reflect.defineMetadata(METADATA_KEY.PROPERTIES, properties, target.constructor);
+    Reflect.defineMetadata(MetadataKeys.PROPERTIES, properties, target.constructor);
   }
 
-  static getPropertiesMetadata(target: any): Map<string | symbol, PropertyMetadata> | undefined {
-    return Reflect.getMetadata(METADATA_KEY.PROPERTIES, target.constructor);
+  static getPropertiesMetadata<T = any>(opts: {
+    target: T;
+  }): Map<string | symbol, IPropertyMetadata> | undefined {
+    const { target } = opts;
+    return Reflect.getMetadata(MetadataKeys.PROPERTIES, target.constructor);
   }
 
-  static getPropertyMetadata(
-    target: any,
-    propertyName: string | symbol,
-  ): PropertyMetadata | undefined {
-    const properties = this.getPropertiesMetadata(target);
+  static getPropertyMetadata<T = any>(opts: {
+    target: T;
+    propertyName: string | symbol;
+  }): IPropertyMetadata | undefined {
+    const { target, propertyName } = opts;
+    const properties = this.getPropertiesMetadata({ target });
     return properties?.get(propertyName);
   }
 
   // -----------------------------------------------------------------
   // Injection Metadata
   // -----------------------------------------------------------------
-  static addInjectMetadata(target: any, index: number, metadata: InjectMetadata): void {
-    const injects = Reflect.getMetadata(METADATA_KEY.INJECT, target) || [];
+  static setInjectMetadata<T = any>(opts: {
+    target: T;
+    index: number;
+    metadata: IInjectMetadata;
+  }): void {
+    const { target, index, metadata } = opts;
+    const injects = Reflect.getMetadata(MetadataKeys.INJECT, target) || [];
     injects[index] = metadata;
-    Reflect.defineMetadata(METADATA_KEY.INJECT, injects, target);
+    Reflect.defineMetadata(MetadataKeys.INJECT, injects, target);
   }
 
-  static getInjectMetadata(target: any): InjectMetadata[] | undefined {
-    return Reflect.getMetadata(METADATA_KEY.INJECT, target);
-  }
-
-  static setInjectableMetadata(target: IClass<any>, metadata: InjectableMetadata): void {
-    Reflect.defineMetadata(METADATA_KEY.INJECTABLE, metadata, target);
-  }
-
-  static getInjectableMetadata(target: IClass<any>): InjectableMetadata | undefined {
-    return Reflect.getMetadata(METADATA_KEY.INJECTABLE, target);
+  static getInjectMetadata<T = any>(opts: { target: T }): IInjectMetadata[] | undefined {
+    const { target } = opts;
+    return Reflect.getMetadata(MetadataKeys.INJECT, target);
   }
 
   // -----------------------------------------------------------------
-  // Utility Methods
-  // -----------------------------------------------------------------
+  static setInjectableMetadata<T = any>(opts: { target: T; metadata: IInjectableMetadata }): void {
+    const { target, metadata } = opts;
+    Reflect.defineMetadata(MetadataKeys.INJECTABLE, metadata, target);
+  }
 
-  /**
-   * Get all method names of a class (excluding constructor)
-   */
-  static getMethodNames(target: IClass<any>): string[] {
+  static getInjectableMetadata<T = any>(opts: { target: T }): IInjectableMetadata | undefined {
+    const { target } = opts;
+    return Reflect.getMetadata(MetadataKeys.INJECTABLE, target);
+  }
+
+  // -----------------------------------------------------------------
+  static getMethodNames<T = any>(opts: { target: IClass<T> }): string[] {
+    const { target } = opts;
     const prototype = target.prototype;
     const methods = Object.getOwnPropertyNames(prototype).filter(
       name => name !== 'constructor' && typeof prototype[name] === 'function',
@@ -113,21 +116,12 @@ export class MetadataRegistry {
     return methods;
   }
 
-  /**
-   * Check if a class has any route metadata
-   */
-  static hasRoutes(target: IClass<any>): boolean {
-    const routes = this.getRouteMetadata(target);
-    return routes && routes.length > 0;
-  }
-
-  /**
-   * Clear all metadata for a target (useful for testing)
-   */
-  static clearMetadata(target: any): void {
+  static clearMetadata<T = any>(opts: { target: T }): void {
+    const { target } = opts;
     const keys = Reflect.getMetadataKeys(target);
-    keys.forEach(key => {
+
+    for (const key of keys) {
       Reflect.deleteMetadata(key, target);
-    });
+    }
   }
 }

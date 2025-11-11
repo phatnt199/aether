@@ -66,6 +66,9 @@
     "README.md",
     "LICENSE",
     "dist",
+    "configs",
+    "!/**/tests",
+    "!/**/dist/tests",
     "!/**/__tests__"
   ],
   "publishConfig": {

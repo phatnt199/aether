@@ -1,5 +1,7 @@
+import { IClass, IDataSource, IRepository, IService, ValueOrPromise } from '@/common/types';
 import type { Context } from 'hono';
 import { IPRestrictionRules as IIPRestrictionRules } from 'hono/ip-restriction';
+import { BaseComponent } from '../components';
 
 // ------------------------------------------------------------------------------
 // CORS Options
@@ -49,6 +51,7 @@ export interface IBodyLimitOptions {
 export type TBunServerInstance = ReturnType<typeof Bun.serve>;
 export type TNodeServerInstance = any; // Will be set at runtime from @hono/node-server
 
+// ------------------------------------------------------------------------------
 export interface IApplicationConfig {
   host?: string;
   port?: number;
@@ -71,4 +74,34 @@ export interface IApplicationConfig {
   };
 
   [key: string]: any;
+}
+
+// ------------------------------------------------------------------------------
+export interface IApplication {
+  initialize(): ValueOrPromise<void>;
+
+  staticConfigure(): void;
+  preConfigure(): ValueOrPromise<void>;
+  postConfigure(): ValueOrPromise<void>;
+
+  getProjectConfigs(): IApplicationConfig;
+  getProjectRoot(): string;
+  getServerHost(): string;
+  getServerPort(): number;
+  getServerAddress(): string;
+
+  start(): ValueOrPromise<void>;
+  stop(): ValueOrPromise<void>;
+}
+
+// ------------------------------------------------------------------------------
+export interface IRestApplication extends IApplication {
+  component<T extends BaseComponent = any>(ctor: IClass<T>): IApplication;
+  controller<T>(controllerClass: IClass<T>): IApplication;
+  repository<T extends IRepository>(ctor: IClass<T>): IApplication;
+  service<T extends IService>(ctor: IClass<T>): IApplication;
+  dataSource<T extends IDataSource>(ctor: IClass<T>): IApplication;
+  static(opts: { restPath?: string; folderPath: string }): IApplication;
+
+  registerComponents(): ValueOrPromise<void>;
 }

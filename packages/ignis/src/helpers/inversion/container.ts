@@ -6,7 +6,7 @@ import { BindingScopes, BindingValueTypes, TBindingScope } from './types';
 
 // -------------------------------------------------------------------------------------
 export class Binding<T = any> extends BaseHelper {
-  private scope: TBindingScope = BindingScopes.SINGLETON;
+  private scope: TBindingScope = BindingScopes.TRANSIENT;
 
   public key: string;
   private tags: Set<string>;
@@ -110,7 +110,7 @@ export class Binding<T = any> extends BaseHelper {
 
 // -------------------------------------------------------------------------------------
 export class Container extends BaseHelper {
-  private bindings = new Map<string | symbol, Binding>();
+  protected bindings = new Map<string | symbol, Binding>();
 
   constructor(opts?: { scope: string }) {
     super({ scope: opts?.scope ?? Container.name });
@@ -139,15 +139,19 @@ export class Container extends BaseHelper {
     return this.bindings.delete(key);
   }
 
-  get<T>(opts: { key: string | symbol }): T {
+  get<T>(opts: { key: string | symbol; optional: boolean }): T {
     const binding = this.getBinding<T>(opts);
-    if (!binding) {
+    if (binding) {
+      return binding.getValue(this);
+    }
+
+    if (!opts.optional) {
       throw getError({
         message: `No binding found for key: ${opts.key.toString()}`,
       });
     }
 
-    return binding.getValue(this);
+    return undefined;
   }
 
   resolve<T>(cls: IClass<T>): T {
@@ -155,33 +159,36 @@ export class Container extends BaseHelper {
   }
 
   instantiate<T>(cls: IClass<T>): T {
-    const injectMetadata = MetadataRegistry.getInjectMetadata(cls);
-    if (!injectMetadata || injectMetadata.length === 0) {
-      return new cls();
-    }
+    // 1. Handle constructor parameter injection
+    const injectMetadata = MetadataRegistry.getInjectMetadata({ target: cls });
 
-    const dependencies: any[] = [];
-    const sortedDeps = [...injectMetadata].sort((a, b) => a.index - b.index);
+    const args: any[] = [];
+    if (injectMetadata?.length) {
+      const sortedDeps = [...injectMetadata].sort((a, b) => a.index - b.index);
 
-    for (const meta of sortedDeps) {
-      try {
-        const dep = this.get(meta);
-        dependencies[meta.index] = dep;
-      } catch (error) {
-        if (meta.optional) {
-          dependencies[meta.index] = undefined;
-          continue;
-        }
-
-        throw error;
+      for (const meta of sortedDeps) {
+        const dep = this.get({ key: meta.key, optional: meta.optional ?? false });
+        args[meta.index] = dep;
       }
     }
 
-    return new cls(...dependencies);
+    // Create instance
+    const instance = new cls(...args);
+
+    // 2. Handle property injection
+    const propertyMetadata = MetadataRegistry.getPropertiesMetadata({ target: instance });
+    if (propertyMetadata && propertyMetadata.size > 0) {
+      for (const [propertyKey, metadata] of propertyMetadata.entries()) {
+        const dep = this.get({ key: metadata.bindingKey, optional: metadata.optional ?? false });
+        (instance as any)[propertyKey] = dep;
+      }
+    }
+
+    return instance;
   }
 
-  findByTag(opts: { tag: string }): Binding[] {
-    const rs: Binding[] = [];
+  findByTag<T = any>(opts: { tag: string }): Binding<T>[] {
+    const rs: Binding<T>[] = [];
     for (const [_k, binding] of this.bindings) {
       if (!binding.hasTag(opts.tag)) {
         continue;
@@ -191,11 +198,6 @@ export class Container extends BaseHelper {
     }
 
     return rs;
-  }
-
-  getAllByTag<T>(opts: { tag: string }): T[] {
-    const bindings = this.findByTag(opts);
-    return bindings.map(b => b.getValue(this) as T);
   }
 
   clear(): void {

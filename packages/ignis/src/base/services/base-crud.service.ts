@@ -1,22 +1,22 @@
-import type {
-  ICrudService,
-  ICrudMethodOptions,
-  IdType,
-  Filter,
-  Where,
-  Count,
-  DataObject,
-  EntityRelationType,
-} from '@/common/types';
 import type { TBaseTzEntity } from '@/base/models';
 import type { AbstractTzRepository } from '@/base/repositories';
-import { BaseService } from './base.service';
 import { App } from '@/common/constants';
+import type {
+    DataObject,
+    EntityRelationType,
+    ICount,
+    ICrudMethodOptions,
+    ICrudService,
+    IdType,
+    IFilter,
+    TWhere,
+} from '@/common/types';
+import { BaseService } from './base.service';
 
 /**
  * Apply default limit to filter
  */
-export function applyLimit<T>(filter?: Filter<T>, defaultLimit?: number): Filter<T> {
+export function applyLimit<T>(filter?: IFilter<T>, defaultLimit?: number): IFilter<T> {
   return {
     ...filter,
     limit: filter?.limit || defaultLimit || App.DEFAULT_QUERY_LIMIT,
@@ -41,7 +41,7 @@ export abstract class BaseCrudService<E extends TBaseTzEntity>
   }
 
   async find(
-    filter: Filter<E>,
+    filter: IFilter<E>,
     _options: ICrudMethodOptions,
   ): Promise<Array<E & EntityRelationType>> {
     return this.repository.find(applyLimit(filter));
@@ -49,20 +49,20 @@ export abstract class BaseCrudService<E extends TBaseTzEntity>
 
   async findById(
     id: IdType,
-    filter: Filter<E>,
+    filter: IFilter<E>,
     _options: ICrudMethodOptions,
   ): Promise<E & EntityRelationType> {
     return this.repository.findById(id, applyLimit(filter));
   }
 
   async findOne(
-    filter: Filter<E>,
+    filter: IFilter<E>,
     _options: ICrudMethodOptions,
   ): Promise<(E & EntityRelationType) | null> {
     return this.repository.findOne(filter);
   }
 
-  async count(where: Where<E>, _options: ICrudMethodOptions): Promise<Count> {
+  async count(where: TWhere<E>, _options: ICrudMethodOptions): Promise<ICount> {
     return this.repository.count(where);
   }
 
@@ -72,7 +72,11 @@ export abstract class BaseCrudService<E extends TBaseTzEntity>
     });
   }
 
-  async updateAll(data: Partial<E>, where: Where<E>, options: ICrudMethodOptions): Promise<Count> {
+  async updateAll(
+    data: Partial<E>,
+    where: TWhere<E>,
+    options: ICrudMethodOptions,
+  ): Promise<ICount> {
     return this.repository.updateAll(data as DataObject<E>, where, {
       authorId: options.currentUser?.userId,
     });

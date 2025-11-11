@@ -1,10 +1,12 @@
-import { BindingKeys, BindingNamespaces } from '@/common/bindings';
+import { BindingKeys, BindingNamespaces, CoreBindings } from '@/common/bindings';
 import { RuntimeModules } from '@/common/constants';
 import type { IClass, IDataSource, IRepository, IService, ValueOrPromise } from '@/common/types';
-import { IRouteMetadata, MetadataRegistry } from '@/helpers/inversion';
+import { HealthComponent } from '@/components/health';
+import { BindingScopes } from '@/helpers/inversion';
 import { getError } from '@/utilities/error.utility';
-import type { Context } from 'hono';
+import { BaseComponent } from '../components';
 import { AbstractApplication } from './abstract.application';
+import { IApplication, IRestApplication } from './types';
 
 const {
   NODE_ENV,
@@ -20,49 +22,63 @@ const {
 } = process.env;
 
 // ------------------------------------------------------------------------------
-export abstract class BaseApplication extends AbstractApplication {
-  // ------------------------------------------------------------------------------
+export abstract class BaseApplication extends AbstractApplication implements IRestApplication {
   abstract override staticConfigure(): void;
   abstract override preConfigure(): ValueOrPromise<void>;
   abstract override postConfigure(): ValueOrPromise<void>;
 
   // ------------------------------------------------------------------------------
-  controller<T>(controllerClass: IClass<T>): any {
+  component<T extends BaseComponent>(ctor: IClass<T>): IApplication {
+    this.bind(
+      BindingKeys.build({
+        namespace: BindingNamespaces.COMPONENT,
+        key: ctor.name,
+      }),
+    )
+      .toClass(ctor)
+      .setScope(BindingScopes.SINGLETON);
+    return this;
+  }
+
+  controller<T>(controllerClass: IClass<T>): IApplication {
     this.bind<T>(
       BindingKeys.build({
         namespace: BindingNamespaces.CONTROLLER,
         key: controllerClass.name,
       }),
     ).toClass(controllerClass);
-    this.registerController({ controllerClass });
+    // this.registerController({ controllerClass });
     return this;
   }
 
-  repository<T extends IRepository>(ctor: IClass<T>): void {
+  repository<T extends IRepository>(ctor: IClass<T>): IApplication {
     this.bind(
       BindingKeys.build({
         namespace: BindingNamespaces.REPOSITORY,
-        key: ctor.name,
+        key: ctor.nameff,
       }),
     ).toClass(ctor);
+    return this;
   }
 
-  service<T extends IService>(ctor: IClass<T>): void {
+  service<T extends IService>(ctor: IClass<T>): IApplication {
     this.bind(
       BindingKeys.build({
         namespace: BindingNamespaces.SERVICE,
         key: ctor.name,
       }),
     ).toClass(ctor);
+    return this;
   }
 
-  dataSource<T extends IDataSource>(ctor: IClass<T>): void {
+  dataSource<T extends IDataSource>(ctor: IClass<T>): IApplication {
     this.bind(
       BindingKeys.build({
         namespace: BindingNamespaces.DATASOURCE,
         key: ctor.name,
       }),
     ).toClass(ctor);
+    return this;
   }
 
   // ------------------------------------------------------------------------------
@@ -101,6 +117,7 @@ export abstract class BaseApplication extends AbstractApplication {
       restPath,
       folderPath,
     );
+    return this;
   }
 
   // ------------------------------------------------------------------------------
@@ -109,7 +126,7 @@ export abstract class BaseApplication extends AbstractApplication {
     return joined || '/';
   }
 
-  protected registerController<T>(opts: { controllerClass: IClass<T> }): void {
+  /* protected registerController<T>(opts: { controllerClass: IClass<T> }): void {
     const { controllerClass } = opts;
     const routes = MetadataRegistry.getRouteMetadata(controllerClass);
     const totalRoute = routes?.length ?? 0;
@@ -129,9 +146,9 @@ export abstract class BaseApplication extends AbstractApplication {
     }
 
     this.logger.debug('[registerController] Registered controllers | totalRoute: %s', totalRoute);
-  }
+  } */
 
-  protected registerRoute(opts: { controllerInstance: any; route: IRouteMetadata }): void {
+  /* protected registerRoute(opts: { controllerInstance: any; route: IRouteMetadata }): void {
     const { controllerInstance, route } = opts;
     const fullPath = this.normalizePath(route.path);
     const method = route.method.toLowerCase();
@@ -152,9 +169,25 @@ export abstract class BaseApplication extends AbstractApplication {
       fullPath,
       String(methodName),
     );
+  } */
+
+  async registerComponents() {
+    this.logger.info('[registerComponents] START | Register Application Components...');
+
+    const components = this.findByTag<BaseComponent>({ tag: 'components' });
+    for (const component of components) {
+      const instance = component.getValue(this);
+      await instance.binding();
+    }
+
+    this.logger.info('[registerComponents] DONE | Register Application Components...');
   }
 
+  // ------------------------------------------------------------------------------
   override async initialize() {
+    this.bind<IRestApplication>(CoreBindings.APPLICATION_INSTANCE).toProvider(() => this);
+    this.bind<typeof this.server>(CoreBindings.APPLICATION_SERVER).toProvider(() => this.server);
+
     this.logger.info(
       '[initialize] ------------------------------------------------------------------------',
     );
@@ -182,19 +215,14 @@ export abstract class BaseApplication extends AbstractApplication {
     );
 
     // this.bind(AuthenticateKeys.ALWAYS_ALLOW_PATHS).to([]);
-
-    this.staticConfigure();
-    this.projectRoot = this.getProjectRoot();
-    this.logger.info('[initialize] Project root: %s', this.projectRoot);
-
     this.validateEnvs();
+    this.staticConfigure();
 
-    this.logger.info('[initialize] Declare application models...');
-
-    this.logger.info('[initialize] Executing Pre-Configuration...');
     await this.preConfigure();
 
-    this.logger.info('[initialize] Executing Post-Configuration...');
+    this.component(HealthComponent);
+
     await this.postConfigure();
+    await this.registerComponents();
   }
 }

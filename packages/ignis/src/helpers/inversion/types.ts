@@ -1,5 +1,4 @@
-import { THttpMethod } from '@/common';
-import type { AnyObject, TConstValue } from '@/common/types';
+import type { TConstValue } from '@/common/types';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Binding
@@ -25,7 +24,7 @@ export interface IBindingTag {
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Metadata
 // ----------------------------------------------------------------------------------------------------------------------------------------
-export interface IRouteMetadata {
+/* export interface IRouteMetadata {
   path: string;
   method: THttpMethod;
   methodName: string | symbol;
@@ -35,11 +34,10 @@ export interface IRouteMetadata {
   operationId?: string;
   security?: AnyObject[];
   [key: string]: any;
-}
+} */
 
-export type TRouteMetadata = IRouteMetadata;
-export type TControllerMetadata = IControllerMetadata;
-export type TPropertyMetadata = IPropertyMetadata;
+// export type TRouteMetadata = IRouteMetadata;
+// export type TPropertyMetadata = IPropertyMetadata;
 
 export interface IControllerMetadata {
   basePath?: string;
@@ -48,13 +46,8 @@ export interface IControllerMetadata {
 }
 
 export interface IPropertyMetadata {
-  type?: string;
-  required?: boolean;
-  id?: boolean;
-  generated?: boolean;
-  default?: () => any;
-  description?: string;
-  jsonSchema?: AnyObject;
+  bindingKey: string | symbol;
+  optional?: boolean;
   [key: string]: any;
 }
 
@@ -69,7 +62,7 @@ export interface IInjectableMetadata {
   tags?: Record<string, any>;
 }
 
-export interface IMiddlewareMetadata {
+/* export interface IMiddlewareMetadata {
   handler: Function;
   priority?: number;
 }
@@ -77,4 +70,4 @@ export interface IMiddlewareMetadata {
 export interface IInterceptorMetadata {
   handler: Function;
   group?: string;
-}
+} */
