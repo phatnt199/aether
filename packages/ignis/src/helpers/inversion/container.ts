@@ -19,7 +19,7 @@ export class Binding<T = any> extends BaseHelper {
   private cachedInstance?: T;
 
   constructor(opts: { key: string; namespace?: string }) {
-    super({ scope: opts.key });
+    super({ scope: opts.key.toString() });
     this.tags = new Set([]);
 
     this.key = opts.key;
@@ -29,6 +29,10 @@ export class Binding<T = any> extends BaseHelper {
       const [namespace] = keyParts;
       this.setTags(namespace);
     }
+  }
+
+  static override bind<T = any>(opts: { key: string }): Binding<T> {
+    return new Binding<T>(opts);
   }
 
   toClass(value: IClass<T>): this {
@@ -116,14 +120,16 @@ export class Container extends BaseHelper {
     super({ scope: opts?.scope ?? Container.name });
   }
 
-  bind<T>(key: string | symbol): Binding<T> {
+  bind<T>(opts: { key: string | symbol }): Binding<T> {
+    const { key } = opts;
     const keyStr = String(key);
     const binding = new Binding<T>({ key: keyStr });
     this.bindings.set(keyStr, binding as Binding);
     return binding;
   }
 
-  isBound(key: string | symbol): boolean {
+  isBound(opts: { key: string | symbol }): boolean {
+    const { key } = opts;
     const keyStr = String(key);
     return this.bindings.has(keyStr);
   }
@@ -139,15 +145,17 @@ export class Container extends BaseHelper {
     return this.bindings.delete(key);
   }
 
-  get<T>(opts: { key: string | symbol; optional: boolean }): T {
-    const binding = this.getBinding<T>(opts);
+  get<T>(opts: { key: string | symbol; optional?: boolean }): T {
+    const { key, optional = false } = opts;
+
+    const binding = this.getBinding<T>({ key });
     if (binding) {
       return binding.getValue(this);
     }
 
-    if (!opts.optional) {
+    if (!optional) {
       throw getError({
-        message: `No binding found for key: ${opts.key.toString()}`,
+        message: `Binding key: ${opts.key.toString()} is not bounded in context!`,
       });
     }
 

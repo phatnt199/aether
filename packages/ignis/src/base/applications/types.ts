@@ -1,7 +1,10 @@
-import { IClass, IDataSource, IRepository, IService, ValueOrPromise } from '@/common/types';
+import { IClass, ValueOrPromise } from '@/common/types';
 import type { Context } from 'hono';
 import { IPRestrictionRules as IIPRestrictionRules } from 'hono/ip-restriction';
 import { BaseComponent } from '../components';
+import { IDataSource } from '../datasources';
+import { IRepository } from '../repositories';
+import { IService } from '../services';
 
 // ------------------------------------------------------------------------------
 // CORS Options

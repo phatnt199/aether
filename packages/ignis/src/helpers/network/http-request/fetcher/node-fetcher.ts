@@ -1,4 +1,4 @@
-import { stringify } from '@/utilities/url.utility';
+import { stringify } from 'node:querystring';
 import { AbstractNetworkFetchableHelper, IRequestOptions } from './base-fetcher';
 
 export interface INodeFetchRequestOptions extends RequestInit, IRequestOptions {

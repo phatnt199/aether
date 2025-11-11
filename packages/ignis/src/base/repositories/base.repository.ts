@@ -1,16 +1,14 @@
-import type { TBaseIdEntity, TBaseTzEntity } from '@/base/models';
-import type {
-  AnyObject,
-  ICount,
+import { EntityClassType, TBaseIdEntity, TBaseTzEntity } from '../models';
+import {
   DataObject,
-  EntityClassType,
+  ICount,
   IFilter,
-  IdType,
   IPersistableRepository,
   IRepository,
   ITzRepository,
   TWhere,
-} from '@/common/types';
+} from './types';
+import { AnyObject, IdType } from '@/common/types';
 
 /**
  * Base repository class

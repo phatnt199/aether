@@ -1,12 +1,15 @@
 import { BindingKeys, BindingNamespaces, CoreBindings } from '@/common/bindings';
 import { RuntimeModules } from '@/common/constants';
-import type { IClass, IDataSource, IRepository, IService, ValueOrPromise } from '@/common/types';
 import { HealthComponent } from '@/components/health';
 import { BindingScopes } from '@/helpers/inversion';
 import { getError } from '@/utilities/error.utility';
 import { BaseComponent } from '../components';
 import { AbstractApplication } from './abstract.application';
 import { IApplication, IRestApplication } from './types';
+import { IClass, ValueOrPromise } from '@/common/types';
+import { IRepository } from '../repositories';
+import { IService } from '../services';
+import { IDataSource } from '../datasources';
 
 const {
   NODE_ENV,
@@ -29,55 +32,55 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
 
   // ------------------------------------------------------------------------------
   component<T extends BaseComponent>(ctor: IClass<T>): IApplication {
-    this.bind(
-      BindingKeys.build({
+    this.bind({
+      key: BindingKeys.build({
         namespace: BindingNamespaces.COMPONENT,
         key: ctor.name,
       }),
-    )
+    })
       .toClass(ctor)
       .setScope(BindingScopes.SINGLETON);
     return this;
   }
 
   controller<T>(controllerClass: IClass<T>): IApplication {
-    this.bind<T>(
-      BindingKeys.build({
+    this.bind<T>({
+      key: BindingKeys.build({
         namespace: BindingNamespaces.CONTROLLER,
         key: controllerClass.name,
       }),
-    ).toClass(controllerClass);
+    }).toClass(controllerClass);
     // this.registerController({ controllerClass });
     return this;
   }
 
   repository<T extends IRepository>(ctor: IClass<T>): IApplication {
-    this.bind(
-      BindingKeys.build({
+    this.bind({
+      key: BindingKeys.build({
         namespace: BindingNamespaces.REPOSITORY,
         key: ctor.nameff,
       }),
-    ).toClass(ctor);
+    }).toClass(ctor);
     return this;
   }
 
   service<T extends IService>(ctor: IClass<T>): IApplication {
-    this.bind(
-      BindingKeys.build({
+    this.bind({
+      key: BindingKeys.build({
         namespace: BindingNamespaces.SERVICE,
         key: ctor.name,
       }),
-    ).toClass(ctor);
+    }).toClass(ctor);
     return this;
   }
 
   dataSource<T extends IDataSource>(ctor: IClass<T>): IApplication {
-    this.bind(
-      BindingKeys.build({
+    this.bind({
+      key: BindingKeys.build({
         namespace: BindingNamespaces.DATASOURCE,
         key: ctor.name,
       }),
-    ).toClass(ctor);
+    }).toClass(ctor);
     return this;
   }
 
@@ -185,8 +188,10 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
 
   // ------------------------------------------------------------------------------
   override async initialize() {
-    this.bind<IRestApplication>(CoreBindings.APPLICATION_INSTANCE).toProvider(() => this);
-    this.bind<typeof this.server>(CoreBindings.APPLICATION_SERVER).toProvider(() => this.server);
+    this.bind<IRestApplication>({ key: CoreBindings.APPLICATION_INSTANCE }).toProvider(() => this);
+    this.bind<typeof this.server>({ key: CoreBindings.APPLICATION_SERVER }).toProvider(
+      () => this.server,
+    );
 
     this.logger.info(
       '[initialize] ------------------------------------------------------------------------',
@@ -218,11 +223,11 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
     this.validateEnvs();
     this.staticConfigure();
 
-    await this.preConfigure();
-
     this.component(HealthComponent);
 
+    await this.preConfigure();
     await this.postConfigure();
+
     await this.registerComponents();
   }
 }

@@ -1,17 +1,9 @@
-import type { TBaseTzEntity } from '@/base/models';
-import type { AbstractTzRepository } from '@/base/repositories';
 import { App } from '@/common/constants';
-import type {
-  DataObject,
-  EntityRelationType,
-  ICount,
-  ICrudMethodOptions,
-  ICrudService,
-  IdType,
-  IFilter,
-  TWhere,
-} from '@/common/types';
+import type { IdType } from '@/common/types';
 import { BaseService } from './base.service';
+import { AbstractTzRepository, DataObject, ICount, IFilter, TWhere } from '../repositories';
+import { EntityRelationType, TBaseTzEntity } from '../models';
+import { ICrudMethodOptions, ICrudService } from './types';
 
 /**
  * Apply default limit to filter

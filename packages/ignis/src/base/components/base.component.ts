@@ -1,9 +1,13 @@
 import { ValueOrPromise } from '@/common';
 import { BaseHelper } from '../base.helper';
+import { Binding } from '@/helpers/inversion';
 
 export abstract class BaseComponent extends BaseHelper {
+  protected bindings: Record<string | symbol, Binding>;
+
   constructor(opts: { scope: string }) {
     super(opts);
+    this.bindings = {};
   }
 
   abstract binding(): ValueOrPromise<void>;

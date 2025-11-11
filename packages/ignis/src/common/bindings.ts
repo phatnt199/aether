@@ -3,6 +3,7 @@ import isEmpty from 'lodash/isEmpty';
 
 export class BindingNamespaces {
   static readonly COMPONENT = 'components';
+
   static readonly DATASOURCE = 'datasources';
   static readonly REPOSITORY = 'repositories';
   static readonly SERVICE = 'services';

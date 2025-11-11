@@ -30,7 +30,7 @@ export class DefaultRedisHelper extends BaseHelper {
       onReady?.({ name: this.name, helper: this });
     });
 
-    this.client.on('error', error => {
+    this.client.on('error', (error: Error) => {
       this.logger.error('[%s][error] Redis ERROR | Error: %s', this.name, error);
       onError?.({ name: this.name, helper: this, error });
     });
@@ -342,7 +342,7 @@ export class DefaultRedisHelper extends BaseHelper {
 
     await Promise.all(
       validTopics.map(topic => {
-        let packet;
+        let packet: any;
 
         if (useCompress) {
           packet = zlib.deflateSync(Buffer.from(JSON.stringify(payload)));

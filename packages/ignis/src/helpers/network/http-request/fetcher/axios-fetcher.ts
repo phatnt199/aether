@@ -1,7 +1,7 @@
 import { AnyObject } from '@/common';
-import { stringify } from '@/utilities/url.utility';
 import axios, { AxiosRequestConfig } from 'axios';
 import https from 'node:https';
+import { stringify } from 'node:querystring';
 import { AbstractNetworkFetchableHelper, IRequestOptions } from './base-fetcher';
 
 export interface IAxiosRequestOptions extends AxiosRequestConfig, IRequestOptions {

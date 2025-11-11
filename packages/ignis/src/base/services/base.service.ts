@@ -1,5 +1,5 @@
-import type { IService } from '@/common/types';
 import { BaseHelper } from '../base.helper';
+import { IService } from './types';
 
 /**
  * Base service class
