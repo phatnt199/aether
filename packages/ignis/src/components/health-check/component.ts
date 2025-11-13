@@ -1,29 +1,24 @@
-import { BaseApplication } from '@/base';
+import { BaseApplication } from '@/base/applications';
 import { BaseComponent } from '@/base/components';
-import { ValueOrPromise } from '@/common';
 import { CoreBindings } from '@/common/bindings';
+import { ValueOrPromise } from '@/common/types';
+import { Binding } from '@/helpers/inversion';
 import { inject } from '@/helpers/inversion/decorators';
 import { Hono } from 'hono';
-import { HealthBindingKeys } from './common';
-import { Binding } from '@/helpers/inversion';
+import { HealthCheckBindingKeys } from './keys';
+import { IHealthCheckOptions } from './types';
 
-interface IHealthCheckOptions {
-  restOptions: {
-    path: string;
-  };
-}
-
-export class HealthComponent extends BaseComponent {
+export class HealthCheckComponent extends BaseComponent {
   private route: Hono;
 
   constructor(
     @inject({ key: CoreBindings.APPLICATION_INSTANCE }) private application: BaseApplication,
   ) {
-    super({ scope: HealthComponent.name });
+    super({ scope: HealthCheckComponent.name });
 
     this.bindings = {
-      [HealthBindingKeys.HEALTH_OPTIONS]: Binding.bind<IHealthCheckOptions>({
-        key: HealthBindingKeys.HEALTH_OPTIONS,
+      [HealthCheckBindingKeys.HEALTH_CHECK_OPTIONS]: Binding.bind<IHealthCheckOptions>({
+        key: HealthCheckBindingKeys.HEALTH_CHECK_OPTIONS,
       }).toValue({
         restOptions: {
           path: '/health',
@@ -36,7 +31,7 @@ export class HealthComponent extends BaseComponent {
 
   override binding(): ValueOrPromise<void> {
     const healthOptions = this.application.get<IHealthCheckOptions>({
-      key: HealthBindingKeys.HEALTH_OPTIONS,
+      key: HealthCheckBindingKeys.HEALTH_CHECK_OPTIONS,
       optional: true,
     }) ?? {
       restOptions: { path: '/health' },

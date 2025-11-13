@@ -1,15 +1,14 @@
 import { BindingKeys, BindingNamespaces, CoreBindings } from '@/common/bindings';
 import { RuntimeModules } from '@/common/constants';
-import { HealthComponent } from '@/components/health';
+import { AnyObject, IClass, ValueOrPromise } from '@/common/types';
 import { BindingScopes } from '@/helpers/inversion';
 import { getError } from '@/utilities/error.utility';
 import { BaseComponent } from '../components';
-import { AbstractApplication } from './abstract.application';
-import { IApplication, IRestApplication } from './types';
-import { IClass, ValueOrPromise } from '@/common/types';
+import { IDataSource } from '../datasources';
 import { IRepository } from '../repositories';
 import { IService } from '../services';
-import { IDataSource } from '../datasources';
+import { AbstractApplication } from './abstract.application';
+import { IApplication, IRestApplication } from './types';
 
 const {
   NODE_ENV,
@@ -31,7 +30,10 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
   abstract override postConfigure(): ValueOrPromise<void>;
 
   // ------------------------------------------------------------------------------
-  component<T extends BaseComponent>(ctor: IClass<T>): IApplication {
+  component<T extends BaseComponent, O extends AnyObject = any>(
+    ctor: IClass<T>,
+    _args?: O,
+  ): IApplication {
     this.bind({
       key: BindingKeys.build({
         namespace: BindingNamespaces.COMPONENT,
@@ -43,13 +45,13 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
     return this;
   }
 
-  controller<T>(controllerClass: IClass<T>): IApplication {
+  controller<T>(ctor: IClass<T>): IApplication {
     this.bind<T>({
       key: BindingKeys.build({
         namespace: BindingNamespaces.CONTROLLER,
-        key: controllerClass.name,
+        key: ctor.name,
       }),
-    }).toClass(controllerClass);
+    }).toClass(ctor);
     // this.registerController({ controllerClass });
     return this;
   }
@@ -219,15 +221,7 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
       '[initialize] ------------------------------------------------------------------------',
     );
 
-    // this.bind(AuthenticateKeys.ALWAYS_ALLOW_PATHS).to([]);
-    this.validateEnvs();
-    this.staticConfigure();
-
-    this.component(HealthComponent);
-
-    await this.preConfigure();
-    await this.postConfigure();
-
+    await super.initialize();
     await this.registerComponents();
   }
 }

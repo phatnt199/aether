@@ -1,11 +1,11 @@
+import { ApplicationLogger, LoggerFactory } from '@/helpers/logger';
+import { MemoryStorageHelper } from '@/helpers/storage';
 import { it } from 'node:test';
-import { ITestCase, ITestHooks, ITestPlan, ITestPlanOptions } from '../types';
-import { ApplicationLogger, LoggerFactory } from './../../logger';
-import { DIContainerHelper } from './../../storage';
+import { ITestCase, ITestHooks, ITestPlan, ITestPlanOptions } from './types';
 
 export abstract class BaseTestPlan<R extends object> implements ITestPlan<R> {
   private logger: ApplicationLogger;
-  private registry: DIContainerHelper<R>;
+  private registry: MemoryStorageHelper<R>;
   private hooks: ITestHooks<R>;
   private testCases: Array<ITestCase<R>>;
 
@@ -15,7 +15,7 @@ export abstract class BaseTestPlan<R extends object> implements ITestPlan<R> {
     const { scope } = opts;
 
     this.logger = LoggerFactory.getLogger([scope]);
-    this.registry = DIContainerHelper.newInstance();
+    this.registry = MemoryStorageHelper.newInstance();
 
     this.scope = scope;
     this.hooks = opts.hooks ?? {};

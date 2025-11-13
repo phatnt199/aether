@@ -1,4 +1,4 @@
-export class BindingKeys {
+export class SocketIOBindingKeys {
   // static readonly IDENTIFIER = '@app/socket-io/identifier';
   static readonly SOCKET_IO_INSTANCE = '@app/socket-io/instance';
 
