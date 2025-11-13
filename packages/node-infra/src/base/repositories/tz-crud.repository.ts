@@ -211,7 +211,7 @@ export abstract class TzCrudRepository<
       }
 
       const now = new Date();
-      this.find({ fields: { id: true }, where })
+      this.find({ fields: { id: true }, where }, options)
         .then(rs => {
           const sqlBuilder = QueryBuilderHelper.getPostgresQueryBuilder()
             .withSchema(databaseSchema ?? schema ?? 'public')
