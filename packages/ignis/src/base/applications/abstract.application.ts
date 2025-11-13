@@ -4,7 +4,7 @@ import { applicationEnvironment } from '@/helpers/env';
 import { Container } from '@/helpers/inversion';
 import { getError } from '@/utilities/error.utility';
 import { int, toBoolean } from '@/utilities/parse.utility';
-import { Hono } from 'hono';
+import { OpenAPIHono } from '@hono/zod-openapi';
 import isEmpty from 'lodash/isEmpty';
 import path from 'node:path';
 import { IApplication, IApplicationConfig, TBunServerInstance, TNodeServerInstance } from './types';
@@ -13,12 +13,12 @@ import { IApplication, IApplicationConfig, TBunServerInstance, TNodeServerInstan
 export abstract class AbstractApplication extends Container implements IApplication {
   protected server:
     | {
-        hono: Hono;
+        hono: OpenAPIHono;
         runtime: typeof RuntimeModules.BUN;
         instance?: TBunServerInstance;
       }
     | {
-        hono: Hono;
+        hono: OpenAPIHono;
         runtime: typeof RuntimeModules.NODE;
         instance?: TNodeServerInstance;
       };
@@ -39,10 +39,12 @@ export abstract class AbstractApplication extends Container implements IApplicat
     this.projectRoot = this.getProjectRoot();
     this.logger.info('[constructor] Project root: %s', this.projectRoot);
 
+    const honoServer = new OpenAPIHono({
+      strict: this.configs.strictPath ?? true,
+    }).basePath(this.configs.basePath!);
+
     this.server = {
-      hono: new Hono({
-        strict: this.configs.strictPath ?? true,
-      }).basePath(this.configs.basePath),
+      hono: honoServer,
       runtime: this.detectRuntimeModule(),
     };
   }
@@ -51,6 +53,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
   abstract staticConfigure(): void;
   abstract preConfigure(): ValueOrPromise<void>;
   abstract postConfigure(): ValueOrPromise<void>;
+  abstract getApplicationVersion(): ValueOrPromise<string>;
 
   // ------------------------------------------------------------------------------
   getProjectConfigs(): IApplicationConfig {
@@ -61,12 +64,12 @@ export abstract class AbstractApplication extends Container implements IApplicat
     return process.cwd();
   }
 
-  getServerHost() {
-    return this.configs.host;
+  getServerHost(): string {
+    return this.configs.host!;
   }
 
-  getServerPort() {
-    return this.configs.port;
+  getServerPort(): number {
+    return this.configs.port!;
   }
 
   getServerAddress() {
@@ -204,11 +207,11 @@ export abstract class AbstractApplication extends Container implements IApplicat
     this.logger.info('[stop] Server STOPPED');
     switch (this.server.runtime) {
       case RuntimeModules.BUN: {
-        this.server.instance.stop();
+        this.server.instance?.stop();
         break;
       }
       case RuntimeModules.NODE: {
-        this.server.instance.close();
+        this.server.instance?.close();
         break;
       }
       default: {

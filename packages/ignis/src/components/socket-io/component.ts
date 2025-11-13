@@ -89,6 +89,11 @@ export class SocketIOComponent extends BaseComponent {
     const authenticateFn = this.application.get<SocketIOServerHelper['authenticateFn']>({
       key: SocketIOBindingKeys.AUTHENTICATE_HANDLER,
     });
+    if (!authenticateFn) {
+      throw getError({
+        message: '[DANGER][SocketIOComponent] Invalid authenticateFn to setup io socket server!',
+      });
+    }
 
     let clientConnectedFn: any = null;
     if (this.application.isBound({ key: SocketIOBindingKeys.CLIENT_CONNECTED_HANDLER })) {
@@ -106,7 +111,7 @@ export class SocketIOComponent extends BaseComponent {
 
     this.application.bind({ key: SocketIOBindingKeys.SOCKET_IO_INSTANCE }).toValue(
       new SocketIOServerHelper({
-        identifier: this.serverOptions.identifier,
+        identifier: this.serverOptions.identifier!,
         server: httpServer,
         serverOptions: this.serverOptions,
         redisConnection,

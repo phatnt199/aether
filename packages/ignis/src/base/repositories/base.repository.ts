@@ -41,7 +41,7 @@ export abstract class BaseRepository<E extends TBaseIdEntity> implements IReposi
     const result: AnyObject = {};
 
     for (const key in where) {
-      const value = where[key];
+      const value = where[key as keyof TWhere<E>];
       switch (key) {
         case 'and': {
           result.$and = (value as TWhere<E>[]).map(w => this.buildWhereClause(w));

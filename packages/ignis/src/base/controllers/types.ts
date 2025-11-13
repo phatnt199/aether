@@ -12,3 +12,9 @@ export interface ICrudController extends IController {
   sourceRepository?: IRepository;
   targetRepository?: IRepository;
 }
+
+export interface IControllerOptions {
+  scope: string;
+  basePath: string;
+  strict?: boolean;
+}

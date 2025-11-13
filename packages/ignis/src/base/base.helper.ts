@@ -1,6 +1,7 @@
 import { ApplicationLogger, LoggerFactory } from '@/helpers/logger';
 
 export class BaseHelper {
+  protected _scope: string;
   protected identifier: string;
   protected logger: ApplicationLogger;
 
@@ -8,6 +9,8 @@ export class BaseHelper {
     this.logger = LoggerFactory.getLogger(
       [opts.scope, opts.identifier ?? ''].filter(el => el && el.length > 0),
     );
+
+    this._scope = opts.scope ?? '';
     this.identifier = opts.identifier ?? '';
   }
 }

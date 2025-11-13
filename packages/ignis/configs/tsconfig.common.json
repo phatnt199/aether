@@ -26,10 +26,10 @@
     "downlevelIteration": true,
     "preserveConstEnums": true,
 
-    /* Type Checking - Strict Mode (Balanced for Production) */
+    /* Type Checking - Strict Mode */
     "strict": true,
-    "noImplicitAny": false,
-    "strictNullChecks": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": false,

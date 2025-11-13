@@ -145,7 +145,7 @@ export class Container extends BaseHelper {
     return this.bindings.delete(key);
   }
 
-  get<T>(opts: { key: string | symbol; optional?: boolean }): T {
+  get<T>(opts: { key: string | symbol; optional?: boolean }): T | undefined {
     const { key, optional = false } = opts;
 
     const binding = this.getBinding<T>({ key });
@@ -184,7 +184,7 @@ export class Container extends BaseHelper {
     const instance = new cls(...args);
 
     // 2. Handle property injection
-    const propertyMetadata = MetadataRegistry.getPropertiesMetadata({ target: instance });
+    const propertyMetadata = MetadataRegistry.getPropertiesMetadata({ target: instance as Object });
     if (propertyMetadata && propertyMetadata.size > 0) {
       for (const [propertyKey, metadata] of propertyMetadata.entries()) {
         const dep = this.get({ key: metadata.bindingKey, optional: metadata.optional ?? false });

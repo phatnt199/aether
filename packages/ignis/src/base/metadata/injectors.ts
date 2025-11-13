@@ -1,12 +1,5 @@
+import { IInjectableMetadata, MetadataRegistry } from '@/helpers/inversion';
 import { getError } from '@/utilities';
-import { MetadataRegistry } from './registry';
-import { IControllerMetadata, IInjectableMetadata } from './types';
-
-export const controller = (metadata: IControllerMetadata): ClassDecorator => {
-  return target => {
-    MetadataRegistry.setControllerMetadata({ target, metadata });
-  };
-};
 
 export const injectable = (metadata: IInjectableMetadata): ClassDecorator => {
   return target => {

@@ -12,7 +12,7 @@ export abstract class BaseComponent extends BaseHelper {
 
   abstract binding(): ValueOrPromise<void>;
 
-  protected async configure(): Promise<void> {
+  async configure(): Promise<void> {
     const t = performance.now();
     this.logger.info('[binding] START | Binding health component');
 

@@ -1,6 +1,6 @@
 import { BindingKeys, BindingNamespaces, CoreBindings } from '@/common/bindings';
 import { RuntimeModules } from '@/common/constants';
-import { AnyObject, IClass, ValueOrPromise } from '@/common/types';
+import { AnyObject, IClass } from '@/common/types';
 import { BindingScopes } from '@/helpers/inversion';
 import { getError } from '@/utilities/error.utility';
 import { BaseComponent } from '../components';
@@ -25,11 +25,6 @@ const {
 
 // ------------------------------------------------------------------------------
 export abstract class BaseApplication extends AbstractApplication implements IRestApplication {
-  abstract override staticConfigure(): void;
-  abstract override preConfigure(): ValueOrPromise<void>;
-  abstract override postConfigure(): ValueOrPromise<void>;
-
-  // ------------------------------------------------------------------------------
   component<T extends BaseComponent, O extends AnyObject = any>(
     ctor: IClass<T>,
     _args?: O,
@@ -182,7 +177,7 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
     const components = this.findByTag<BaseComponent>({ tag: 'components' });
     for (const component of components) {
       const instance = component.getValue(this);
-      await instance.binding();
+      await instance.configure();
     }
 
     this.logger.info('[registerComponents] DONE | Register Application Components...');

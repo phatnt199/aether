@@ -1,11 +1,9 @@
 import { BaseApplication } from '@/base/applications';
 import { BaseComponent } from '@/base/components';
 import { CoreBindings } from '@/common/bindings';
-import { ValueOrPromise } from '@/common/types';
 import { Binding } from '@/helpers/inversion';
 import { inject } from '@/helpers/inversion/decorators';
-import { getError } from '@/utilities/error.utility';
-import { Hono } from 'hono';
+import { validateModule } from '@/utilities/module.utility';
 import { SwaggerBindingKeys } from './keys';
 import { ISwaggerOptions } from './types';
 
@@ -18,7 +16,7 @@ const DEFAULT_SWAGGER_OPTIONS: ISwaggerOptions = {
     },
   },
   explorer: {
-    openapi: '3.1.0',
+    openapi: '3.0.0',
     info: {
       title: 'API Documentation',
       version: '1.0.0',
@@ -27,31 +25,7 @@ const DEFAULT_SWAGGER_OPTIONS: ISwaggerOptions = {
   },
 };
 
-const openApiDoc = {
-  openapi: '3.1.0',
-  info: {
-    title: 'API Documentation',
-    version: '1.0.0',
-    description: 'API documentation for your service',
-  },
-  paths: {
-    '/health': {
-      get: {
-        summary: 'Health check',
-        responses: {
-          '200': {
-            description: 'OK',
-          },
-        },
-      },
-    },
-    // Add more endpoints as needed
-  },
-};
-
 export class SwaggerComponent extends BaseComponent {
-  private route: Hono;
-
   constructor(
     @inject({ key: CoreBindings.APPLICATION_INSTANCE }) private application: BaseApplication,
   ) {
@@ -62,47 +36,42 @@ export class SwaggerComponent extends BaseComponent {
         key: SwaggerBindingKeys.SWAGGER_OPTIONS,
       }).toValue(DEFAULT_SWAGGER_OPTIONS),
     };
-
-    this.route = new Hono({ strict: true });
   }
 
-  override binding(): ValueOrPromise<void> {
-    return new Promise((resolve, reject) => {
-      import('@hono/swagger-ui')
-        .then(module => {
-          const { swaggerUI } = module;
+  override async binding() {
+    validateModule({ scope: SwaggerComponent.name, modules: ['@hono/swagger-ui'] });
+    const { swaggerUI } = await import('@hono/swagger-ui');
 
-          const swaggerOptions =
-            this.application.get<ISwaggerOptions>({
-              key: SwaggerBindingKeys.SWAGGER_OPTIONS,
-              optional: true,
-            }) ?? DEFAULT_SWAGGER_OPTIONS;
-          const { restOptions } = swaggerOptions;
+    const swaggerOptions =
+      this.application.get<ISwaggerOptions>({
+        key: SwaggerBindingKeys.SWAGGER_OPTIONS,
+        optional: true,
+      }) ?? DEFAULT_SWAGGER_OPTIONS;
 
-          this.route.get(restOptions.path.doc, async context => {
-            return context.json(openApiDoc);
-          });
+    const applicationRoute = this.application.getServer();
+    const { restOptions, explorer } = swaggerOptions;
 
-          const config = this.application.getProjectConfigs();
-          this.route.get(
-            restOptions.path.ui,
-            swaggerUI({
-              url: [config.basePath ?? '', restOptions.path.base, restOptions.path.doc].join(''),
-            }),
-          );
+    // OpenAPI Documentation URL
+    explorer.info.version = await this.application.getApplicationVersion();
 
-          const applicationRoute = this.application.getServer();
-          applicationRoute.route(restOptions.path.base, this.route);
-          resolve();
-        })
-        .catch(error => {
-          this.logger.error('[binding] Failed to import @hono/swagger-ui | Error: %s', error);
-          reject(
-            getError({
-              message: `[start] @hono/swagger-ui is required for SwaggerComponent. Please install '@hono/swagger-ui'`,
-            }),
-          );
-        });
-    });
+    const docPath = [
+      restOptions.path.base.startsWith('/') ? '' : '/',
+      restOptions.path.base,
+      restOptions.path.doc.startsWith('/') ? '' : '/',
+      restOptions.path.doc,
+    ].join('');
+
+    applicationRoute.doc(docPath, explorer);
+
+    const configs = this.application.getProjectConfigs();
+    applicationRoute.get(
+      [
+        restOptions.path.base.startsWith('/') ? '' : '/',
+        restOptions.path.base,
+        restOptions.path.ui.startsWith('/') ? '' : '/',
+        restOptions.path.ui,
+      ].join(''),
+      swaggerUI({ url: [configs.basePath ?? '', docPath].join('') }),
+    );
   }
 }

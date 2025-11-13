@@ -92,6 +92,7 @@ export interface IApplication {
   getServerHost(): string;
   getServerPort(): number;
   getServerAddress(): string;
+  getApplicationVersion(): ValueOrPromise<string>;
 
   start(): ValueOrPromise<void>;
   stop(): ValueOrPromise<void>;
