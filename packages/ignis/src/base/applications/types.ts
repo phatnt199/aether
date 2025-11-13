@@ -1,4 +1,4 @@
-import { IClass, ValueOrPromise } from '@/common/types';
+import { AnyObject, IClass, ValueOrPromise } from '@/common/types';
 import type { Context } from 'hono';
 import { IPRestrictionRules as IIPRestrictionRules } from 'hono/ip-restriction';
 import { BaseComponent } from '../components';
@@ -99,8 +99,11 @@ export interface IApplication {
 
 // ------------------------------------------------------------------------------
 export interface IRestApplication extends IApplication {
-  component<T extends BaseComponent = any>(ctor: IClass<T>): IApplication;
-  controller<T>(controllerClass: IClass<T>): IApplication;
+  component<T extends BaseComponent = any, O extends AnyObject = AnyObject>(
+    ctor: IClass<T>,
+    args?: O,
+  ): IApplication;
+  controller<T>(ctor: IClass<T>): IApplication;
   repository<T extends IRepository>(ctor: IClass<T>): IApplication;
   service<T extends IService>(ctor: IClass<T>): IApplication;
   dataSource<T extends IDataSource>(ctor: IClass<T>): IApplication;

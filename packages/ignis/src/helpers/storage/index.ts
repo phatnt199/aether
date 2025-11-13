@@ -1,2 +1,2 @@
-export * from './di-container.helper';
+export * from './memory-storage.helper';
 export * from './minio.helper';

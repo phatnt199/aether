@@ -6,6 +6,7 @@ export * from './logger';
 export * from './network';
 export * from './queue';
 export * from './redis';
+export * from './socket-io';
 export * from './storage';
 export * from './testing';
 export * from './worker-thread';

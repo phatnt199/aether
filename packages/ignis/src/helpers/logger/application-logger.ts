@@ -2,7 +2,7 @@ import isEmpty from 'lodash/isEmpty';
 import { applicationLogger } from './default-logger';
 import { getError } from '@/utilities';
 import winston from 'winston';
-import { TLogLevel } from './common';
+import { TLogLevel } from './types';
 
 const extraLogEnvs =
   (process.env.APP_ENV_EXTRA_LOG_ENVS ?? '').split(',').map(el => el.trim()) ?? [];

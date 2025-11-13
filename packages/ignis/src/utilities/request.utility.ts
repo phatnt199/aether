@@ -1,4 +1,3 @@
-import { IRequestedRemark } from '@/common';
 import { Context } from 'hono';
 import get from 'lodash/get';
 import fs from 'node:fs';
@@ -6,6 +5,13 @@ import path from 'node:path';
 import { getError } from './error.utility';
 
 // -------------------------------------------------------------------------
+export interface IRequestedRemark {
+  id: string;
+  url: string;
+  method: string;
+  [extra: string | symbol]: any;
+}
+
 interface IParseMultipartOptions {
   storage?: 'memory' | 'disk';
   uploadDir?: string;

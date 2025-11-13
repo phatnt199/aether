@@ -1,4 +1,4 @@
-import { IApplicationEnvironment } from '@/common';
+import { IApplicationEnvironment } from './types';
 
 export class ApplicationEnvironment implements IApplicationEnvironment {
   private prefix: string;
