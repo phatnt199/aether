@@ -1,10 +1,10 @@
 import { AnyObject, AnyType, ValueOrPromise } from '@/common';
-import { DIContainerHelper } from '../storage';
+import { MemoryStorageHelper } from '../storage';
 
 export interface ITestContext<R extends object> {
   scope: string;
 
-  getRegistry: () => DIContainerHelper<R>;
+  getRegistry: () => MemoryStorageHelper<R>;
 
   bind: <T>(opts: { key: string; value: T }) => void;
   getSync: <E = AnyType>(opts: { key: keyof R }) => E;

@@ -1,7 +1,7 @@
 import { BaseHelper } from '@/base/base.helper';
-import { TBullQueueRole } from '@/common/types';
 import { Job, Queue, Worker } from 'bullmq';
 import Redis from 'ioredis';
+import { TBullQueueRole } from './types';
 
 interface IBullMQOptions<TQueueElement = any, TQueueResult = any> {
   queueName: string;

@@ -5,10 +5,10 @@ import { HTTP } from '@/common/constants';
 import { ValueOrPromise } from '@/common/types';
 import { Binding, inject } from '@/helpers/inversion';
 import { DefaultRedisHelper } from '@/helpers/redis';
-import { getError } from '@/utilities';
+import { SocketIOServerHelper } from '@/helpers/socket-io';
+import { getError } from '@/utilities/error.utility';
 import { ServerOptions } from 'socket.io';
-import { BindingKeys } from './common';
-import { SocketIOServerHelper } from './helpers';
+import { SocketIOBindingKeys } from './keys';
 
 interface IServerOptions extends ServerOptions {
   identifier: string;
@@ -44,18 +44,18 @@ export class SocketIOComponent extends BaseComponent {
     super({ scope: SocketIOComponent.name });
 
     this.bindings = {
-      [BindingKeys.SERVER_OPTIONS]: Binding.bind<Partial<ServerOptions>>({
-        key: BindingKeys.SERVER_OPTIONS,
+      [SocketIOBindingKeys.SERVER_OPTIONS]: Binding.bind<Partial<ServerOptions>>({
+        key: SocketIOBindingKeys.SERVER_OPTIONS,
       }).toValue(DEFAULT_SERVER_OPTIONS),
-      [BindingKeys.REDIS_CONNECTION]: Binding.bind<DefaultRedisHelper | null>({
-        key: BindingKeys.REDIS_CONNECTION,
+      [SocketIOBindingKeys.REDIS_CONNECTION]: Binding.bind<DefaultRedisHelper | null>({
+        key: SocketIOBindingKeys.REDIS_CONNECTION,
       }).toValue(null),
-      [BindingKeys.AUTHENTICATE_HANDLER]: Binding.bind<
+      [SocketIOBindingKeys.AUTHENTICATE_HANDLER]: Binding.bind<
         SocketIOServerHelper['authenticateFn'] | null
-      >({ key: BindingKeys.AUTHENTICATE_HANDLER }).toValue(null),
-      [BindingKeys.CLIENT_CONNECTED_HANDLER]: Binding.bind<
+      >({ key: SocketIOBindingKeys.AUTHENTICATE_HANDLER }).toValue(null),
+      [SocketIOBindingKeys.CLIENT_CONNECTED_HANDLER]: Binding.bind<
         SocketIOServerHelper['onClientConnected'] | null
-      >({ key: BindingKeys.CLIENT_CONNECTED_HANDLER }).toValue(null),
+      >({ key: SocketIOBindingKeys.CLIENT_CONNECTED_HANDLER }).toValue(null),
     };
   }
 
@@ -70,14 +70,14 @@ export class SocketIOComponent extends BaseComponent {
 
     const extraServerOptions =
       this.application.get<Partial<ServerOptions>>({
-        key: BindingKeys.SERVER_OPTIONS,
+        key: SocketIOBindingKeys.SERVER_OPTIONS,
         optional: true,
       }) ?? {};
     this.serverOptions = Object.assign({}, DEFAULT_SERVER_OPTIONS, extraServerOptions);
     this.logger.debug('[binding] Socket.IO Server Options: %j', this.serverOptions);
 
     const redisConnection = this.application.get<DefaultRedisHelper>({
-      key: BindingKeys.REDIS_CONNECTION,
+      key: SocketIOBindingKeys.REDIS_CONNECTION,
     });
     if (!(redisConnection instanceof DefaultRedisHelper)) {
       throw getError({
@@ -87,13 +87,13 @@ export class SocketIOComponent extends BaseComponent {
     }
 
     const authenticateFn = this.application.get<SocketIOServerHelper['authenticateFn']>({
-      key: BindingKeys.AUTHENTICATE_HANDLER,
+      key: SocketIOBindingKeys.AUTHENTICATE_HANDLER,
     });
 
     let clientConnectedFn: any = null;
-    if (this.application.isBound({ key: BindingKeys.CLIENT_CONNECTED_HANDLER })) {
+    if (this.application.isBound({ key: SocketIOBindingKeys.CLIENT_CONNECTED_HANDLER })) {
       clientConnectedFn = this.application.get<SocketIOServerHelper['onClientConnected']>({
-        key: BindingKeys.CLIENT_CONNECTED_HANDLER,
+        key: SocketIOBindingKeys.CLIENT_CONNECTED_HANDLER,
       });
     }
 
@@ -104,7 +104,7 @@ export class SocketIOComponent extends BaseComponent {
       });
     }
 
-    this.application.bind({ key: BindingKeys.SOCKET_IO_INSTANCE }).toValue(
+    this.application.bind({ key: SocketIOBindingKeys.SOCKET_IO_INSTANCE }).toValue(
       new SocketIOServerHelper({
         identifier: this.serverOptions.identifier,
         server: httpServer,

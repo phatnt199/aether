@@ -1,7 +1,7 @@
 import { AnyObject } from '@/common';
 
-export class DIContainerHelper<T extends object = AnyObject> {
-  private static instance: DIContainerHelper;
+export class MemoryStorageHelper<T extends object = AnyObject> {
+  private static instance: MemoryStorageHelper;
   private container: T;
 
   constructor() {
@@ -10,14 +10,14 @@ export class DIContainerHelper<T extends object = AnyObject> {
 
   static getInstance<T extends object = AnyObject>() {
     if (!this.instance) {
-      this.instance = new DIContainerHelper<T>();
+      this.instance = new MemoryStorageHelper<T>();
     }
 
     return this.instance;
   }
 
   static newInstance<T extends object = AnyObject>() {
-    return new DIContainerHelper<T>();
+    return new MemoryStorageHelper<T>();
   }
 
   isBound(key: string) {

@@ -1,17 +1,8 @@
-import { ApplicationLogger, LoggerFactory } from '@/helpers';
-import { getError } from '@/utilities';
-import { io, Socket, SocketOptions } from 'socket.io-client';
-
-interface IOptions extends SocketOptions {
-  path: string;
-  extraHeaders: Record<string | symbol | number, any>;
-}
-
-export interface ISocketIOClientOptions {
-  identifier: string;
-  host: string;
-  options: IOptions;
-}
+import { ApplicationLogger, LoggerFactory } from '@/helpers/logger';
+import { getError } from '@/utilities/error.utility';
+import { type Socket, io } from 'socket.io-client';
+import { IOptions, ISocketIOClientOptions } from './types';
+import { validateModule } from '@/utilities/module.utility';
 
 export class SocketIOClientHelper {
   private logger: ApplicationLogger;
@@ -42,6 +33,10 @@ export class SocketIOClientHelper {
       return;
     }
 
+    validateModule({
+      scope: SocketIOClientHelper.name,
+      modules: ['socket.io-client'],
+    });
     this.client = io(this.host, this.options);
   }
 
@@ -77,7 +72,7 @@ export class SocketIOClientHelper {
         continue;
       }
 
-      this.client.on(eventName, (...props) => {
+      this.client.on(eventName, (...props: any[]) => {
         handler(this.client, ...props);
       });
     }

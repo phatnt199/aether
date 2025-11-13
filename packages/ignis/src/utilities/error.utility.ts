@@ -1,3 +1,10 @@
+export interface IError<StatusCode extends number = number> extends Error {
+  statusCode: StatusCode;
+  messageCode?: string;
+  message: string;
+  [key: string]: any;
+}
+
 export class ApplicationError extends Error {
   statusCode: number;
   messageCode?: string;

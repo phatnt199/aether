@@ -1,27 +1,16 @@
-import { SocketIOConstants } from '@/components/socket-io/common/constants';
-import { ApplicationLogger, DefaultRedisHelper, LoggerFactory } from '@/helpers';
-import { getError } from '@/utilities';
+import { ApplicationLogger, LoggerFactory } from '@/helpers/logger';
+import { DefaultRedisHelper } from '@/helpers/redis';
+import { getError } from '@/utilities/error.utility';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Emitter } from '@socket.io/redis-emitter';
 import isEmpty from 'lodash/isEmpty';
 import { Server as HTTPServer } from 'node:http';
 import { Server as IOServer, Socket as IOSocket, ServerOptions } from 'socket.io';
-import { IHandshake } from '../common/types';
+import { SocketIOConstants } from './constants';
+import { IHandshake, ISocketIOServerOptions } from './types';
+import { validateModule } from '@/utilities/module.utility';
 
 const CLIENT_AUTHENTICATE_TIMEOUT = 10_000;
-
-export interface ISocketIOServerOptions {
-  identifier: string;
-  server: HTTPServer;
-  serverOptions: Partial<ServerOptions>;
-
-  redisConnection: DefaultRedisHelper;
-
-  authenticateFn: (args: IHandshake) => Promise<boolean>;
-  clientConnectedFn: (opts: { socket: IOSocket }) => Promise<void>;
-  authenticateTimeout?: number;
-  defaultRooms?: string[];
-}
 
 // -------------------------------------------------------------------------------------------------------------
 export class SocketIOServerHelper {
@@ -121,6 +110,10 @@ export class SocketIOServerHelper {
 
   // -------------------------------------------------------------------------------------------------------------
   configure() {
+    validateModule({
+      scope: SocketIOServerHelper.name,
+      modules: ['@socket.io/redis-adapter', '@socket.io/redis-emitter', 'socket.io'],
+    });
     this.logger.info('[configure][%s] Configuring IO Server', this.identifier);
 
     if (!this.server) {
