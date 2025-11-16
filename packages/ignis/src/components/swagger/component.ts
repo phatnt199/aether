@@ -48,11 +48,23 @@ export class SwaggerComponent extends BaseComponent {
         isOptional: true,
       }) ?? DEFAULT_SWAGGER_OPTIONS;
 
-    const applicationRoute = this.application.getServer();
+    const rootRouter = this.application.getRootRouter();
+    const configs = this.application.getProjectConfigs();
+
     const { restOptions, explorer } = swaggerOptions;
 
     // OpenAPI Documentation URL
     explorer.info.version = await this.application.getApplicationVersion();
+
+    // Application Server Urls
+    if (!explorer.servers?.length) {
+      explorer.servers = [
+        {
+          url: ['http://', this.application.getServerAddress(), configs.basePath ?? ''].join(''),
+          description: 'Application Server URL',
+        },
+      ];
+    }
 
     const docPath = [
       restOptions.path.base.startsWith('/') ? '' : '/',
@@ -61,17 +73,18 @@ export class SwaggerComponent extends BaseComponent {
       restOptions.path.doc,
     ].join('');
 
-    applicationRoute.doc(docPath, explorer);
+    rootRouter.doc(docPath, explorer);
 
-    const configs = this.application.getProjectConfigs();
-    applicationRoute.get(
+    rootRouter.get(
       [
         restOptions.path.base.startsWith('/') ? '' : '/',
         restOptions.path.base,
         restOptions.path.ui.startsWith('/') ? '' : '/',
         restOptions.path.ui,
       ].join(''),
-      swaggerUI({ url: [configs.basePath ?? '', docPath].join('') }),
+      swaggerUI({
+        url: [configs.basePath ?? '', docPath].join(''),
+      }),
     );
   }
 }

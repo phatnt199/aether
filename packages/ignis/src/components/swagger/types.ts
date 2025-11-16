@@ -13,5 +13,9 @@ export interface ISwaggerOptions {
       version: string;
       description: string;
     };
+    servers?: Array<{
+      url: string;
+      description?: string;
+    }>;
   };
 }

@@ -1,3 +1,4 @@
+import { CoreBindings } from '@/common/bindings';
 import { RuntimeModules, TRuntimeModule } from '@/common/constants';
 import { ValueOrPromise } from '@/common/types';
 import { applicationEnvironment } from '@/helpers/env';
@@ -5,6 +6,7 @@ import { getError } from '@/helpers/error';
 import { Container } from '@/helpers/inversion';
 import { int, toBoolean } from '@/utilities/parse.utility';
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { showRoutes as showApplicationRoutes } from 'hono/dev';
 import isEmpty from 'lodash/isEmpty';
 import path from 'node:path';
 import { IApplication, IApplicationConfig, TBunServerInstance, TNodeServerInstance } from './types';
@@ -22,6 +24,8 @@ export abstract class AbstractApplication extends Container implements IApplicat
         runtime: typeof RuntimeModules.NODE;
         instance?: TNodeServerInstance;
       };
+
+  protected rootRouter: OpenAPIHono;
   protected configs: IApplicationConfig;
   protected projectRoot: string;
 
@@ -39,6 +43,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
     this.projectRoot = this.getProjectRoot();
     this.logger.info('[constructor] Project root: %s', this.projectRoot);
 
+    this.rootRouter = new OpenAPIHono({ strict: true });
     const honoServer = new OpenAPIHono({
       strict: this.configs.strictPath ?? true,
     }).basePath(this.configs.basePath!);
@@ -51,6 +56,9 @@ export abstract class AbstractApplication extends Container implements IApplicat
 
   // ------------------------------------------------------------------------------
   abstract staticConfigure(): void;
+  abstract setupMiddlewares(opts?: {
+    middlewares?: Record<string | symbol, any>;
+  }): ValueOrPromise<void>;
   abstract preConfigure(): ValueOrPromise<void>;
   abstract postConfigure(): ValueOrPromise<void>;
   abstract getApplicationVersion(): ValueOrPromise<string>;
@@ -62,6 +70,10 @@ export abstract class AbstractApplication extends Container implements IApplicat
 
   getProjectRoot(): string {
     return process.cwd();
+  }
+
+  getRootRouter(): OpenAPIHono {
+    return this.rootRouter;
   }
 
   getServerHost(): string {
@@ -76,7 +88,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
     return `${this.getServerHost()}:${this.getServerPort()}`;
   }
 
-  getServer() {
+  getServer(): OpenAPIHono {
     return this.server.hono;
   }
 
@@ -85,6 +97,10 @@ export abstract class AbstractApplication extends Container implements IApplicat
   }
 
   async initialize() {
+    this.bind({ key: CoreBindings.APPLICATION_INSTANCE }).toProvider(() => this);
+    this.bind({ key: CoreBindings.APPLICATION_SERVER }).toProvider(() => this.server);
+    this.bind({ key: CoreBindings.APPLICATION_ROOT_ROUTER }).toValue(() => this.server);
+
     this.validateEnvs();
     this.staticConfigure();
 
@@ -99,6 +115,22 @@ export abstract class AbstractApplication extends Container implements IApplicat
     }
 
     return RuntimeModules.NODE;
+  }
+
+  protected inspectRoutes() {
+    const t = performance.now();
+    const showRoutes = this.configs?.debug?.showRoutes ?? false;
+
+    if (!showRoutes) {
+      return;
+    }
+
+    this.logger.info('[inspectRoutes] START | Inspect all application route(s)');
+    showApplicationRoutes(this.getServer());
+    this.logger.info(
+      '[start] DONE | Inspect all application route(s) | Took: %s (ms)',
+      performance.now() - t,
+    );
   }
 
   protected validateEnvs() {
@@ -137,12 +169,14 @@ export abstract class AbstractApplication extends Container implements IApplicat
       Promise.resolve(Bun.serve({ port, fetch: server.fetch, hostname: host }))
         .then(rs => {
           this.server.instance = rs;
+          this.inspectRoutes();
 
           this.logger.info('[start] Server STARTED | Address: %s', this.getServerAddress());
           this.logger.info(
             '[start] Log folder: %s',
             path.resolve(process.env.APP_ENV_LOGGER_FOLDER_PATH ?? '').toString(),
           );
+
           resolve(rs);
         })
         .catch(reject);
@@ -159,6 +193,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
         .then(module => {
           const { serve } = module;
           const rs = serve({ fetch: server.fetch, port, hostname: host }, info => {
+            this.inspectRoutes();
             this.logger.info(
               '[start] Server STARTED | Address: %s | Info: %j',
               this.getServerAddress(),
@@ -186,6 +221,11 @@ export abstract class AbstractApplication extends Container implements IApplicat
 
   async start() {
     await this.initialize();
+    await this.setupMiddlewares();
+
+    const server = this.getServer();
+    server.route('/', this.rootRouter);
+
     switch (this.server.runtime) {
       case RuntimeModules.BUN: {
         await this.startBunModule();

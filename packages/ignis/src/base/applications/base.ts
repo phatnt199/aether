@@ -1,4 +1,4 @@
-import { BindingKeys, BindingNamespaces, CoreBindings } from '@/common/bindings';
+import { BindingKeys, BindingNamespaces } from '@/common/bindings';
 import { HTTP, RuntimeModules } from '@/common/constants';
 import { AnyObject, IClass } from '@/common/types';
 import { ApplicationError, getError } from '@/helpers/error';
@@ -10,7 +10,7 @@ import { IDataSource } from '../datasources';
 import { IRepository } from '../repositories';
 import { IService } from '../services';
 import { AbstractApplication } from './abstract';
-import { IApplication, IRestApplication } from './types';
+import { IApplication, IMiddlewareOptions, IRestApplication } from './types';
 
 const {
   NODE_ENV,
@@ -142,7 +142,7 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
   async registerControllers() {
     this.logger.info('[registerControllers] START | Register Application Components...');
 
-    const router = this.getServer();
+    const router = this.getRootRouter();
 
     const bindings = this.findByTag<BaseController>({ tag: 'controllers' });
     for (const binding of bindings) {
@@ -167,12 +167,48 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
   }
 
   // ------------------------------------------------------------------------------
-  override async initialize() {
-    this.bind<IRestApplication>({ key: CoreBindings.APPLICATION_INSTANCE }).toProvider(() => this);
-    this.bind<typeof this.server>({ key: CoreBindings.APPLICATION_SERVER }).toProvider(
-      () => this.server,
-    );
+  override async setupMiddlewares(_opts?: {
+    middlewares?: Record<string | symbol, any>;
+  }): Promise<void> {
+    const server = this.getServer();
 
+    const {
+      compress = { enable: false },
+      cors = { enable: false },
+      csrf = { enable: false },
+      requestId = { enable: false },
+    } = this.configs.middlewares;
+
+    const mwConfs: Array<
+      IMiddlewareOptions & { name: string; module: { package: string; variable: string } }
+    > = [
+      { ...compress, name: 'Compress', module: { package: 'hono/compress', variable: 'compress' } },
+      { ...cors, name: 'CORS', module: { package: 'hono/cors', variable: 'cors' } },
+      { ...csrf, name: 'CSRF', module: { package: 'hono/csrf', variable: 'csrf' } },
+      {
+        ...requestId,
+        name: 'RequestId',
+        module: { package: 'hono/request-id', variable: 'requestId' },
+      },
+    ];
+
+    for (const mwConf of mwConfs) {
+      if (!mwConf.enable) {
+        this.logger.debug(
+          '[setupMiddlewares] SKIP setting up middleware | enable: %s | name: %s',
+          mwConf.enable,
+          mwConf.name,
+        );
+        continue;
+      }
+
+      const { enable, name, module, ...options } = mwConf;
+      const mw = await import(module.package);
+      server.use(mwConf.path ?? '*', mw[module.variable](options));
+    }
+  }
+
+  override async initialize() {
     this.logger.info(
       '[initialize] ------------------------------------------------------------------------',
     );
@@ -200,8 +236,8 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
     );
 
     await super.initialize();
-    await this.registerComponents();
 
+    await this.registerComponents();
     await this.registerControllers();
   }
 }

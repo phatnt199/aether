@@ -1,4 +1,5 @@
 import { AnyObject, IClass, ValueOrPromise } from '@/common/types';
+import type { OpenAPIHono } from '@hono/zod-openapi';
 import type { Context } from 'hono';
 import { IPRestrictionRules as IIPRestrictionRules } from 'hono/ip-restriction';
 import { BaseComponent } from '../components';
@@ -7,9 +8,15 @@ import { IRepository } from '../repositories';
 import { IService } from '../services';
 
 // ------------------------------------------------------------------------------
-// CORS Options
+export interface IMiddlewareOptions {
+  enable: boolean;
+  path?: string;
+}
+
 // ------------------------------------------------------------------------------
-export interface ICORSOptions {
+// CORS Middleware Options
+// ------------------------------------------------------------------------------
+export interface ICORSOptions extends IMiddlewareOptions {
   origin:
     | string
     | string[]
@@ -25,28 +32,41 @@ export interface ICORSOptions {
 }
 
 // ------------------------------------------------------------------------------
-// CSRF Options
+// CSRF Middleware Options
 // ------------------------------------------------------------------------------
 export type TIsAllowedOriginHandler = (origin: string, context: Context) => boolean;
-export const SecFetchSiteValues = ['same-origin', 'same-site', 'none', 'cross-site'];
+export const SecFetchSiteValues = ['same-origin', 'same-site', 'none', 'cross-site'] as const;
 export type TSecFetchSite = (typeof SecFetchSiteValues)[number];
 export type TIsAllowedSecFetchSiteHandler = (
   secFetchSite: TSecFetchSite,
   context: Context,
 ) => boolean;
 
-export interface ICSRFOptions {
+export interface ICSRFOptions extends IMiddlewareOptions {
   origin?: string | string[] | TIsAllowedOriginHandler;
   secFetchSite?: TSecFetchSite | TSecFetchSite[] | TIsAllowedSecFetchSiteHandler;
 }
 
 // ------------------------------------------------------------------------------
-// Body Limit Options
+// Body Limit Middleware Options
 // ------------------------------------------------------------------------------
-export interface IBodyLimitOptions {
+export interface IBodyLimitOptions extends IMiddlewareOptions {
   maxSize: number;
   onError?: (c: Context) => Response | Promise<Response>;
 }
+
+// ------------------------------------------------------------------------------
+// Compress Middleware Options
+// ------------------------------------------------------------------------------
+export interface ICompressOptions extends IMiddlewareOptions {
+  encoding: 'gzip' | 'deflate';
+  threshold?: number;
+}
+
+// ------------------------------------------------------------------------------
+// RequestId Middleware Options
+// ------------------------------------------------------------------------------
+export interface IRequestIdOptions extends IMiddlewareOptions {}
 
 // ------------------------------------------------------------------------------
 // Application
@@ -58,22 +78,27 @@ export type TNodeServerInstance = any; // Will be set at runtime from @hono/node
 export interface IApplicationConfig {
   host?: string;
   port?: number;
-  basePath?: string;
-  strictPath?: boolean;
 
-  compress?: boolean;
+  path: { base: string; isStrict: boolean };
 
-  cors?: ICORSOptions;
-  csrf?: ICSRFOptions;
-  bodyLimit?: IBodyLimitOptions;
+  middlewares: {
+    compress?: ICompressOptions;
+    cors?: ICORSOptions;
+    csrf?: ICSRFOptions;
+    bodyLimit?: IBodyLimitOptions;
+    requestId?: IRequestIdOptions;
+    ipRestriction?: IMiddlewareOptions & IIPRestrictionRules;
+  };
 
-  ipRestriction?: IIPRestrictionRules;
-
-  autoLoad: {
+  autoLoad?: {
     dirs: Record<
       string, // folder name | namespace
       string // folder path from basePath
     >;
+  };
+
+  debug?: {
+    showRoutes?: boolean;
   };
 
   [key: string]: any;
@@ -84,11 +109,13 @@ export interface IApplication {
   initialize(): ValueOrPromise<void>;
 
   staticConfigure(): void;
+  setupMiddlewares(opts?: { middlewares?: Record<string | symbol, any> }): ValueOrPromise<void>;
   preConfigure(): ValueOrPromise<void>;
   postConfigure(): ValueOrPromise<void>;
 
   getProjectConfigs(): IApplicationConfig;
   getProjectRoot(): string;
+  getRootRouter(): OpenAPIHono;
   getServerHost(): string;
   getServerPort(): number;
   getServerAddress(): string;

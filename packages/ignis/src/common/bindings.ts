@@ -15,9 +15,11 @@ export class BindingNamespaces {
 }
 
 export class BindingKeys {
-  static readonly APPLICATION_INSTANCE = Symbol.for('@app/instance');
-  static readonly APPLICATION_SERVER = Symbol.for('@app/server');
-  static readonly APPLICATION_CONFIG = Symbol.for('@app/config');
+  static readonly APPLICATION_INSTANCE = '@app/instance';
+  static readonly APPLICATION_SERVER = '@app/server';
+  static readonly APPLICATION_CONFIG = '@app/config';
+
+  static readonly APPLICATION_ROOT_ROUTER = '@app/router/root';
 
   static readonly APPLICATION_ENVIRONMENTS = Symbol.for('@app/environments');
   static readonly APPLICATION_MIDDLEWARE_OPTIONS = Symbol.for('@app/middleware_options');
@@ -59,4 +61,6 @@ export class CoreBindings {
   static readonly APPLICATION_INSTANCE = BindingKeys.APPLICATION_INSTANCE;
   static readonly APPLICATION_SERVER = BindingKeys.APPLICATION_SERVER;
   static readonly APPLICATION_CONFIG = BindingKeys.APPLICATION_CONFIG;
+
+  static readonly APPLICATION_ROOT_ROUTER = BindingKeys.APPLICATION_ROOT_ROUTER;
 }
