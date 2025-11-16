@@ -3,10 +3,10 @@ import { BaseComponent } from '@/base/components';
 import { CoreBindings } from '@/common/bindings';
 import { HTTP } from '@/common/constants';
 import { ValueOrPromise } from '@/common/types';
-import { Binding, inject } from '@/helpers/inversion';
 import { DefaultRedisHelper } from '@/helpers/redis';
 import { SocketIOServerHelper } from '@/helpers/socket-io';
-import { getError } from '@/utilities/error.utility';
+import { inject } from '@/base/metadata';
+import { getError } from '@/helpers/error';
 import { ServerOptions } from 'socket.io';
 import { SocketIOBindingKeys } from './keys';
 

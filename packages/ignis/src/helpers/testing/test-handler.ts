@@ -1,5 +1,5 @@
 import { ValueOrPromise } from '@/common';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import assert from 'node:assert';
 import { ApplicationLogger, LoggerFactory } from '../logger';
 import { TestCaseDecisions } from './common';

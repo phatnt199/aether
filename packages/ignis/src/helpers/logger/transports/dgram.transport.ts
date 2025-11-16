@@ -1,5 +1,5 @@
 import { HTTP } from '@/common';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import dgram from 'node:dgram';
 import Transport from 'winston-transport';
 

@@ -1,5 +1,5 @@
 import { applicationLogger as logger } from '@/helpers/logger';
-import { getError } from './error.utility';
+import { getError } from '@/helpers/error';
 
 export const validateModule = (opts: { scope?: string; modules: Array<string> }) => {
   const { scope = '', modules = [] } = opts;

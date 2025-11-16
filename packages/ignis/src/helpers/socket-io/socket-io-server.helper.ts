@@ -1,6 +1,6 @@
 import { ApplicationLogger, LoggerFactory } from '@/helpers/logger';
 import { DefaultRedisHelper } from '@/helpers/redis';
-import { getError } from '@/utilities/error.utility';
+import { getError } from '@/helpers/error';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { Emitter } from '@socket.io/redis-emitter';
 import isEmpty from 'lodash/isEmpty';
@@ -270,7 +270,7 @@ export class SocketIOServerHelper {
       new Date().toISOString(),
     );
 
-    Promise.all(this.defaultRooms.map((room: string) => socket.join(room)))
+    Promise.all(this.defaultRooms.map((room: string) => Promise.resolve(socket.join(room))))
       .then(() => {
         this.logger.info(
           '[onClientAuthenticated] Connection %s joined all defaultRooms %s',

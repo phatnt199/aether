@@ -1,7 +1,7 @@
 import os from 'node:os';
 
 import { BaseHelper } from '@/base/base.helper';
-import { getError } from '@/utilities/error.utility';
+import { getError } from '@/helpers/error';
 import { IWorker } from './types';
 
 export class WorkerPoolHelper extends BaseHelper {

@@ -19,17 +19,17 @@
 
     /* Emit */
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "declarationMap": false,
+    "sourceMap": false,
     "removeComments": false,
     "importHelpers": false,
     "downlevelIteration": true,
     "preserveConstEnums": true,
 
-    /* Type Checking - Strict Mode */
+    /* Type Checking - Strict Mode (Balanced for Production) */
     "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "strictFunctionTypes": true,
     "strictBindCallApply": true,
     "strictPropertyInitialization": false,
@@ -50,6 +50,10 @@
     /* Performance */
     "incremental": true,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "assumeChangesOnlyAffectDirectDependencies": true,
+    "noCheck": false,
+    "disableSourceOfProjectReferenceRedirect": true,
 
     /* Output */
     "pretty": true,

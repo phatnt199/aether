@@ -2,7 +2,7 @@ import { RuntimeModules, TRuntimeModule } from '@/common/constants';
 import { ValueOrPromise } from '@/common/types';
 import { applicationEnvironment } from '@/helpers/env';
 import { Container } from '@/helpers/inversion';
-import { getError } from '@/utilities/error.utility';
+import { getError } from '@/helpers/error';
 import { int, toBoolean } from '@/utilities/parse.utility';
 import { OpenAPIHono } from '@hono/zod-openapi';
 import isEmpty from 'lodash/isEmpty';

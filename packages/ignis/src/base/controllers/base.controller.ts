@@ -4,10 +4,10 @@ import type { Context, Env, ValidationTargets } from 'hono';
 import { BaseHelper } from '../base.helper';
 import { IController, IControllerOptions } from './types';
 
-type Hook<T, E extends Env, P extends string, R> = (
+type THook<T, E extends Env, P extends string, R> = (
   result: { target: keyof ValidationTargets } & (
     | { success: true; data: T }
-    | { success: false; error: ZodError }
+    | { success: false; error: any }
   ),
   c: Context<E, P>,
 ) => R;
@@ -17,8 +17,8 @@ export abstract class BaseController extends BaseHelper implements IController {
 
   constructor(opts: IControllerOptions) {
     super(opts);
-    const { strict = true, basePath = '' } = opts;
-    this.route = new OpenAPIHono({ strict }).basePath(basePath);
+    const { isStrict = true, basePath = '' } = opts;
+    this.route = new OpenAPIHono({ strict: isStrict }).basePath(basePath);
   }
 
   abstract binding(): ValueOrPromise<void>;
@@ -26,7 +26,7 @@ export abstract class BaseController extends BaseHelper implements IController {
   protected defineRoute<R extends RouteConfig>(
     opts: R & {
       handler: RouteHandler<R>;
-      hook?: Hook<unknown, Env, string, Response | void | Promise<Response | void>>;
+      hook?: THook<unknown, Env, string, Response | void | Promise<Response | void>>;
     },
   ) {
     const { handler, hook, ...rest } = opts;

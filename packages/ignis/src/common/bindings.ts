@@ -1,4 +1,4 @@
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import isEmpty from 'lodash/isEmpty';
 
 export class BindingNamespaces {

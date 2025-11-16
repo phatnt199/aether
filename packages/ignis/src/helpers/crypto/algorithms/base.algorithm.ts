@@ -1,5 +1,6 @@
 import { BaseHelper } from '@/base/base.helper';
-import { getError, int } from '@/utilities';
+import { getError } from '@/helpers/error';
+import { int } from '@/utilities';
 import { DEFAULT_CIPHER_BITS, DEFAULT_PAD_END, ICryptoAlgorithm } from '../common';
 
 export abstract class AbstractCryptoAlgorithm<AL extends string, IO>

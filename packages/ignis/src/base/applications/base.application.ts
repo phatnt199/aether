@@ -2,7 +2,7 @@ import { BindingKeys, BindingNamespaces, CoreBindings } from '@/common/bindings'
 import { RuntimeModules } from '@/common/constants';
 import { AnyObject, IClass } from '@/common/types';
 import { BindingScopes } from '@/helpers/inversion';
-import { getError } from '@/utilities/error.utility';
+import { getError } from '@/helpers/error';
 import { BaseComponent } from '../components';
 import { IDataSource } from '../datasources';
 import { IRepository } from '../repositories';

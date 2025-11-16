@@ -2,7 +2,7 @@ import { isMainThread, Worker, WorkerOptions } from 'node:worker_threads';
 
 import { BaseHelper } from '@/base/base.helper';
 import { AnyType, ValueOrPromise } from '@/common/types';
-import { getError } from '@/utilities/error.utility';
+import { getError } from '@/helpers/error';
 import { IWorker, IWorkerBus, IWorkerThread } from './types';
 
 // -------------------------------------------------------------------------------------------

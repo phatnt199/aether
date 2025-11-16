@@ -1,7 +1,7 @@
 import { BaseHelper } from '@/base/base.helper';
-import { getError } from '@/utilities';
 import { CronJob, CronOnCompleteCommand, CronTime } from 'cron';
 import isEmpty from 'lodash/isEmpty';
+import { ApplicationError } from '../error';
 
 export interface ICronHelperOptions {
   cronTime: string;
@@ -43,7 +43,7 @@ export class CronHelper extends BaseHelper {
 
   configure() {
     if (!this.cronTime || isEmpty(this.cronTime)) {
-      throw getError({
+      throw ApplicationError.getError({
         message: '[CronHelper][configure] Invalid cronTime to configure application cron!',
       });
     }

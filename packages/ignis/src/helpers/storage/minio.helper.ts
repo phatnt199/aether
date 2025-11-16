@@ -1,6 +1,6 @@
 import { BaseHelper } from '@/base/base.helper';
 import { MimeTypes } from '@/common';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import isEmpty from 'lodash/isEmpty';
 import { Client, ClientOptions } from 'minio';
 import { Readable } from 'node:stream';

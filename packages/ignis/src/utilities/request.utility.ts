@@ -2,7 +2,7 @@ import { Context } from 'hono';
 import get from 'lodash/get';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getError } from './error.utility';
+import { getError } from '@/helpers/error';
 
 // -------------------------------------------------------------------------
 export interface IRequestedRemark {

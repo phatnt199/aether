@@ -1,6 +1,6 @@
 import { BaseHelper } from '@/base/base.helper';
 import { AnyObject } from '@/common/types';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import isEmpty from 'lodash/isEmpty';
 import { IFetchable, IRequestOptions } from './fetcher';
 import { AxiosFetcher, IAxiosRequestOptions } from './fetcher/axios-fetcher';

@@ -1,6 +1,6 @@
 import isEmpty from 'lodash/isEmpty';
 import { applicationLogger } from './default-logger';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import winston from 'winston';
 import { TLogLevel } from './types';
 

@@ -1,5 +1,5 @@
 import { ApplicationLogger, LoggerFactory } from '@/helpers/logger';
-import { getError } from '@/utilities/error.utility';
+import { getError } from '@/helpers/error';
 import { type Socket, io } from 'socket.io-client';
 import { IOptions, ISocketIOClientOptions } from './types';
 import { validateModule } from '@/utilities/module.utility';

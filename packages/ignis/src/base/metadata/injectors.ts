@@ -1,5 +1,5 @@
 import { IInjectableMetadata, MetadataRegistry } from '@/helpers/inversion';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 
 export const injectable = (metadata: IInjectableMetadata): ClassDecorator => {
   return target => {

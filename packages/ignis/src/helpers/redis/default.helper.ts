@@ -1,5 +1,5 @@
 import { BaseHelper } from '@/base/base.helper';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import { Cluster, Redis } from 'ioredis';
 import isEmpty from 'lodash/isEmpty';
 import zlib from 'node:zlib';

@@ -1,6 +1,6 @@
 import { BaseHelper } from '@/base/base.helper';
 import { ValueOrPromise } from '@/common/types';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import { dayjs } from '@/utilities/date.utility';
 import { getUID } from '@/utilities/parse.utility';
 import omit from 'lodash/omit';

@@ -1,8 +1,8 @@
 import { BaseApplication } from '@/base/applications';
 import { BaseComponent } from '@/base/components';
+import { inject } from '@/base/metadata';
 import { CoreBindings } from '@/common/bindings';
 import { Binding } from '@/helpers/inversion';
-import { inject } from '@/helpers/inversion/decorators';
 import { validateModule } from '@/utilities/module.utility';
 import { SwaggerBindingKeys } from './keys';
 import { ISwaggerOptions } from './types';

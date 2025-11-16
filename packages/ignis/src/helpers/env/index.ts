@@ -1,2 +1,2 @@
-export * from './application-environment.helper';
+export * from './app-env';
 export * from './types';

@@ -1,4 +1,4 @@
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import { after, afterEach, before, beforeEach, describe } from 'node:test';
 import { ApplicationLogger, LoggerFactory } from '../logger';
 import { ITestPlan } from './types';

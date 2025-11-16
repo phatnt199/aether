@@ -14,7 +14,7 @@ export class MetadataRegistry {
   // -----------------------------------------------------------------
   // Controller Metadata
   // -----------------------------------------------------------------
-  static setControllerMetadata<T extends Object = Object>(opts: {
+  static setControllerMetadata<T extends object = object>(opts: {
     target: T;
     metadata: IControllerMetadata;
   }): void {
@@ -22,7 +22,7 @@ export class MetadataRegistry {
     Reflect.defineMetadata(MetadataKeys.CONTROLLER, metadata, target);
   }
 
-  static getControllerMetadata<T extends Object = Object>(opts: {
+  static getControllerMetadata<T extends object = object>(opts: {
     target: T;
   }): IControllerMetadata | undefined {
     const { target } = opts;
@@ -49,7 +49,7 @@ export class MetadataRegistry {
   // -----------------------------------------------------------------
   // Property Metadata
   // -----------------------------------------------------------------
-  static setPropertyMetadata<T extends Object = Object>(opts: {
+  static setPropertyMetadata<T extends object = object>(opts: {
     target: T;
     propertyName: string | symbol;
     metadata: IPropertyMetadata;
@@ -65,14 +65,14 @@ export class MetadataRegistry {
     Reflect.defineMetadata(MetadataKeys.PROPERTIES, properties, target.constructor);
   }
 
-  static getPropertiesMetadata<T extends Object = Object>(opts: {
+  static getPropertiesMetadata<T extends object = object>(opts: {
     target: T;
   }): Map<string | symbol, IPropertyMetadata> | undefined {
     const { target } = opts;
     return Reflect.getMetadata(MetadataKeys.PROPERTIES, target.constructor);
   }
 
-  static getPropertyMetadata<T extends Object = Object>(opts: {
+  static getPropertyMetadata<T extends object = object>(opts: {
     target: T;
     propertyName: string | symbol;
   }): IPropertyMetadata | undefined {
@@ -84,7 +84,7 @@ export class MetadataRegistry {
   // -----------------------------------------------------------------
   // Injection Metadata
   // -----------------------------------------------------------------
-  static setInjectMetadata<T extends Object = Object>(opts: {
+  static setInjectMetadata<T extends object = object>(opts: {
     target: T;
     index: number;
     metadata: IInjectMetadata;
@@ -95,7 +95,7 @@ export class MetadataRegistry {
     Reflect.defineMetadata(MetadataKeys.INJECT, injects, target);
   }
 
-  static getInjectMetadata<T extends Object = Object>(opts: {
+  static getInjectMetadata<T extends object = object>(opts: {
     target: T;
   }): IInjectMetadata[] | undefined {
     const { target } = opts;
@@ -103,7 +103,7 @@ export class MetadataRegistry {
   }
 
   // -----------------------------------------------------------------
-  static setInjectableMetadata<T extends Object = Object>(opts: {
+  static setInjectableMetadata<T extends object = object>(opts: {
     target: T;
     metadata: IInjectableMetadata;
   }): void {
@@ -111,7 +111,7 @@ export class MetadataRegistry {
     Reflect.defineMetadata(MetadataKeys.INJECTABLE, metadata, target);
   }
 
-  static getInjectableMetadata<T extends Object = Object>(opts: {
+  static getInjectableMetadata<T extends object = object>(opts: {
     target: T;
   }): IInjectableMetadata | undefined {
     const { target } = opts;
@@ -122,13 +122,13 @@ export class MetadataRegistry {
   static getMethodNames<T = any>(opts: { target: IClass<T> }): string[] {
     const { target } = opts;
     const prototype = target.prototype;
-    const methods = Object.getOwnPropertyNames(prototype).filter(
-      name => name !== 'constructor' && typeof prototype[name] === 'function',
-    );
+    const methods = object
+      .getOwnPropertyNames(prototype)
+      .filter(name => name !== 'constructor' && typeof prototype[name] === 'function');
     return methods;
   }
 
-  static clearMetadata<T extends Object = Object>(opts: { target: T }): void {
+  static clearMetadata<T extends object = object>(opts: { target: T }): void {
     const { target } = opts;
     const keys = Reflect.getMetadataKeys(target);
 

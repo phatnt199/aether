@@ -1,6 +1,6 @@
 import { BaseHelper } from '@/base/base.helper';
 import { type IClass } from '@/common/types';
-import { getError } from '@/utilities';
+import { getError } from '@/helpers/error';
 import { MetadataRegistry } from './registry';
 import { BindingScopes, BindingValueTypes, TBindingScope } from './types';
 
@@ -145,15 +145,15 @@ export class Container extends BaseHelper {
     return this.bindings.delete(key);
   }
 
-  get<T>(opts: { key: string | symbol; optional?: boolean }): T | undefined {
-    const { key, optional = false } = opts;
+  get<T>(opts: { key: string | symbol; isOptional?: boolean }): T | undefined {
+    const { key, isOptional = false } = opts;
 
     const binding = this.getBinding<T>({ key });
     if (binding) {
       return binding.getValue(this);
     }
 
-    if (!optional) {
+    if (!isOptional) {
       throw getError({
         message: `Binding key: ${opts.key.toString()} is not bounded in context!`,
       });
@@ -184,7 +184,7 @@ export class Container extends BaseHelper {
     const instance = new cls(...args);
 
     // 2. Handle property injection
-    const propertyMetadata = MetadataRegistry.getPropertiesMetadata({ target: instance as Object });
+    const propertyMetadata = MetadataRegistry.getPropertiesMetadata({ target: instance as object });
     if (propertyMetadata && propertyMetadata.size > 0) {
       for (const [propertyKey, metadata] of propertyMetadata.entries()) {
         const dep = this.get({ key: metadata.bindingKey, optional: metadata.optional ?? false });
