@@ -1,3 +1,3 @@
-export * from './abstract.application';
-export * from './base.application';
+export * from './abstract';
+export * from './base';
 export * from './types';

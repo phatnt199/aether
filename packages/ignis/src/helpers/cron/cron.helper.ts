@@ -1,4 +1,4 @@
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { CronJob, CronOnCompleteCommand, CronTime } from 'cron';
 import isEmpty from 'lodash/isEmpty';
 import { ApplicationError } from '../error';

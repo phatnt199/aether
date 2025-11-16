@@ -1,6 +1,5 @@
-import { IControllerOptions } from '@/base/controllers';
-import { BaseController } from '@/base/controllers/base.controller';
-import { ValueOrPromise } from '@/common';
+import { BaseController, IControllerOptions } from '@/base/controllers';
+import { HTTP, ValueOrPromise } from '@/common';
 import { z } from '@hono/zod-openapi';
 
 export class HealthCheckController extends BaseController {
@@ -13,16 +12,16 @@ export class HealthCheckController extends BaseController {
 
   override binding(): ValueOrPromise<void> {
     this.defineRoute({
-      method: 'get',
-      path: '/',
-      responses: {
-        200: {
-          description: 'Health check status',
-          content: {
-            'application/json': {
-              schema: z.object({
-                status: z.string(),
-              }),
+      configs: {
+        method: 'get',
+        path: '/',
+        responses: {
+          [HTTP.ResultCodes.RS_2.Ok]: {
+            description: 'Health check status',
+            content: {
+              'application/json': {
+                schema: z.object({ status: z.string() }),
+              },
             },
           },
         },

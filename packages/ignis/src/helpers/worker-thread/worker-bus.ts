@@ -1,4 +1,4 @@
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { ValueOrPromise } from '@/common/types';
 import { MessagePort, Transferable } from 'node:worker_threads';
 import { IWorkerBus, IWorkerMessageBusHandler } from './types';

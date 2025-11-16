@@ -1,3 +1,3 @@
-export * from './base.service';
-export * from './base-crud.service';
+export * from './base';
+export * from './base-crud';
 export * from './types';

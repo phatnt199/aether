@@ -19,8 +19,8 @@
 
     /* Emit */
     "declaration": true,
-    "declarationMap": false,
-    "sourceMap": false,
+    "declarationMap": true,
+    "sourceMap": true,
     "removeComments": false,
     "importHelpers": false,
     "downlevelIteration": true,
@@ -50,10 +50,6 @@
     /* Performance */
     "incremental": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
-    "assumeChangesOnlyAffectDirectDependencies": true,
-    "noCheck": false,
-    "disableSourceOfProjectReferenceRedirect": true,
 
     /* Output */
     "pretty": true,

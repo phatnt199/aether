@@ -122,9 +122,9 @@ export class MetadataRegistry {
   static getMethodNames<T = any>(opts: { target: IClass<T> }): string[] {
     const { target } = opts;
     const prototype = target.prototype;
-    const methods = object
-      .getOwnPropertyNames(prototype)
-      .filter(name => name !== 'constructor' && typeof prototype[name] === 'function');
+    const methods = Object.getOwnPropertyNames(prototype).filter(
+      name => name !== 'constructor' && typeof prototype[name] === 'function',
+    );
     return methods;
   }
 

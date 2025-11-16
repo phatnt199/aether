@@ -1,6 +1,6 @@
 import { ValueOrPromise } from '@/common';
-import { BaseHelper } from '../base.helper';
 import { Binding } from '@/helpers/inversion';
+import { BaseHelper } from '../helpers';
 
 export abstract class BaseComponent extends BaseHelper {
   protected bindings: Record<string | symbol, Binding>;
@@ -12,15 +12,13 @@ export abstract class BaseComponent extends BaseHelper {
 
   abstract binding(): ValueOrPromise<void>;
 
+  // ------------------------------------------------------------------------------
   async configure(): Promise<void> {
     const t = performance.now();
-    this.logger.info('[binding] START | Binding health component');
+    this.logger.info('[binding] START | Binding component');
 
     await this.binding();
 
-    this.logger.info(
-      '[binding] DONE | Binding health component | Took: %s (ms)',
-      performance.now() - t,
-    );
+    this.logger.info('[binding] DONE | Binding component | Took: %s (ms)', performance.now() - t);
   }
 }

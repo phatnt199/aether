@@ -17,4 +17,4 @@ export const ZErrorSchema = z
   })
   .catchall(z.any());
 
-export type IError = z.infer<typeof ZErrorSchema>;
+export type TError = z.infer<typeof ZErrorSchema>;

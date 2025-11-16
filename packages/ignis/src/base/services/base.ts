@@ -1,4 +1,4 @@
-import { BaseHelper } from '../base.helper';
+import { BaseHelper } from '../helpers';
 import { IService } from './types';
 
 /**

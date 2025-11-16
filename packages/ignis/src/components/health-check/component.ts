@@ -1,17 +1,14 @@
 import { BaseApplication } from '@/base/applications';
 import { BaseComponent } from '@/base/components';
-import { inject } from '@/base/metadata';
+import { controller, inject } from '@/base/metadata';
 import { CoreBindings } from '@/common/bindings';
 import { ValueOrPromise } from '@/common/types';
 import { Binding } from '@/helpers/inversion';
-import { OpenAPIHono } from '@hono/zod-openapi';
 import { HealthCheckController } from './controller';
 import { HealthCheckBindingKeys } from './keys';
 import { IHealthCheckOptions } from './types';
 
 export class HealthCheckComponent extends BaseComponent {
-  protected route: OpenAPIHono;
-
   constructor(
     @inject({ key: CoreBindings.APPLICATION_INSTANCE }) private application: BaseApplication,
   ) {
@@ -22,42 +19,17 @@ export class HealthCheckComponent extends BaseComponent {
         key: HealthCheckBindingKeys.HEALTH_CHECK_OPTIONS,
       }).toValue({ restOptions: { path: '/health' } }),
     };
-
-    this.route = new OpenAPIHono({ strict: true });
   }
 
   override binding(): ValueOrPromise<void> {
     const healthOptions = this.application.get<IHealthCheckOptions>({
       key: HealthCheckBindingKeys.HEALTH_CHECK_OPTIONS,
-      optional: true,
+      isOptional: true,
     }) ?? {
       restOptions: { path: '/health' },
     };
 
-    /* this.route.openapi(
-      createRoute({
-        path: '/',
-        method: 'get',
-        responses: {
-          200: {
-            description: 'Server is alive | Status: OK',
-            content: {
-              'application/json': {
-                schema: z.object({ status: z.string() }),
-              },
-            },
-          },
-        },
-      }),
-
-      context => {
-        return context.json({ status: 'ok' }, 200);
-      },
-    ); */
-
+    Reflect.decorate([controller({ path: healthOptions.restOptions.path })], HealthCheckController);
     this.application.controller(HealthCheckController);
-
-    const applicationRoute = this.application.getServer();
-    applicationRoute.route(healthOptions.restOptions.path, this.route);
   }
 }

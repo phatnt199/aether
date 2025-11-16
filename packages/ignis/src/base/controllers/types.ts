@@ -15,6 +15,6 @@ export interface ICrudController extends IController {
 
 export interface IControllerOptions {
   scope: string;
-  basePath: string;
+  path: string;
   isStrict?: boolean;
 }

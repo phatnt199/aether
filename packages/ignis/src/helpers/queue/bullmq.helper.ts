@@ -1,4 +1,4 @@
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { Job, Queue, Worker } from 'bullmq';
 import Redis from 'ioredis';
 import { TBullQueueRole } from './types';

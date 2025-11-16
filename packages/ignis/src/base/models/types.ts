@@ -1,5 +1,5 @@
 import { IdType } from '@/common/types';
-import { BaseEntity } from './base.model';
+import { BaseEntity } from './base';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Entity Interfaces

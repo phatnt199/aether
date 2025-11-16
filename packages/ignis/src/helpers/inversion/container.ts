@@ -1,6 +1,6 @@
-import { BaseHelper } from '@/base/base.helper';
-import { type IClass } from '@/common/types';
-import { getError } from '@/helpers/error';
+import { BaseHelper } from '@/base/helpers';
+import { TConstValue, type IClass } from '@/common/types';
+import { ApplicationError, getError } from '@/helpers/error';
 import { MetadataRegistry } from './registry';
 import { BindingScopes, BindingValueTypes, TBindingScope } from './types';
 
@@ -48,6 +48,16 @@ export class Binding<T = any> extends BaseHelper {
   toProvider(value: (container: Container) => T): this {
     this.resolver = { type: BindingValueTypes.PROVIDER, value };
     return this;
+  }
+
+  getBindingMeta(opts: { type: TConstValue<typeof BindingValueTypes> }) {
+    if (this.resolver.type !== opts.type) {
+      throw ApplicationError.getError({
+        message: `[getBindingMeta] Invalid resolver type, only ${this.resolver.type} is allowd | resolverType: ${this.resolver.type} | optType: ${opts.type}`,
+      });
+    }
+
+    return this.resolver.value;
   }
 
   setScope(scope: TBindingScope): this {
@@ -175,7 +185,7 @@ export class Container extends BaseHelper {
       const sortedDeps = [...injectMetadata].sort((a, b) => a.index - b.index);
 
       for (const meta of sortedDeps) {
-        const dep = this.get({ key: meta.key, optional: meta.optional ?? false });
+        const dep = this.get({ key: meta.key, isOptional: meta.isOptional ?? false });
         args[meta.index] = dep;
       }
     }
@@ -187,7 +197,7 @@ export class Container extends BaseHelper {
     const propertyMetadata = MetadataRegistry.getPropertiesMetadata({ target: instance as object });
     if (propertyMetadata && propertyMetadata.size > 0) {
       for (const [propertyKey, metadata] of propertyMetadata.entries()) {
-        const dep = this.get({ key: metadata.bindingKey, optional: metadata.optional ?? false });
+        const dep = this.get({ key: metadata.bindingKey, isOptional: metadata.optional ?? false });
         (instance as any)[propertyKey] = dep;
       }
     }

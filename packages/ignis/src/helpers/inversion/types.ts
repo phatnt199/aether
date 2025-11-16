@@ -40,21 +40,21 @@ export interface IBindingTag {
 // export type TPropertyMetadata = IPropertyMetadata;
 
 export interface IControllerMetadata {
-  basePath?: string;
+  path: string;
   tags?: string[];
   description?: string;
 }
 
 export interface IPropertyMetadata {
   bindingKey: string | symbol;
-  optional?: boolean;
+  isOptional?: boolean;
   [key: string]: any;
 }
 
 export interface IInjectMetadata {
   key: string | symbol;
   index: number;
-  optional?: boolean;
+  isOptional?: boolean;
 }
 
 export interface IInjectableMetadata {

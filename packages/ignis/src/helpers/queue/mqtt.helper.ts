@@ -1,4 +1,4 @@
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { getError } from '@/helpers/error';
 import isEmpty from 'lodash/isEmpty';
 import mqtt from 'mqtt';

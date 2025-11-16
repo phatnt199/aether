@@ -37,7 +37,7 @@ export const injectable = (metadata: IInjectableMetadata): ClassDecorator => {
  * @param opts.key - The binding key to inject (can be string or symbol)
  * @param opts.optional - Whether the dependency is optional (defaults to false)
  */
-export const inject = (opts: { key: string | symbol; optional?: boolean }) => {
+export const inject = (opts: { key: string | symbol; isOptional?: boolean }) => {
   return (target: any, propertyName: string | symbol | undefined, parameterIndex?: number) => {
     // Constructor parameter injection
     if (typeof parameterIndex === 'number') {
@@ -47,7 +47,7 @@ export const inject = (opts: { key: string | symbol; optional?: boolean }) => {
         metadata: {
           key: opts.key,
           index: parameterIndex,
-          optional: opts.optional ?? false,
+          isOptional: opts.isOptional ?? false,
         },
       });
       return;
@@ -60,7 +60,7 @@ export const inject = (opts: { key: string | symbol; optional?: boolean }) => {
         propertyName: propertyName,
         metadata: {
           bindingKey: opts.key,
-          optional: opts.optional ?? false,
+          isOptional: opts.isOptional ?? false,
         },
       });
       return;

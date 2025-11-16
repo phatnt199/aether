@@ -1,12 +1,13 @@
 import { BaseApplication } from '@/base/applications';
 import { BaseComponent } from '@/base/components';
+import { inject } from '@/base/metadata';
 import { CoreBindings } from '@/common/bindings';
 import { HTTP } from '@/common/constants';
 import { ValueOrPromise } from '@/common/types';
+import { getError } from '@/helpers/error';
+import { Binding } from '@/helpers/inversion';
 import { DefaultRedisHelper } from '@/helpers/redis';
 import { SocketIOServerHelper } from '@/helpers/socket-io';
-import { inject } from '@/base/metadata';
-import { getError } from '@/helpers/error';
 import { ServerOptions } from 'socket.io';
 import { SocketIOBindingKeys } from './keys';
 
@@ -71,7 +72,7 @@ export class SocketIOComponent extends BaseComponent {
     const extraServerOptions =
       this.application.get<Partial<ServerOptions>>({
         key: SocketIOBindingKeys.SERVER_OPTIONS,
-        optional: true,
+        isOptional: true,
       }) ?? {};
     this.serverOptions = Object.assign({}, DEFAULT_SERVER_OPTIONS, extraServerOptions);
     this.logger.debug('[binding] Socket.IO Server Options: %j', this.serverOptions);

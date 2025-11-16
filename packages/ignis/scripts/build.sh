@@ -2,10 +2,6 @@
 
 echo "START | Building application..."
 
-# Clean previous build
-rm -rf dist
+tsc -p tsconfig.json --extendedDiagnostics && tsc-alias -p tsconfig.json
 
-# Build with tsc using fast build config (minimal type checking)
-tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json
-
-echo "DONE | Build application (use 'bun run typecheck' for full type checking)"
+echo "DONE | Build application"

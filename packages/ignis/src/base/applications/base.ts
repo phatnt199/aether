@@ -1,13 +1,15 @@
 import { BindingKeys, BindingNamespaces, CoreBindings } from '@/common/bindings';
-import { RuntimeModules } from '@/common/constants';
+import { HTTP, RuntimeModules } from '@/common/constants';
 import { AnyObject, IClass } from '@/common/types';
-import { BindingScopes } from '@/helpers/inversion';
-import { getError } from '@/helpers/error';
+import { ApplicationError, getError } from '@/helpers/error';
+import { BindingScopes, BindingValueTypes, MetadataRegistry } from '@/helpers/inversion';
+import isEmpty from 'lodash/isEmpty';
 import { BaseComponent } from '../components';
+import { BaseController } from '../controllers';
 import { IDataSource } from '../datasources';
 import { IRepository } from '../repositories';
 import { IService } from '../services';
-import { AbstractApplication } from './abstract.application';
+import { AbstractApplication } from './abstract';
 import { IApplication, IRestApplication } from './types';
 
 const {
@@ -47,7 +49,6 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
         key: ctor.name,
       }),
     }).toClass(ctor);
-    // this.registerController({ controllerClass });
     return this;
   }
 
@@ -121,66 +122,48 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
   }
 
   // ------------------------------------------------------------------------------
-  protected normalizePath(...segments: string[]): string {
+  /* protected normalizePath(...segments: string[]): string {
     const joined = segments.join('/').replace(/\/+/g, '/').replace(/\/$/, '');
     return joined || '/';
-  }
-
-  /* protected registerController<T>(opts: { controllerClass: IClass<T> }): void {
-    const { controllerClass } = opts;
-    const routes = MetadataRegistry.getRouteMetadata(controllerClass);
-    const totalRoute = routes?.length ?? 0;
-
-    if (!totalRoute) {
-      this.logger.debug(
-        '[registerController] Skip register controller | totalRoute: %s',
-        totalRoute,
-      );
-      return;
-    }
-
-    const controllerInstance = this.resolve(controllerClass);
-    for (let index = 0; index < totalRoute; index++) {
-      const route = routes[index];
-      this.registerRoute({ controllerInstance, route });
-    }
-
-    this.logger.debug('[registerController] Registered controllers | totalRoute: %s', totalRoute);
-  } */
-
-  /* protected registerRoute(opts: { controllerInstance: any; route: IRouteMetadata }): void {
-    const { controllerInstance, route } = opts;
-    const fullPath = this.normalizePath(route.path);
-    const method = route.method.toLowerCase();
-    const methodName = route.methodName;
-
-    // Create route handler
-    const handler = async (c: Context) => {
-      const rs = await controllerInstance[methodName](this, c);
-      return rs;
-    };
-
-    const server = this.getServer();
-    server.on(method, fullPath, handler);
-
-    this.logger.info(
-      '[registerRoute] Route | method: %s | path: %s | methodName: %s',
-      route.method,
-      fullPath,
-      String(methodName),
-    );
   } */
 
   async registerComponents() {
     this.logger.info('[registerComponents] START | Register Application Components...');
 
-    const components = this.findByTag<BaseComponent>({ tag: 'components' });
-    for (const component of components) {
-      const instance = component.getValue(this);
+    const bindings = this.findByTag<BaseComponent>({ tag: 'components' });
+    for (const binding of bindings) {
+      const instance = binding.getValue(this);
       await instance.configure();
     }
 
     this.logger.info('[registerComponents] DONE | Register Application Components...');
+  }
+
+  async registerControllers() {
+    this.logger.info('[registerControllers] START | Register Application Components...');
+
+    const router = this.getServer();
+
+    const bindings = this.findByTag<BaseController>({ tag: 'controllers' });
+    for (const binding of bindings) {
+      const controllerMetadata = MetadataRegistry.getControllerMetadata({
+        target: binding.getBindingMeta({ type: BindingValueTypes.CLASS }),
+      });
+
+      if (isEmpty(controllerMetadata?.path)) {
+        throw ApplicationError.getError({
+          statusCode: HTTP.ResultCodes.RS_5.InternalServerError,
+          message: `[registerControllers] key: '${binding.key}' | Invalid controller metadata, 'path' is required for controller metadata`,
+        });
+      }
+
+      const instance = binding.getValue(this);
+      await instance.configure();
+
+      router.route(controllerMetadata.path, instance.getRouter());
+    }
+
+    this.logger.info('[registerControllers] DONE | Register Application Components...');
   }
 
   // ------------------------------------------------------------------------------
@@ -218,5 +201,7 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
 
     await super.initialize();
     await this.registerComponents();
+
+    await this.registerControllers();
   }
 }

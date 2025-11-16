@@ -14,6 +14,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["src/**/*", "./*.config.*", ".prettierrc.*"],
+  "include": ["src", "./*.config.*", ".prettierrc.*"],
   "exclude": ["node_modules", "dist", "**/__tests__/**"]
 }

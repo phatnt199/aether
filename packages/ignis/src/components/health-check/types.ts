@@ -1,5 +1,3 @@
 export interface IHealthCheckOptions {
-  restOptions: {
-    path: string;
-  };
+  restOptions: { path: string };
 }

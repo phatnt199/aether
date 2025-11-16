@@ -1,4 +1,4 @@
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { AnyObject } from '@/common/types';
 import { getError } from '@/helpers/error';
 import isEmpty from 'lodash/isEmpty';

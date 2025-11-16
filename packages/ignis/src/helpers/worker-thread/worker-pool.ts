@@ -1,6 +1,6 @@
 import os from 'node:os';
 
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { getError } from '@/helpers/error';
 import { IWorker } from './types';
 

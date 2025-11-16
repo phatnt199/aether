@@ -1,4 +1,4 @@
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { ValueOrPromise } from '@/common';
 import isEmpty from 'lodash/isEmpty';
 import {

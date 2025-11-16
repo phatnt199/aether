@@ -45,7 +45,7 @@ export class SwaggerComponent extends BaseComponent {
     const swaggerOptions =
       this.application.get<ISwaggerOptions>({
         key: SwaggerBindingKeys.SWAGGER_OPTIONS,
-        optional: true,
+        isOptional: true,
       }) ?? DEFAULT_SWAGGER_OPTIONS;
 
     const applicationRoute = this.application.getServer();

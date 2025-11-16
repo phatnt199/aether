@@ -1,4 +1,4 @@
-import { BaseHelper } from '@/base/base.helper';
+import { BaseHelper } from '@/base/helpers';
 import { ValueOrPromise } from '@/common/types';
 import { getError } from '@/helpers/error';
 import { dayjs } from '@/utilities/date.utility';
@@ -7,8 +7,8 @@ import omit from 'lodash/omit';
 import {
   ListenOptions,
   ServerOpts,
-  Server as SocketServer,
   Socket as SocketClient,
+  Server as SocketServer,
 } from 'node:net';
 
 export interface ITcpSocketClient<SocketClientType> {

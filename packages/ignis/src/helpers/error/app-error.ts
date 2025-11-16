@@ -1,10 +1,10 @@
-import { IError } from './types';
+import { TError } from './types';
 
 export class ApplicationError extends Error {
   statusCode: number;
   messageCode?: string;
 
-  constructor(opts: IError) {
+  constructor(opts: TError) {
     const { message, messageCode, statusCode = 400 } = opts;
     super(message);
 
@@ -12,11 +12,11 @@ export class ApplicationError extends Error {
     this.messageCode = messageCode;
   }
 
-  static getError(opts: IError) {
+  static getError(opts: TError) {
     return new ApplicationError(opts);
   }
 }
 
-export const getError = (opts: IError) => {
+export const getError = (opts: TError) => {
   return new ApplicationError(opts);
 };
