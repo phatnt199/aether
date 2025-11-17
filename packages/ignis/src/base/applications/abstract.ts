@@ -9,7 +9,12 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { showRoutes as showApplicationRoutes } from 'hono/dev';
 import isEmpty from 'lodash/isEmpty';
 import path from 'node:path';
-import { IApplication, IApplicationConfig, TBunServerInstance, TNodeServerInstance } from './types';
+import {
+  IApplication,
+  IApplicationConfigs,
+  TBunServerInstance,
+  TNodeServerInstance,
+} from './types';
 
 // ------------------------------------------------------------------------------
 export abstract class AbstractApplication extends Container implements IApplication {
@@ -26,11 +31,11 @@ export abstract class AbstractApplication extends Container implements IApplicat
       };
 
   protected rootRouter: OpenAPIHono;
-  protected configs: IApplicationConfig;
+  protected configs: IApplicationConfigs;
   protected projectRoot: string;
 
   // ------------------------------------------------------------------------------
-  constructor(opts: { scope: string; config: IApplicationConfig }) {
+  constructor(opts: { scope: string; config: IApplicationConfigs }) {
     const { scope, config } = opts;
     super({ scope });
 
@@ -64,7 +69,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
   abstract getApplicationVersion(): ValueOrPromise<string>;
 
   // ------------------------------------------------------------------------------
-  getProjectConfigs(): IApplicationConfig {
+  getProjectConfigs(): IApplicationConfigs {
     return this.configs;
   }
 

@@ -10,7 +10,7 @@ import { IDataSource } from '../datasources';
 import { IRepository } from '../repositories';
 import { IService } from '../services';
 import { AbstractApplication } from './abstract';
-import { IApplication, IMiddlewareOptions, IRestApplication } from './types';
+import { IApplication, IBaseMiddlewareOptions, IRestApplication } from './types';
 
 const {
   NODE_ENV,
@@ -167,24 +167,33 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
   }
 
   // ------------------------------------------------------------------------------
-  override async setupMiddlewares(_opts?: {
-    middlewares?: Record<string | symbol, any>;
-  }): Promise<void> {
+  override async setupMiddlewares(): Promise<void> {
     const server = this.getServer();
 
-    const {
-      compress = { enable: false },
-      cors = { enable: false },
-      csrf = { enable: false },
-      requestId = { enable: false },
-    } = this.configs.middlewares;
+    const { middlewares = {} } = this.configs;
+    const { compress, cors, csrf, requestId } = middlewares;
 
     const mwConfs: Array<
-      IMiddlewareOptions & { name: string; module: { package: string; variable: string } }
+      IBaseMiddlewareOptions & {
+        name: string;
+        module: { package: string; variable: string };
+      }
     > = [
-      { ...compress, name: 'Compress', module: { package: 'hono/compress', variable: 'compress' } },
-      { ...cors, name: 'CORS', module: { package: 'hono/cors', variable: 'cors' } },
-      { ...csrf, name: 'CSRF', module: { package: 'hono/csrf', variable: 'csrf' } },
+      {
+        ...compress,
+        name: 'Compress',
+        module: { package: 'hono/compress', variable: 'compress' },
+      },
+      {
+        ...cors,
+        name: 'CORS',
+        module: { package: 'hono/cors', variable: 'cors' },
+      },
+      {
+        ...csrf,
+        name: 'CSRF',
+        module: { package: 'hono/csrf', variable: 'csrf' },
+      },
       {
         ...requestId,
         name: 'RequestId',
@@ -193,7 +202,8 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
     ];
 
     for (const mwConf of mwConfs) {
-      if (!mwConf.enable) {
+      const isMWEnable = mwConf?.enable ?? false;
+      if (!isMWEnable) {
         this.logger.debug(
           '[setupMiddlewares] SKIP setting up middleware | enable: %s | name: %s',
           mwConf.enable,
@@ -202,13 +212,13 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
         continue;
       }
 
-      const { enable, name, module, ...options } = mwConf;
+      const { enable, path: mwPath, name, module, ...options } = mwConf;
       const mw = await import(module.package);
-      server.use(mwConf.path ?? '*', mw[module.variable](options));
+      server.use(mwPath ?? '*', mw[module.variable](options));
     }
   }
 
-  override async initialize() {
+  protected printStartUpInfo() {
     this.logger.info(
       '[initialize] ------------------------------------------------------------------------',
     );
@@ -234,7 +244,10 @@ export abstract class BaseApplication extends AbstractApplication implements IRe
     this.logger.info(
       '[initialize] ------------------------------------------------------------------------',
     );
+  }
 
+  override async initialize() {
+    this.printStartUpInfo();
     await super.initialize();
 
     await this.registerComponents();

@@ -8,22 +8,33 @@ import { IRepository } from '../repositories';
 import { IService } from '../services';
 
 // ------------------------------------------------------------------------------
-export interface IMiddlewareOptions {
+// Common Middleware Options
+// ------------------------------------------------------------------------------
+export interface IBaseMiddlewareOptions {
   enable: boolean;
   path?: string;
 }
 
 // ------------------------------------------------------------------------------
+// Compress Middleware Options
+// ------------------------------------------------------------------------------
+export interface ICompressOptions extends IBaseMiddlewareOptions {
+  encoding: 'gzip' | 'deflate';
+  threshold?: number;
+}
+
+// ------------------------------------------------------------------------------
 // CORS Middleware Options
 // ------------------------------------------------------------------------------
-export interface ICORSOptions extends IMiddlewareOptions {
-  origin:
-    | string
-    | string[]
-    | ((
-        origin: string,
-        c: Context,
-      ) => Promise<string | undefined | null> | string | undefined | null);
+export type TOrigin =
+  | string
+  | string[]
+  | ((
+      origin: string,
+      c: Context,
+    ) => Promise<string | undefined | null> | string | undefined | null);
+export interface ICORSOptions extends IBaseMiddlewareOptions {
+  origin: TOrigin;
   allowMethods?: string[] | ((origin: string, c: Context) => Promise<string[]> | string[]);
   allowHeaders?: string[];
   maxAge?: number;
@@ -42,7 +53,7 @@ export type TIsAllowedSecFetchSiteHandler = (
   context: Context,
 ) => boolean;
 
-export interface ICSRFOptions extends IMiddlewareOptions {
+export interface ICSRFOptions extends IBaseMiddlewareOptions {
   origin?: string | string[] | TIsAllowedOriginHandler;
   secFetchSite?: TSecFetchSite | TSecFetchSite[] | TIsAllowedSecFetchSiteHandler;
 }
@@ -50,23 +61,15 @@ export interface ICSRFOptions extends IMiddlewareOptions {
 // ------------------------------------------------------------------------------
 // Body Limit Middleware Options
 // ------------------------------------------------------------------------------
-export interface IBodyLimitOptions extends IMiddlewareOptions {
+export interface IBodyLimitOptions extends IBaseMiddlewareOptions {
   maxSize: number;
   onError?: (c: Context) => Response | Promise<Response>;
 }
 
 // ------------------------------------------------------------------------------
-// Compress Middleware Options
-// ------------------------------------------------------------------------------
-export interface ICompressOptions extends IMiddlewareOptions {
-  encoding: 'gzip' | 'deflate';
-  threshold?: number;
-}
-
-// ------------------------------------------------------------------------------
 // RequestId Middleware Options
 // ------------------------------------------------------------------------------
-export interface IRequestIdOptions extends IMiddlewareOptions {}
+export interface IRequestIdOptions extends IBaseMiddlewareOptions {}
 
 // ------------------------------------------------------------------------------
 // Application
@@ -75,26 +78,27 @@ export type TBunServerInstance = ReturnType<typeof Bun.serve>;
 export type TNodeServerInstance = any; // Will be set at runtime from @hono/node-server
 
 // ------------------------------------------------------------------------------
-export interface IApplicationConfig {
+export interface IMiddlewareConfigs {
+  compress?: ICompressOptions;
+  cors?: ICORSOptions;
+  csrf?: ICSRFOptions;
+  bodyLimit?: IBodyLimitOptions;
+  requestId?: IRequestIdOptions;
+  ipRestriction?: IBaseMiddlewareOptions & IIPRestrictionRules;
+  [extra: string | symbol]: IBaseMiddlewareOptions;
+}
+
+export interface IApplicationConfigs {
   host?: string;
   port?: number;
-
   path: { base: string; isStrict: boolean };
 
-  middlewares: {
-    compress?: ICompressOptions;
-    cors?: ICORSOptions;
-    csrf?: ICSRFOptions;
-    bodyLimit?: IBodyLimitOptions;
-    requestId?: IRequestIdOptions;
-    ipRestriction?: IMiddlewareOptions & IIPRestrictionRules;
-  };
+  middlewares: IMiddlewareConfigs;
 
   autoLoad?: {
-    dirs: Record<
-      string, // folder name | namespace
-      string // folder path from basePath
-    >;
+    dirs: {
+      [key: string | symbol]: { path: string };
+    };
   };
 
   debug?: {
@@ -108,12 +112,12 @@ export interface IApplicationConfig {
 export interface IApplication {
   initialize(): ValueOrPromise<void>;
 
-  staticConfigure(): void;
-  setupMiddlewares(opts?: { middlewares?: Record<string | symbol, any> }): ValueOrPromise<void>;
+  staticConfigure(): ValueOrPromise<void>;
+  setupMiddlewares(): ValueOrPromise<void>;
   preConfigure(): ValueOrPromise<void>;
   postConfigure(): ValueOrPromise<void>;
 
-  getProjectConfigs(): IApplicationConfig;
+  getProjectConfigs(): IApplicationConfigs;
   getProjectRoot(): string;
   getRootRouter(): OpenAPIHono;
   getServerHost(): string;
