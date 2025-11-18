@@ -174,8 +174,8 @@ export abstract class TzCrudRepository<
       authorId?: IdType;
       useIgnoreModified?: boolean;
     },
-  ): Promise<Count> {
-    return new Promise<Count>((resolve, reject) => {
+  ): Promise<{ count: number; data: DataObject<E>[] }> {
+    return new Promise<{ count: number; data: DataObject<E>[] }>((resolve, reject) => {
       const {
         databaseSchema,
         connectorType = 'postgresql',
@@ -211,7 +211,7 @@ export abstract class TzCrudRepository<
       }
 
       const now = new Date();
-      this.find({ fields: { id: true }, where }, options)
+      this.find({ where }, options)
         .then(rs => {
           const sqlBuilder = QueryBuilderHelper.getPostgresQueryBuilder()
             .withSchema(databaseSchema ?? schema ?? 'public')
@@ -232,7 +232,7 @@ export abstract class TzCrudRepository<
 
           this.execute(sqlBuilder.toQuery(), null, options)
             .then(res => {
-              resolve({ count: res.count });
+              resolve({ count: res.count, data: rs });
             })
             .catch(reject);
         })
@@ -249,8 +249,8 @@ export abstract class TzCrudRepository<
       authorId?: IdType;
       ignoreModified?: boolean;
     },
-  ): Promise<Count> {
-    return new Promise<Count>((resolve, reject) => {
+  ): Promise<{ count: number; data: DataObject<E>[] }> {
+    return new Promise<{ count: number; data: DataObject<E>[] }>((resolve, reject) => {
       this._softDelete(where, options)
         .then(rs => {
           resolve(rs);
