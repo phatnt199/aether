@@ -107,7 +107,6 @@ export class AuthenticateComponent extends BaseComponent {
           type: 'authorization_code',
           authServiceKey: handler.authServiceKey,
           injectionGetter: <T>(key: string | BindingKey<T>) => this.application.getSync<T>(key),
-          userFetcher: oauth2Options.restOptions?.userFetcher,
         },
         serverOptions: {
           allowEmptyState: true,

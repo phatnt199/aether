@@ -1,4 +1,4 @@
-import { AnyObject, IdType, ITzRepository, OAuth2TokenStatuses, TInjectionGetter } from '@/common';
+import { AnyObject, ITzRepository, OAuth2TokenStatuses, TInjectionGetter } from '@/common';
 import { ApplicationLogger, LoggerFactory } from '@/helpers';
 import { getError, int } from '@/utilities';
 import { securityId } from '@loopback/security';
@@ -17,7 +17,14 @@ import { JWTTokenService } from '../services';
 
 import { TBaseTzEntity } from '@/base/models';
 import get from 'lodash/get';
-import { Authentication, AuthenticationTokenTypes, IAuthService, IOAuth2User } from '../common';
+import {
+  AuthenticateKeys,
+  Authentication,
+  AuthenticationTokenTypes,
+  IAuthenticateOAuth2Options,
+  IAuthService,
+  IOAuth2User,
+} from '../common';
 
 export interface IOAuth2AuthenticationHandler extends BaseModel, RequestAuthenticationModel {}
 
@@ -25,20 +32,13 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
   protected authServiceKey: string;
   protected logger: ApplicationLogger;
   protected injectionGetter: TInjectionGetter;
-  protected userFetcher?: (userId: IdType) => Promise<IOAuth2User | null>;
 
-  constructor(opts: {
-    scope?: string;
-    authServiceKey: string;
-    injectionGetter: TInjectionGetter;
-    userFetcher?: (userId: IdType) => Promise<IOAuth2User | null>;
-  }) {
+  constructor(opts: { scope?: string; authServiceKey: string; injectionGetter: TInjectionGetter }) {
     this.logger = LoggerFactory.getLogger([
       opts?.scope ?? AbstractOAuth2AuthenticationHandler.name,
     ]);
     this.injectionGetter = opts.injectionGetter;
     this.authServiceKey = opts.authServiceKey;
-    this.userFetcher = opts.userFetcher;
   }
 
   getClient(clientId: string, clientSecret: string): Promise<Client | Falsey> {
@@ -185,9 +185,13 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     }
 
     let user: IOAuth2User;
-    if (this.userFetcher) {
+    const oauth2Options = this.injectionGetter<IAuthenticateOAuth2Options>(
+      AuthenticateKeys.OAUTH2_OPTIONS,
+    );
+    const userFetcher = oauth2Options?.restOptions?.userFetcher;
+    if (userFetcher) {
       // Use custom user fetcher if provided
-      user = await this.userFetcher(oauth2Token.userId);
+      user = await userFetcher(oauth2Token.userId);
     } else {
       // Default behavior: fetch from repository
       const userRepository = this.injectionGetter<ITzRepository<TBaseTzEntity>>(

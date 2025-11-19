@@ -1,7 +1,7 @@
-import { IdType, TInjectionGetter } from '@/common';
+import { TInjectionGetter } from '@/common';
 import { getError } from '@/utilities';
 import { Client, ClientCredentialsModel, Falsey, User } from '@node-oauth/oauth2-server';
-import { IAuthService, IOAuth2User } from '../common';
+import { IAuthService } from '../common';
 import { AbstractOAuth2AuthenticationHandler } from './base';
 
 export class OAuth2ClientCredentialHandler
@@ -13,13 +13,11 @@ export class OAuth2ClientCredentialHandler
     authServiceKey: string;
     injectionGetter: TInjectionGetter;
     serviceKey: string;
-    userFetcher?: (userId: IdType) => Promise<IOAuth2User | null>;
   }) {
     super({
       scope: opts.scope,
       authServiceKey: opts.authServiceKey,
       injectionGetter: opts.injectionGetter,
-      userFetcher: opts.userFetcher,
     });
   }
 
