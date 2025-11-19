@@ -16,6 +16,12 @@ export interface ITokenPayload extends IJWTTokenPayload {}
 export type TGetTokenExpiresFn = () => ValueOrPromise<number>;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
+export interface IOAuth2User {
+  id: IdType;
+  [key: string]: any;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
 export interface IAuthenticateTokenOptions {
   tokenSecret: string;
   tokenExpiresIn: number;
@@ -44,6 +50,7 @@ export interface IAuthenticateOAuth2RestOptions {
   authorizePath?: string;
   oauth2ServiceKey?: string;
   useImplicitGrant?: boolean;
+  userFetcher?: (userId: IdType) => Promise<IOAuth2User | null>;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------

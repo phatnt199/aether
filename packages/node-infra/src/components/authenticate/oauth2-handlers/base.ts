@@ -17,7 +17,14 @@ import { JWTTokenService } from '../services';
 
 import { TBaseTzEntity } from '@/base/models';
 import get from 'lodash/get';
-import { Authentication, AuthenticationTokenTypes, IAuthService } from '../common';
+import {
+  AuthenticateKeys,
+  Authentication,
+  AuthenticationTokenTypes,
+  IAuthenticateOAuth2Options,
+  IAuthService,
+  IOAuth2User,
+} from '../common';
 
 export interface IOAuth2AuthenticationHandler extends BaseModel, RequestAuthenticationModel {}
 
@@ -177,13 +184,24 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       });
     }
 
-    const userRepository = this.injectionGetter<ITzRepository<TBaseTzEntity>>(
-      'repositories.UserRepository',
+    let user: IOAuth2User;
+    const oauth2Options = this.injectionGetter<IAuthenticateOAuth2Options>(
+      AuthenticateKeys.OAUTH2_OPTIONS,
     );
-    const user = await userRepository.findOne({
-      where: { id: int(oauth2Token.userId) },
-      fields: ['id'],
-    });
+    const userFetcher = oauth2Options?.restOptions?.userFetcher;
+    if (userFetcher) {
+      // Use custom user fetcher if provided
+      user = await userFetcher(oauth2Token.userId);
+    } else {
+      // Default behavior: fetch from repository
+      const userRepository = this.injectionGetter<ITzRepository<TBaseTzEntity>>(
+        'repositories.UserRepository',
+      );
+      user = await userRepository.findOne({
+        where: { id: int(oauth2Token.userId) },
+        fields: ['id'],
+      });
+    }
     if (!user) {
       this.logger.error(
         '[_getToken] Not found User | type: %s | token: %s | oauth2Token: %j',
