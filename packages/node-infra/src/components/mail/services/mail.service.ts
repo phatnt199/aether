@@ -1,0 +1,192 @@
+import { BaseService } from '@/base/services';
+import { getError } from '@/utilities';
+import { BindingScope, inject, injectable } from '@loopback/core';
+import {
+  IMailMessage,
+  IMailSendResult,
+  IMailService,
+  IMailTemplateEngine,
+  IMailTransport,
+  MailDefaults,
+  MailErrorCodes,
+  MailKeys,
+  TMailOptions,
+} from '../common';
+import { TGetMailTransportFn } from '../providers';
+
+@injectable({ scope: BindingScope.SINGLETON })
+export class MailService extends BaseService implements IMailService {
+  private transport: IMailTransport;
+
+  constructor(
+    @inject(MailKeys.MAIL_OPTIONS)
+    protected options: TMailOptions,
+    @inject(MailKeys.MAIL_TRANSPORT_PROVIDER)
+    protected transportGetter: TGetMailTransportFn,
+    @inject(MailKeys.MAIL_TEMPLATE_ENGINE, { optional: true })
+    protected templateEngine?: IMailTemplateEngine,
+  ) {
+    super({ scope: MailService.name });
+    this.logger.info(
+      '[constructor] Mail service initialized with provider: %s',
+      this.options.provider,
+    );
+
+    this.transport = this.transportGetter();
+  }
+
+  async send(message: IMailMessage): Promise<IMailSendResult> {
+    try {
+      this.validateMessage(message);
+
+      const emailMessage: IMailMessage = {
+        ...message,
+        from: message.from ?? this.getDefaultFrom(),
+      };
+
+      this.logger.debug('[send] Sending email to: %s', emailMessage.to);
+      const result = await this.transport.send(emailMessage);
+
+      if (result.success) {
+        this.logger.debug('[send] Email sent successfully. MessageId: %s', result.messageId);
+      } else {
+        this.logger.debug('[send] Email send failed: %s', result.error);
+      }
+
+      return result;
+    } catch (error) {
+      this.logger.error('[send] Error sending email: %s', error);
+      throw getError({
+        statusCode: 500,
+        messageCode: MailErrorCodes.SEND_FAILED,
+        message: `Failed to send email: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+    }
+  }
+
+  async sendBatch(
+    messages: IMailMessage[],
+    options?: { concurrency?: number },
+  ): Promise<IMailSendResult[]> {
+    try {
+      this.logger.debug('[sendBatch] Sending batch of %d emails', messages.length);
+
+      const results: IMailSendResult[] = [];
+      const concurrency = options?.concurrency ?? MailDefaults.BATCH_CONCURRENCY;
+
+      for (let i = 0; i < messages.length; i += concurrency) {
+        const batch = messages.slice(i, i + concurrency);
+        const batchResults = await Promise.allSettled(batch.map(message => this.send(message)));
+
+        for (const result of batchResults) {
+          if (result.status === 'fulfilled') {
+            results.push(result.value);
+          } else {
+            results.push({
+              success: false,
+              error: result.reason instanceof Error ? result.reason.message : 'Unknown error',
+            });
+          }
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+      this.logger.debug(
+        '[sendBatch] Batch send completed. Success: %d, Failed: %d',
+        successCount,
+        results.length - successCount,
+      );
+
+      return results;
+    } catch (error) {
+      this.logger.error('[sendBatch] Error sending batch emails: %s', error);
+      throw getError({
+        statusCode: 500,
+        messageCode: MailErrorCodes.BATCH_SEND_FAILED,
+        message: `Failed to send batch emails: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+    }
+  }
+
+  async sendTemplate(
+    templateName: string,
+    data: Record<string, any>,
+    recipients: string | string[],
+    options?: Partial<IMailMessage>,
+  ): Promise<IMailSendResult> {
+    try {
+      if (!this.templateEngine) {
+        throw getError({
+          statusCode: 500,
+          messageCode: MailErrorCodes.INVALID_CONFIGURATION,
+          message: 'Template engine not configured',
+        });
+      }
+
+      this.logger.debug('[sendTemplate] Rendering template: %s', templateName);
+      const html = await this.templateEngine.render(templateName, data);
+
+      const message: IMailMessage = {
+        to: recipients,
+        subject: options?.subject ?? 'No Subject',
+        html,
+        ...options,
+      };
+
+      return await this.send(message);
+    } catch (error) {
+      this.logger.error('[sendTemplate] Error sending template email: %s', error);
+      throw error;
+    }
+  }
+
+  async verify(): Promise<boolean> {
+    try {
+      this.logger.debug('[verify] Verifying mail transport connection');
+      const isValid = await this.transport.verify();
+      this.logger.debug('[verify] Verification result: %s', isValid);
+      return isValid;
+    } catch (error) {
+      this.logger.error('[verify] Verification failed: %s', error);
+      throw getError({
+        statusCode: 500,
+        messageCode: MailErrorCodes.VERIFICATION_FAILED,
+        message: `Mail transport verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      });
+    }
+  }
+
+  protected validateMessage(message: IMailMessage): void {
+    if (!message.to || (Array.isArray(message.to) && message.to.length === 0)) {
+      throw getError({
+        statusCode: 400,
+        messageCode: MailErrorCodes.INVALID_RECIPIENT,
+        message: 'Recipient email address is required',
+      });
+    }
+
+    if (!message.subject) {
+      throw getError({
+        statusCode: 400,
+        messageCode: MailErrorCodes.INVALID_CONFIGURATION,
+        message: 'Email subject is required',
+      });
+    }
+
+    if (!message.text && !message.html) {
+      throw getError({
+        statusCode: 400,
+        messageCode: MailErrorCodes.INVALID_CONFIGURATION,
+        message: 'Email must have either text or html content',
+      });
+    }
+  }
+
+  protected getDefaultFrom(): string {
+    if (this.options.fromName) {
+      return `"${this.options.fromName}" <${this.options.from}>`;
+    }
+
+    return this.options.from ?? 'noreply@example.com';
+  }
+}
