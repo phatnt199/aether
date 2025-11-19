@@ -184,7 +184,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       });
     }
 
-    let user: any;
+    let user: IOAuth2User;
     if (this.userFetcher) {
       // Use custom user fetcher if provided
       user = await this.userFetcher(oauth2Token.userId);
