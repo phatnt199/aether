@@ -4,7 +4,7 @@ import { getError } from '@/utilities';
 import { BindingScope, Component, CoreBindings, inject } from '@loopback/core';
 import { MailKeys } from './common';
 import { MailTransportProvider } from './providers';
-import { MailService } from './services';
+import { MailService, TemplateEngineService } from './services';
 
 export class MailComponent extends BaseComponent implements Component {
   constructor(
@@ -37,6 +37,11 @@ export class MailComponent extends BaseComponent implements Component {
     this.application
       .bind(MailKeys.MAIL_SERVICE)
       .toClass(MailService)
+      .inScope(BindingScope.SINGLETON);
+
+    this.application
+      .bind(MailKeys.MAIL_TEMPLATE_ENGINE)
+      .toClass(TemplateEngineService)
       .inScope(BindingScope.SINGLETON);
 
     this.logger.info('[binding] Mail component initialized successfully');

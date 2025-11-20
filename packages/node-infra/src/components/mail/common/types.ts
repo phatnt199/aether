@@ -83,19 +83,28 @@ export interface IMailTransport {
 
 export interface IMailService {
   send(message: IMailMessage): Promise<IMailSendResult>;
-  sendBatch(messages: IMailMessage[]): Promise<IMailSendResult[]>;
-  sendTemplate(
-    templateName: string,
-    data: Record<string, any>,
-    recipients: string | string[],
-    options?: Partial<IMailMessage>,
-  ): Promise<IMailSendResult>;
+  sendBatch(
+    messages: IMailMessage[],
+    options?: {
+      concurrency?: number;
+    },
+  ): Promise<IMailSendResult[]>;
+  sendTemplate(opts: {
+    templateName: string;
+    data: Record<string, any>;
+    recipients: string | string[];
+    options?: Partial<IMailMessage>;
+  }): Promise<IMailSendResult>;
   verify(): Promise<boolean>;
 }
 
 export interface IMailTemplateEngine {
-  render(templateName: string, data: Record<string, any>): ValueOrPromise<string>;
-  registerTemplate(name: string, content: string): void;
+  render(opts: { templateName: string; data: Record<string, any> }): ValueOrPromise<string>;
+  registerTemplate(opts: { name: string; content: string }): void;
+  getTemplate(name: string): any | undefined;
+  listTemplates(): any[];
+  hasTemplate(name: string): boolean;
+  removeTemplate(name: string): boolean;
 }
 
 export function isMailTransport(value: AnyType): value is IMailTransport {

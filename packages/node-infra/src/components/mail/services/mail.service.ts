@@ -1,5 +1,5 @@
 import { BaseService } from '@/base/services';
-import { getError } from '@/utilities';
+import { executePromiseWithLimit, getError } from '@/utilities';
 import { BindingScope, inject, injectable } from '@loopback/core';
 import {
   IMailMessage,
@@ -13,6 +13,7 @@ import {
   TMailOptions,
 } from '../common';
 import { TGetMailTransportFn } from '../providers';
+import { AnyType } from '@/common';
 
 @injectable({ scope: BindingScope.SINGLETON })
 export class MailService extends BaseService implements IMailService {
@@ -69,29 +70,31 @@ export class MailService extends BaseService implements IMailService {
     options?: { concurrency?: number },
   ): Promise<IMailSendResult[]> {
     try {
-      this.logger.debug('[sendBatch] Sending batch of %d emails', messages.length);
-
-      const results: IMailSendResult[] = [];
       const concurrency = options?.concurrency ?? MailDefaults.BATCH_CONCURRENCY;
+      this.logger.info(
+        '[sendBatch] Sending batch of %d emails with concurrency: %d',
+        messages.length,
+        concurrency,
+      );
 
-      for (let i = 0; i < messages.length; i += concurrency) {
-        const batch = messages.slice(i, i + concurrency);
-        const batchResults = await Promise.allSettled(batch.map(message => this.send(message)));
-
-        for (const result of batchResults) {
-          if (result.status === 'fulfilled') {
-            results.push(result.value);
-          } else {
-            results.push({
-              success: false,
-              error: result.reason instanceof Error ? result.reason.message : 'Unknown error',
-            });
-          }
+      const tasks = messages.map(message => async () => {
+        try {
+          return await this.send(message);
+        } catch (error) {
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          };
         }
-      }
+      });
+
+      const results = await executePromiseWithLimit<IMailSendResult>({
+        tasks,
+        limit: concurrency,
+      });
 
       const successCount = results.filter(r => r.success).length;
-      this.logger.debug(
+      this.logger.info(
         '[sendBatch] Batch send completed. Success: %d, Failed: %d',
         successCount,
         results.length - successCount,
@@ -108,12 +111,14 @@ export class MailService extends BaseService implements IMailService {
     }
   }
 
-  async sendTemplate(
-    templateName: string,
-    data: Record<string, any>,
-    recipients: string | string[],
-    options?: Partial<IMailMessage>,
-  ): Promise<IMailSendResult> {
+  async sendTemplate(opts: {
+    templateName: string;
+    data: Record<string, AnyType>;
+    recipients: string | string[];
+    options?: Partial<IMailMessage>;
+  }): Promise<IMailSendResult> {
+    const { templateName, data, recipients, options } = opts;
+
     try {
       if (!this.templateEngine) {
         throw getError({
@@ -124,7 +129,7 @@ export class MailService extends BaseService implements IMailService {
       }
 
       this.logger.debug('[sendTemplate] Rendering template: %s', templateName);
-      const html = await this.templateEngine.render(templateName, data);
+      const html = await this.templateEngine.render({ templateName, data });
 
       const message: IMailMessage = {
         to: recipients,
