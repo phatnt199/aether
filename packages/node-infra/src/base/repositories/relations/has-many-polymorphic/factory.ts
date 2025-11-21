@@ -16,7 +16,7 @@ import {
 } from '@loopback/repository';
 import get from 'lodash/get';
 import { WhereBuilder } from '../../base.repository';
-import { IHasManyPolymorphicDefinition, TPolymorphic } from './types';
+import { IHasManyPolymorphicDefinition, THasManyPolymorphic } from './types';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 const getPolymorphicFields = (opts: {
@@ -57,11 +57,11 @@ export class DefaultHasManyPolymorphicRepository<
   Target extends BaseEntity,
   TargetId extends IdType,
   TargetRepository extends EntityCrudRepository<Target, TargetId>,
-  SourceId,
+  SourceId extends IdType,
 > extends DefaultHasManyRepository<Target, TargetId, TargetRepository> {
   constructor(opts: {
     targetRepositoryGetter: Getter<TargetRepository>;
-    polymorphic: TPolymorphic & { typeValue: string; idValue: SourceId };
+    polymorphic: THasManyPolymorphic & { typeValue: string; idValue: SourceId };
   }) {
     const { targetRepositoryGetter, polymorphic } = opts;
     const { typeField, idField } = getPolymorphicFields(polymorphic);
