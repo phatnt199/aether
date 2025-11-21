@@ -10,7 +10,10 @@ import { IHasManyThroughPolymorphicDefinition } from './types';
  * @experimental
  */
 export function hasManyThroughPolymorphic(
-  definition: ValueOptionalExcept<IHasManyThroughPolymorphicDefinition, 'target' | 'through' | 'polymorphic'>,
+  definition: ValueOptionalExcept<
+    IHasManyThroughPolymorphicDefinition,
+    'target' | 'through' | 'polymorphic'
+  >,
 ) {
   return (decoratedTarget: Entity, key: string) => {
     const meta: IHasManyThroughPolymorphicDefinition = {
