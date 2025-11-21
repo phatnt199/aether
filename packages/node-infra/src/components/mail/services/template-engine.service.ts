@@ -1,27 +1,8 @@
 import { BaseService } from '@/base/services';
-import { AnyType, TConstValue } from '@/common';
+import { AnyType } from '@/common';
 import { getError } from '@/utilities';
 import { BindingScope, injectable } from '@loopback/core';
-import {
-  DefaultTemplateNames,
-  IMailTemplateEngine,
-  MailErrorCodes,
-  TemplateTypes,
-} from '../common';
-import {
-  WELCOME_TEMPLATE,
-  PASSWORD_RESET_TEMPLATE,
-  VERIFY_EMAIL_TEMPLATE,
-} from '../common/templates';
-
-export interface ITemplate {
-  name: string;
-  type: TConstValue<typeof TemplateTypes>;
-  content?: string;
-  render?: (data: Record<string, AnyType>) => string;
-  subject?: string;
-  description?: string;
-}
+import { IMailTemplateEngine, ITemplate, MailErrorCodes } from '../common';
 
 @injectable({ scope: BindingScope.SINGLETON })
 export class TemplateEngineService extends BaseService implements IMailTemplateEngine {
@@ -30,20 +11,14 @@ export class TemplateEngineService extends BaseService implements IMailTemplateE
   constructor() {
     super({ scope: TemplateEngineService.name });
     this.logger.info('[constructor] Template engine initialized');
-    this.registerBuiltInTemplates();
   }
 
   registerTemplate(opts: { name: string; content: string; options?: Partial<ITemplate> }): void {
     const { name, content, options } = opts;
     this.logger.info('[registerTemplate] Registering template: %s', name);
 
-    if (options?.type && !TemplateTypes.isValid(options.type)) {
-      throw getError({ message: `Invalid template type: ${options.type}` });
-    }
-
     const template: ITemplate = {
       name,
-      type: options?.type ?? TemplateTypes.SIMPLE,
       content,
       subject: options?.subject,
       description: options?.description,
@@ -52,63 +27,37 @@ export class TemplateEngineService extends BaseService implements IMailTemplateE
     this.templates.set(name, template);
   }
 
-  registerFunctionTemplate(
-    name: string,
-    renderFn: (data: Record<string, AnyType>) => string,
-    options?: { subject?: string; description?: string },
-  ): void {
-    this.logger.info('[registerFunctionTemplate] Registering function template: %s', name);
+  render(opts: {
+    templateData?: string;
+    templateName?: string;
+    data: Record<string, AnyType>;
+    requireValidate?: boolean;
+  }): string {
+    const { templateData, templateName, data, requireValidate } = opts;
 
-    const template: ITemplate = {
-      name,
-      type: TemplateTypes.FUNCTION,
-      render: renderFn,
-      subject: options?.subject,
-      description: options?.description,
-    };
-
-    this.templates.set(name, template);
-  }
-
-  render(opts: { templateName: string; data: Record<string, AnyType> }): string {
-    const { templateName, data } = opts;
-    const template = this.templates.get(templateName);
-
-    if (!template) {
-      throw getError({
-        statusCode: 404,
-        messageCode: MailErrorCodes.TEMPLATE_NOT_FOUND,
-        message: `Template not found: ${templateName}`,
-      });
+    if (!templateData && !templateName) {
+      throw getError({ message: 'Either templateName or templateData must be provided' });
     }
 
-    this.logger.debug('[render] Rendering template: %s', templateName);
+    let content = templateData;
 
-    switch (template.type) {
-      case TemplateTypes.FUNCTION: {
-        if (!template.render) {
-          throw getError({
-            statusCode: 500,
-            messageCode: MailErrorCodes.INVALID_CONFIGURATION,
-            message: `Function template ${templateName} has no render function`,
-          });
-        }
-        return template.render(data);
-      }
+    if (!content && templateName) {
+      const template = this.templates.get(templateName);
 
-      case TemplateTypes.SIMPLE:
-      case TemplateTypes.HTML: {
-        return this.renderSimpleTemplate(template.content, data);
-      }
-
-      default: {
+      if (!template) {
         throw getError({
-          statusCode: 500,
-          messageCode: MailErrorCodes.INVALID_CONFIGURATION,
-          message: `Unsupported template type: ${template.type}`,
+          statusCode: 404,
+          messageCode: MailErrorCodes.TEMPLATE_NOT_FOUND,
+          message: `Template not found: ${templateName}`,
         });
       }
+
+      this.logger.debug('[render] Rendering template: %s', templateName);
+
+      content = template.content;
     }
+
+    return this.renderSimpleTemplate(content, data, { requireValidate });
   }
 
   getTemplate(name: string): ITemplate | undefined {
@@ -133,7 +82,56 @@ export class TemplateEngineService extends BaseService implements IMailTemplateE
     this.templates.clear();
   }
 
-  private renderSimpleTemplate(template: string, data: Record<string, AnyType>): string {
+  validateTemplateData(opts: { template: string; data: Record<string, AnyType> }): {
+    isValid: boolean;
+    missingKeys: string[];
+    allKeys: string[];
+  } {
+    const { template, data } = opts;
+    const placeholderRegex = /\{\{(\s*[\w.]+\s*)\}\}/g;
+    const allKeys: string[] = [];
+    const missingKeys: string[] = [];
+
+    let match: RegExpExecArray | null;
+    while ((match = placeholderRegex.exec(template)) !== null) {
+      const key = match[1].trim();
+      if (!allKeys.includes(key)) {
+        allKeys.push(key);
+        const value = this.getNestedValue(data, key);
+        if (value === undefined || value === null) {
+          missingKeys.push(key);
+        }
+      }
+    }
+
+    const isValid = missingKeys.length === 0;
+
+    if (!isValid) {
+      this.logger.warn(
+        '[validateTemplateData] Template validation failed | Missing keys: %s',
+        missingKeys.join(', '),
+      );
+    }
+
+    return { isValid, missingKeys, allKeys };
+  }
+
+  renderSimpleTemplate(
+    template: string,
+    data: Record<string, AnyType>,
+    opts?: { requireValidate?: boolean },
+  ): string {
+    if (opts?.requireValidate) {
+      const validation = this.validateTemplateData({ template, data });
+      if (!validation.isValid) {
+        throw getError({
+          statusCode: 400,
+          messageCode: MailErrorCodes.INVALID_CONFIGURATION,
+          message: `Missing template data for keys: ${validation.missingKeys.join(', ')}`,
+        });
+      }
+    }
+
     return template.replace(/\{\{(\s*[\w.]+\s*)\}\}/g, (match, key) => {
       const trimmedKey = key.trim();
       const value = this.getNestedValue(data, trimmedKey);
@@ -151,42 +149,5 @@ export class TemplateEngineService extends BaseService implements IMailTemplateE
     return path.split('.').reduce((current, key) => {
       return current?.[key];
     }, obj);
-  }
-
-  private registerBuiltInTemplates(): void {
-    this.registerTemplate({
-      name: DefaultTemplateNames.WELCOME,
-      content: WELCOME_TEMPLATE,
-      options: {
-        type: TemplateTypes.HTML,
-        subject: 'Welcome to {{appName}}!',
-        description: 'Welcome email with email verification link',
-      },
-    });
-
-    this.registerTemplate({
-      name: DefaultTemplateNames.PASSWORD_RESET,
-      content: PASSWORD_RESET_TEMPLATE,
-      options: {
-        type: TemplateTypes.HTML,
-        subject: 'Reset Your Password',
-        description: 'Password reset email with secure reset link',
-      },
-    });
-
-    this.registerTemplate({
-      name: DefaultTemplateNames.VERIFY_EMAIL,
-      content: VERIFY_EMAIL_TEMPLATE,
-      options: {
-        type: TemplateTypes.HTML,
-        subject: 'Verify Your Email Address',
-        description: 'Email verification with code and link',
-      },
-    });
-
-    this.logger.info(
-      '[registerBuiltInTemplates] Registered %d built-in templates',
-      this.templates.size,
-    );
   }
 }

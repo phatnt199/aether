@@ -129,11 +129,24 @@ export class MailService extends BaseService implements IMailService {
       }
 
       this.logger.debug('[sendTemplate] Rendering template: %s', templateName);
-      const html = await this.templateEngine.render({ templateName, data });
+      const html = this.templateEngine.render({
+        templateName,
+        data,
+        requireValidate: options?.requireValidate,
+      });
+
+      const templateData = this.templateEngine.getTemplate(templateName);
 
       const message: IMailMessage = {
         to: recipients,
-        subject: options?.subject ?? 'No Subject',
+        subject:
+          options?.subject ??
+          this.templateEngine.render({
+            templateData: templateData.subject,
+            data,
+            requireValidate: options?.requireValidate,
+          }) ??
+          'No Subject',
         html,
         ...options,
       };

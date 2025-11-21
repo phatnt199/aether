@@ -6,9 +6,9 @@ import {
   IMailSendResult,
   IMailService,
   IMailTemplateEngine,
+  ITemplate,
   MailKeys,
 } from '../common';
-import { ITemplate } from '../services';
 import { AnyType } from '@/common';
 
 @api({ basePath: '/mails' })
@@ -203,6 +203,7 @@ export class MailController extends BaseController {
                       },
                     },
                   },
+                  requireValidate: { type: 'boolean' },
                 },
               },
             },
@@ -222,7 +223,7 @@ export class MailController extends BaseController {
     return this.mailService.sendTemplate({ templateName, data, recipients: to, options });
   }
 
-  @get('/templates', {
+  @get('template-engine', {
     responses: {
       '200': {
         description: 'List all registered templates',
@@ -249,7 +250,7 @@ export class MailController extends BaseController {
     return this.templateEngine.listTemplates();
   }
 
-  @get('/templates/{name}', {
+  @get('template-engine/{name}', {
     responses: {
       '200': {
         description: 'Get template information',

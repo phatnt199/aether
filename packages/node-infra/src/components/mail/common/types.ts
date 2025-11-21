@@ -1,8 +1,7 @@
 import type { AnyType } from '@/common';
-import { ValueOrPromise } from '@loopback/core';
+import type { MailgunClientOptions } from 'mailgun.js/definitions';
 import { Readable } from 'node:stream';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import type { MailgunClientOptions } from 'mailgun.js/definitions';
 
 export enum EMailProvider {
   NODEMAILER = 'nodemailer',
@@ -65,6 +64,7 @@ export interface IMailMessage {
   html?: string;
   attachments?: IMailAttachment[];
   headers?: Record<string, string>;
+  requireValidate?: boolean;
   [key: string]: any;
 }
 
@@ -98,11 +98,29 @@ export interface IMailService {
   verify(): Promise<boolean>;
 }
 
+export interface ITemplate {
+  name: string;
+  content?: string;
+  render?: (data: Record<string, AnyType>) => string;
+  subject?: string;
+  description?: string;
+}
+
 export interface IMailTemplateEngine {
-  render(opts: { templateName: string; data: Record<string, any> }): ValueOrPromise<string>;
+  render(opts: {
+    templateData?: string;
+    templateName?: string;
+    data: Record<string, any>;
+    requireValidate?: boolean;
+  }): string;
   registerTemplate(opts: { name: string; content: string }): void;
-  getTemplate(name: string): any | undefined;
-  listTemplates(): any[];
+  validateTemplateData(opts: { template: string; data: Record<string, any> }): {
+    isValid: boolean;
+    missingKeys: string[];
+    allKeys: string[];
+  };
+  getTemplate(name: string): ITemplate | undefined;
+  listTemplates(): ITemplate[];
   hasTemplate(name: string): boolean;
   removeTemplate(name: string): boolean;
 }
