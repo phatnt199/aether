@@ -1,4 +1,4 @@
-import { AnyObject, ITzRepository, OAuth2TokenStatuses, TInjectionGetter } from '@/common';
+import { AnyObject, OAuth2TokenStatuses, TInjectionGetter } from '@/common';
 import { ApplicationLogger, LoggerFactory } from '@/helpers';
 import { getError, int } from '@/utilities';
 import { securityId } from '@loopback/security';
@@ -11,11 +11,6 @@ import {
   User,
 } from '@node-oauth/oauth2-server';
 
-import { OAuth2Client, OAuth2Token } from '../models';
-import { OAuth2ClientRepository, OAuth2TokenRepository } from '../repositories';
-import { JWTTokenService } from '../services';
-
-import { TBaseTzEntity } from '@/base/models';
 import get from 'lodash/get';
 import {
   AuthenticateKeys,
@@ -23,8 +18,13 @@ import {
   AuthenticationTokenTypes,
   IAuthenticateOAuth2Options,
   IAuthService,
-  IOAuth2User,
+  IScopeValidationResult,
 } from '../common';
+import { OAuth2Client, OAuth2Token } from '../models';
+import { OAuth2ClientRepository, OAuth2TokenRepository } from '../repositories';
+import { JWTTokenService } from '../services';
+import { UserDataFetcher } from './data';
+import { ScopeManager } from './scope';
 
 export interface IOAuth2AuthenticationHandler extends BaseModel, RequestAuthenticationModel {}
 
@@ -32,6 +32,8 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
   protected authServiceKey: string;
   protected logger: ApplicationLogger;
   protected injectionGetter: TInjectionGetter;
+  protected scopeManager: ScopeManager;
+  protected userDataFetcher: UserDataFetcher;
 
   constructor(opts: { scope?: string; authServiceKey: string; injectionGetter: TInjectionGetter }) {
     this.logger = LoggerFactory.getLogger([
@@ -39,19 +41,45 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     ]);
     this.injectionGetter = opts.injectionGetter;
     this.authServiceKey = opts.authServiceKey;
+
+    this.initializeServices();
+  }
+
+  private initializeServices(): void {
+    const oauth2Options = this.injectionGetter<IAuthenticateOAuth2Options>(
+      AuthenticateKeys.OAUTH2_OPTIONS,
+    );
+
+    const availableScopes = oauth2Options?.restOptions?.availableScopes ?? [];
+    const defaultScopes = oauth2Options?.restOptions?.defaultScopes ?? [];
+
+    // Initialize scope manager
+    this.scopeManager = new ScopeManager(
+      availableScopes,
+      defaultScopes,
+      `${this.constructor.name}:ScopeManager`,
+    );
+
+    // Initialize user data fetcher
+    this.userDataFetcher = new UserDataFetcher(
+      {
+        injectionGetter: this.injectionGetter,
+        scopeManager: this.scopeManager,
+      },
+      `${this.constructor.name}:UserDataFetcher`,
+    );
+
+    this.logger.info('[initializeServices] Services initialized successfully');
   }
 
   getClient(clientId: string, clientSecret: string): Promise<Client | Falsey> {
     return new Promise((resolve, reject) => {
-      this.logger.debug(
-        '[getClient] Retreiving application client | client_id: %s | client_secret: %s',
-        clientId,
-        clientSecret,
-      );
+      this.logger.debug('[getClient] Retrieving application client | client_id: %s', clientId);
 
       const clientRepository = this.injectionGetter<OAuth2ClientRepository>(
         'repositories.OAuth2ClientRepository',
       );
+
       clientRepository
         .findOne({
           where: { or: [{ clientId }, { clientId, clientSecret }] },
@@ -123,14 +151,15 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     return Promise.resolve(tokenValue);
   }
 
-  _saveToken(opts: {
+  protected _saveToken(opts: {
     type: string;
     token: string;
     client: Client;
     user: User;
     details?: AnyObject;
+    scopes?: string[];
   }): Promise<OAuth2Token | null> {
-    const { type, token, client, user, details } = opts;
+    const { type, token, client, user, details, scopes } = opts;
     const oauth2TokenRepository = this.injectionGetter<OAuth2TokenRepository>(
       'repositories.OAuth2TokenRepository',
     );
@@ -141,17 +170,21 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       status: OAuth2TokenStatuses.ACTIVATED,
       clientId: int(client.id),
       userId: int(user.id),
+      scopes: scopes ?? [],
       details,
     });
   }
 
   saveToken(token: Token, client: Client, user: User): Promise<Token | Falsey> {
     return new Promise((resolve, reject) => {
+      const scopes = this.scopeManager.normalizeScopes(token.scope);
+
       this._saveToken({
         token: token.accessToken,
         type: AuthenticationTokenTypes.TYPE_ACCESS_TOKEN,
         client,
         user,
+        scopes,
         details: token,
       })
         .then(() => {
@@ -167,9 +200,11 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     const oauth2TokenRepository = this.injectionGetter<OAuth2TokenRepository>(
       'repositories.OAuth2TokenRepository',
     );
+
     const oauth2Token: OAuth2Token | null = await oauth2TokenRepository.findOne({
       where: { type, token },
     });
+
     if (!oauth2Token) {
       this.logger.error('[_getToken] Not found OAuth2Token | type: %s | token: %s', type, token);
       throw getError({
@@ -184,25 +219,13 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       });
     }
 
-    let user: IOAuth2User;
-    const oauth2Options = this.injectionGetter<IAuthenticateOAuth2Options>(
-      AuthenticateKeys.OAUTH2_OPTIONS,
-    );
-    const userFetcher = oauth2Options?.restOptions?.userFetcher;
-    if (userFetcher) {
-      // Use custom user fetcher if provided
-      user = await userFetcher(oauth2Token.userId);
-    } else {
-      // Default behavior: fetch from repository
-      const userRepository = this.injectionGetter<ITzRepository<TBaseTzEntity>>(
-        'repositories.UserRepository',
-      );
-      user = await userRepository.findOne({
-        where: { id: int(oauth2Token.userId) },
-        fields: ['id'],
-      });
-    }
-    if (!user) {
+    // Fetch user data using UserDataFetcher
+    const userId = int(oauth2Token.userId);
+    const grantedScopes = oauth2Token.scopes ?? [];
+
+    const user = await this.userDataFetcher.fetchByScopes({ userId, grantedScopes });
+
+    if (!user?.id) {
       this.logger.error(
         '[_getToken] Not found User | type: %s | token: %s | oauth2Token: %j',
         type,
@@ -221,6 +244,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       where: { id: int(oauth2Token.clientId) },
       fields: ['id', 'provider', 'identifier', 'clientId', 'name', 'description', 'userId'],
     });
+
     if (!oauth2Client) {
       this.logger.error(
         '[_getToken] Not found OAuth2Client | type: %s | token: %s | oauth2Token: %j',
@@ -246,6 +270,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       type: Authentication.TYPE_BEARER,
       token: accessToken,
     });
+
     const clientId = tokenPayload['clientId'];
 
     if (!clientId || clientId === 'NA') {
@@ -265,6 +290,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       where: { clientId },
       fields: ['id', 'provider', 'identifier', 'clientId', 'name', 'description', 'userId'],
     });
+
     if (!oauth2Client) {
       throw getError({
         message: `[getAccessToken] Not found any OAuth2Client with id: ${clientId}`,
@@ -274,6 +300,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     return {
       accessToken,
       accessTokenExpiresAt: new Date(int(tokenPayload['exp']) * 1000),
+      scope: tokenPayload['scopes'],
       client: Object.assign({}, oauth2Client!.toObject() as OAuth2Client, {
         id: oauth2Client.id.toString(),
       }),
@@ -281,10 +308,45 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     };
   }
 
-  verifyScope(token: Token, scopes: string[]): Promise<boolean> {
+  verifyScope(token: Token, requiredScopes: string[]): Promise<boolean> {
     return new Promise(resolve => {
-      this.logger.info('[verifyScope] Token: %j | Scopes: %s', token, scopes);
-      resolve(token !== null);
+      this.logger.info('[verifyScope] Token: %j | Required scopes: %s', token, requiredScopes);
+
+      if (!token) {
+        resolve(false);
+        return;
+      }
+
+      // If no scopes required, allow access
+      if (!requiredScopes || requiredScopes.length === 0) {
+        resolve(true);
+        return;
+      }
+
+      const tokenScopes = this.scopeManager.normalizeScopes(token.scope);
+
+      // Check if token has all required scopes
+      const hasAllScopes = requiredScopes.every(scope => tokenScopes.includes(scope));
+
+      this.logger.info(
+        '[verifyScope] Token scopes: %s | Has all required scopes: %s',
+        tokenScopes.join(', '),
+        hasAllScopes,
+      );
+
+      resolve(hasAllScopes);
     });
+  }
+
+  async validateScopes(requestedScopes: string[]): Promise<IScopeValidationResult> {
+    return this.scopeManager.validateScopes(requestedScopes);
+  }
+
+  protected getScopeManager(): ScopeManager {
+    return this.scopeManager;
+  }
+
+  protected getUserDataFetcher(): UserDataFetcher {
+    return this.userDataFetcher;
   }
 }

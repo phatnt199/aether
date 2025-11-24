@@ -89,7 +89,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
 
     // -----------------------------------------------------------------------------------------------------------------
     this.expressApp.get('/auth', (request, response) => {
-      const { c, r } = request.query;
+      const { c, r, scope } = request.query;
 
       if (!c) {
         response.render('pages/auth', {
@@ -104,6 +104,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
         action: authAction,
         c: decodeURIComponent(c.toString()),
         r: decodeURIComponent(r?.toString() ?? ''),
+        scope: decodeURIComponent(scope.toString() ?? ''),
       };
 
       response.render('pages/auth', {
@@ -114,7 +115,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
 
     // -----------------------------------------------------------------------------------------------------------------
     this.expressApp.post('/auth', (request, response) => {
-      const { username, password, token: clientToken, redirectUrl } = request.body;
+      const { username, password, token: clientToken, redirectUrl, scope } = request.body;
 
       const requiredProps = [
         { key: 'username', value: username },
@@ -142,6 +143,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
       const oauth2Service = this.injectionGetter<OAuth2Service>('services.OAuth2Service');
 
       const decryptedClient = oauth2Service.decryptClientToken({ token: clientToken });
+
       oauth2Service
         .doOAuth2({
           context: { request, response },
@@ -152,6 +154,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
             clientId: decryptedClient.clientId,
           },
           redirectUrl,
+          scopes: scope.split(' ').filter(Boolean),
         })
         .then(rs => {
           const { accessToken, accessTokenExpiresAt, client } = rs.oauth2TokenRs;
