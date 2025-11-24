@@ -125,6 +125,38 @@ export interface IMailTemplateEngine {
   removeTemplate(name: string): boolean;
 }
 
+export interface IVerificationGenerationOptions {
+  codeLength: number;
+  tokenBytes: number;
+  codeExpiryMinutes: number;
+  tokenExpiryHours: number;
+}
+
+export interface IVerificationData {
+  verificationCode: string;
+  codeGeneratedAt: string;
+  codeExpiresAt: string;
+  codeAttempts: number;
+
+  verificationToken: string;
+  tokenGeneratedAt: string;
+  tokenExpiresAt: string;
+
+  lastCodeSentAt: string;
+}
+
+export interface IVerificationCodeGenerator {
+  generateCode(length: number): string;
+}
+
+export interface IVerificationTokenGenerator {
+  generateToken(bytes: number): string;
+}
+
+export interface IVerificationDataGenerator {
+  generateVerificationData(options: IVerificationGenerationOptions): IVerificationData;
+}
+
 export function isMailTransport(value: AnyType): value is IMailTransport {
   if (!value || typeof value !== 'object') {
     return false;

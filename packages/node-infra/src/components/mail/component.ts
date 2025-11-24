@@ -4,7 +4,13 @@ import { getError } from '@/utilities';
 import { BindingScope, Component, CoreBindings, inject } from '@loopback/core';
 import { MailKeys } from './common';
 import { MailTransportProvider } from './providers';
-import { MailService, TemplateEngineService } from './services';
+import {
+  DefaultVerificationDataGenerator,
+  MailService,
+  NumericCodeGenerator,
+  RandomTokenGenerator,
+  TemplateEngineService,
+} from './services';
 
 export class MailComponent extends BaseComponent implements Component {
   constructor(
@@ -28,6 +34,12 @@ export class MailComponent extends BaseComponent implements Component {
 
     const mailOptions = this.application.getSync(MailKeys.MAIL_OPTIONS);
     this.logger.info('[binding] Mail Options: %j', mailOptions);
+
+    this.application.bind(MailKeys.MAIL_VERIFICATION_CODE_GENERATOR).toClass(NumericCodeGenerator);
+    this.application.bind(MailKeys.MAIL_VERIFICATION_TOKEN_GENERATOR).toClass(RandomTokenGenerator);
+    this.application
+      .bind(MailKeys.MAIL_VERIFICATION_DATA_GENERATOR)
+      .toClass(DefaultVerificationDataGenerator);
 
     this.application
       .bind(MailKeys.MAIL_TRANSPORT_PROVIDER)
