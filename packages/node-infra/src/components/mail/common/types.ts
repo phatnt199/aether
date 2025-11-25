@@ -1,7 +1,9 @@
-import type { AnyType } from '@/common';
+import type { AnyType, TConstValue } from '@/common';
 import type { MailgunClientOptions } from 'mailgun.js/definitions';
 import { Readable } from 'node:stream';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
+import { IBullMQMailExecutorOpts, IInternalQueueMailExecutorOpts } from '../helpers';
+import { MailQueueExecutorTypes } from './constants';
 
 export enum EMailProvider {
   NODEMAILER = 'nodemailer',
@@ -157,42 +159,37 @@ export interface IVerificationDataGenerator {
   generateVerificationData(options: IVerificationGenerationOptions): IVerificationData;
 }
 
-export function isMailTransport(value: AnyType): value is IMailTransport {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  const transport = value as Record<string, unknown>;
-
-  if (typeof transport.send !== 'function') {
-    return false;
-  }
-
-  if (typeof transport.verify !== 'function') {
-    return false;
-  }
-
-  if (transport.close !== undefined && typeof transport.close !== 'function') {
-    return false;
-  }
-
-  return true;
+export interface IMailQueueOptions {
+  priority?: number;
+  delay?: number;
+  attempts?: number;
+  backoff?: {
+    type: 'fixed' | 'exponential';
+    delay: number;
+  };
 }
 
-export function isValidMailOptions(options: AnyType): options is TMailOptions {
-  if (!options || typeof options !== 'object') {
-    return false;
-  }
+export interface IMailProcessorResult {
+  success: boolean;
+  message: string;
+  expiresInMinutes: number;
+  nextResendAt?: string;
+}
 
-  const opts = options as Record<string, unknown>;
+export interface IMailQueueResult {
+  jobId?: string;
+  queued: boolean;
+  message: string;
+  result?: IMailProcessorResult;
+}
 
-  if (typeof opts.provider !== 'string') {
-    return false;
-  }
+export interface IMailQueueExecutor {
+  enqueueVerificationEmail(email: string, options?: IMailQueueOptions): Promise<IMailQueueResult>;
+  setProcessor(processor: (email: string) => Promise<IMailProcessorResult>): void;
+}
 
-  if (!opts.config) {
-    return false;
-  }
-
-  return true;
+export interface IMailQueueExecutorConfig {
+  type: TConstValue<typeof MailQueueExecutorTypes>;
+  internalQueue?: IInternalQueueMailExecutorOpts;
+  bullmq?: IBullMQMailExecutorOpts;
 }

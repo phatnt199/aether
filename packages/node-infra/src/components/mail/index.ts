@@ -4,3 +4,4 @@ export * from './controllers';
 export * from './providers';
 export * from './services';
 export * from './utilities';
+export * from './helpers';

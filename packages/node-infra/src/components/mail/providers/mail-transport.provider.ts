@@ -1,36 +1,32 @@
-import { BaseApplication } from '@/base/applications';
 import { BaseProvider } from '@/base/base.provider';
-import { getError } from '@/utilities';
-import { CoreBindings, inject, Provider, ValueOrPromise } from '@loopback/core';
 import {
   EMailProvider,
-  ICustomMailOptions,
-  IMailgunMailOptions,
-  IMailTransport,
-  INodemailerMailOptions,
   isMailTransport,
   MailErrorCodes,
-  MailKeys,
-  TMailOptions,
-} from '../common';
-import { MailgunTransport } from './mailgun.transport';
-import { NodemailerTransport } from './nodemailer.transport';
+  type ICustomMailOptions,
+  type IMailgunMailOptions,
+  type IMailTransport,
+  type INodemailerMailOptions,
+  type TMailOptions,
+} from '@/components/mail';
+import { MailgunTransportHelper, NodemailerTransportHelper } from '@/components/mail/helpers';
+import { getError } from '@/utilities';
+import { Provider, ValueOrPromise } from '@loopback/core';
 
-export type TGetMailTransportFn = () => IMailTransport;
+export type TGetMailTransportFn = (options: TMailOptions) => IMailTransport;
 
 export class MailTransportProvider
   extends BaseProvider<TGetMailTransportFn>
   implements Provider<TGetMailTransportFn>
 {
-  constructor(@inject(CoreBindings.APPLICATION_INSTANCE) private application: BaseApplication) {
+  constructor() {
     super({ scope: MailTransportProvider.name });
   }
 
   value(): ValueOrPromise<TGetMailTransportFn> {
-    const options = this.application.getSync<TMailOptions>(MailKeys.MAIL_OPTIONS);
-    this.logger.info('[value] Creating mail transport for provider: %s', options.provider);
+    return (options: TMailOptions) => {
+      this.logger.info('[value] Creating mail transport for provider: %s', options.provider);
 
-    return () => {
       switch (options.provider) {
         case EMailProvider.NODEMAILER: {
           return this.createNodemailerTransport(options);
@@ -55,10 +51,10 @@ export class MailTransportProvider
     };
   }
 
-  private createNodemailerTransport(options: TMailOptions): NodemailerTransport {
+  private createNodemailerTransport(options: TMailOptions): NodemailerTransportHelper {
     if (this.isNodemailerOptions(options)) {
       this.logger.info('[createNodemailerTransport] Initializing Nodemailer transport');
-      return new NodemailerTransport(options.config);
+      return new NodemailerTransportHelper(options.config);
     }
 
     throw getError({
@@ -68,10 +64,10 @@ export class MailTransportProvider
     });
   }
 
-  private createMailgunTransport(options: TMailOptions): MailgunTransport {
+  private createMailgunTransport(options: TMailOptions): MailgunTransportHelper {
     if (this.isMailgunOptions(options)) {
       this.logger.info('[createMailgunTransport] Initializing Mailgun transport');
-      return new MailgunTransport(options.config);
+      return new MailgunTransportHelper(options.config);
     }
 
     throw getError({

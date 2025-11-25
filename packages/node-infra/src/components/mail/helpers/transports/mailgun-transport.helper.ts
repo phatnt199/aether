@@ -1,22 +1,22 @@
-import { LoggerFactory } from '@/helpers/logger';
-import Mailgun from 'mailgun.js';
-import type { Interfaces, MailgunMessageData, MessagesSendResult } from 'mailgun.js/definitions';
-import { Stream } from 'node:stream';
+import { BaseHelper } from '@/base/base.helper';
 import {
   IMailAttachment,
   IMailMessage,
   IMailSendResult,
   IMailTransport,
   TMailgunConfig,
-} from '../common';
+} from '@/components/mail';
+import Mailgun from 'mailgun.js';
+import type { Interfaces, MailgunMessageData, MessagesSendResult } from 'mailgun.js/definitions';
+import { Stream } from 'node:stream';
 
-export class MailgunTransport implements IMailTransport {
+export class MailgunTransportHelper extends BaseHelper implements IMailTransport {
   private client: Interfaces.IMessagesClient;
   private domain: string;
-  private logger = LoggerFactory.getLogger([MailgunTransport.name]);
 
   constructor(config: TMailgunConfig) {
-    this.logger.info('[constructor] Initializing Mailgun transport');
+    super({ scope: MailgunTransportHelper.name });
+
     this.domain = config.domain;
 
     const mailgun = new Mailgun(FormData);

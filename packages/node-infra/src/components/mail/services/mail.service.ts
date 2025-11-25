@@ -12,18 +12,15 @@ import {
   MailKeys,
   TMailOptions,
 } from '../common';
-import { TGetMailTransportFn } from '../providers';
 import { AnyType } from '@/common';
 
 @injectable({ scope: BindingScope.SINGLETON })
 export class MailService extends BaseService implements IMailService {
-  private transport: IMailTransport;
-
   constructor(
     @inject(MailKeys.MAIL_OPTIONS)
     protected options: TMailOptions,
-    @inject(MailKeys.MAIL_TRANSPORT_PROVIDER)
-    protected transportGetter: TGetMailTransportFn,
+    @inject(MailKeys.MAIL_TRANSPORT_INSTANCE)
+    protected transport: IMailTransport,
     @inject(MailKeys.MAIL_TEMPLATE_ENGINE, { optional: true })
     protected templateEngine?: IMailTemplateEngine,
   ) {
@@ -32,8 +29,6 @@ export class MailService extends BaseService implements IMailService {
       '[constructor] Mail service initialized with provider: %s',
       this.options.provider,
     );
-
-    this.transport = this.transportGetter();
   }
 
   async send(message: IMailMessage): Promise<IMailSendResult> {

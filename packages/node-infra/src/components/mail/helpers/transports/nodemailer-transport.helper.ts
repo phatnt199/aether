@@ -1,14 +1,18 @@
-import { LoggerFactory } from '@/helpers/logger';
+import { BaseHelper } from '@/base/base.helper';
+import {
+  IMailMessage,
+  IMailSendResult,
+  IMailTransport,
+  TNodemailerConfig,
+} from '@/components/mail';
 import nodemailer, { Transporter } from 'nodemailer';
 import type Mail from 'nodemailer/lib/mailer';
-import { IMailMessage, IMailSendResult, IMailTransport, TNodemailerConfig } from '../common';
 
-export class NodemailerTransport implements IMailTransport {
+export class NodemailerTransportHelper extends BaseHelper implements IMailTransport {
   private transporter: Transporter;
-  private logger = LoggerFactory.getLogger([NodemailerTransport.name]);
 
   constructor(config: TNodemailerConfig) {
-    this.logger.info('[constructor] Initializing Nodemailer transport');
+    super({ scope: NodemailerTransportHelper.name });
     this.transporter = nodemailer.createTransport(config);
   }
 
