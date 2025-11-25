@@ -22,7 +22,7 @@ import {
 } from '../common';
 import { OAuth2Client, OAuth2Token } from '../models';
 import { OAuth2ClientRepository, OAuth2TokenRepository } from '../repositories';
-import { JWTTokenService } from '../services';
+import { JWTTokenService, OAuth2ScopeService } from '../services';
 import { UserDataFetcher } from './data';
 import { ScopeManager } from './scope';
 
@@ -32,8 +32,10 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
   protected authServiceKey: string;
   protected logger: ApplicationLogger;
   protected injectionGetter: TInjectionGetter;
-  protected scopeManager: ScopeManager;
-  protected userDataFetcher: UserDataFetcher;
+  protected scopeManager: ScopeManager | null = null;
+  protected userDataFetcher: UserDataFetcher | null = null;
+  protected scopeService: OAuth2ScopeService;
+  private initPromise: Promise<void> | null = null;
 
   constructor(opts: { scope?: string; authServiceKey: string; injectionGetter: TInjectionGetter }) {
     this.logger = LoggerFactory.getLogger([
@@ -42,34 +44,73 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     this.injectionGetter = opts.injectionGetter;
     this.authServiceKey = opts.authServiceKey;
 
-    this.initializeServices();
+    // Initialize scope service
+    this.scopeService = new OAuth2ScopeService(
+      { injectionGetter: this.injectionGetter },
+      `${this.constructor.name}:OAuth2ScopeService`,
+    );
+
+    // Start async initialization but don't wait
+    this.initPromise = this.initializeServices();
   }
 
-  private initializeServices(): void {
-    const oauth2Options = this.injectionGetter<IAuthenticateOAuth2Options>(
-      AuthenticateKeys.OAUTH2_OPTIONS,
-    );
+  private async initializeServices(): Promise<void> {
+    try {
+      const oauth2Options = this.injectionGetter<IAuthenticateOAuth2Options>(
+        AuthenticateKeys.OAUTH2_OPTIONS,
+      );
 
-    const availableScopes = oauth2Options?.restOptions?.availableScopes ?? [];
-    const defaultScopes = oauth2Options?.restOptions?.defaultScopes ?? [];
+      // Try to load scopes from database first
+      let availableScopes = await this.scopeService.loadScopes(true);
 
-    // Initialize scope manager
-    this.scopeManager = new ScopeManager(
-      availableScopes,
-      defaultScopes,
-      `${this.constructor.name}:ScopeManager`,
-    );
+      // Fallback to config if database is empty
+      if (availableScopes.length === 0) {
+        this.logger.warn(
+          '[initializeServices] No scopes found in database, falling back to config',
+        );
+        availableScopes = oauth2Options?.restOptions?.availableScopes ?? [];
+      }
 
-    // Initialize user data fetcher
-    this.userDataFetcher = new UserDataFetcher(
-      {
-        injectionGetter: this.injectionGetter,
-        scopeManager: this.scopeManager,
-      },
-      `${this.constructor.name}:UserDataFetcher`,
-    );
+      const defaultScopes = oauth2Options?.restOptions?.defaultScopes ?? [];
 
-    this.logger.info('[initializeServices] Services initialized successfully');
+      // Initialize scope manager
+      this.scopeManager = new ScopeManager(
+        availableScopes,
+        defaultScopes,
+        `${this.constructor.name}:ScopeManager`,
+      );
+
+      // Initialize user data fetcher
+      this.userDataFetcher = new UserDataFetcher(
+        {
+          injectionGetter: this.injectionGetter,
+          scopeManager: this.scopeManager,
+        },
+        `${this.constructor.name}:UserDataFetcher`,
+      );
+
+      this.logger.info('[initializeServices] Services initialized successfully');
+    } catch (error) {
+      this.logger.error(
+        '[initializeServices] Failed to initialize services: %s',
+        getError(error).message,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Ensure services are initialized before use
+   * Should be called at the start of async methods
+   */
+  protected async ensureInitialized(): Promise<void> {
+    if (this.initPromise) {
+      await this.initPromise;
+    }
+
+    if (!this.scopeManager || !this.userDataFetcher) {
+      throw getError({ message: 'OAuth2 services not initialized' });
+    }
   }
 
   getClient(clientId: string, clientSecret: string): Promise<Client | Falsey> {
@@ -308,45 +349,44 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     };
   }
 
-  verifyScope(token: Token, requiredScopes: string[]): Promise<boolean> {
-    return new Promise(resolve => {
-      this.logger.info('[verifyScope] Token: %j | Required scopes: %s', token, requiredScopes);
+  async verifyScope(token: Token, requiredScopes: string[]): Promise<boolean> {
+    await this.ensureInitialized();
 
-      if (!token) {
-        resolve(false);
-        return;
-      }
+    this.logger.info('[verifyScope] Token: %j | Required scopes: %s', token, requiredScopes);
 
-      // If no scopes required, allow access
-      if (!requiredScopes || requiredScopes.length === 0) {
-        resolve(true);
-        return;
-      }
+    if (!token) {
+      return false;
+    }
 
-      const tokenScopes = this.scopeManager.normalizeScopes(token.scope);
+    // If no scopes required, allow access
+    if (!requiredScopes || requiredScopes.length === 0) {
+      return true;
+    }
 
-      // Check if token has all required scopes
-      const hasAllScopes = requiredScopes.every(scope => tokenScopes.includes(scope));
+    const tokenScopes = this.scopeManager!.normalizeScopes(token.scope);
 
-      this.logger.info(
-        '[verifyScope] Token scopes: %s | Has all required scopes: %s',
-        tokenScopes.join(', '),
-        hasAllScopes,
-      );
+    // Check if token has all required scopes
+    const hasAllScopes = requiredScopes.every(scope => tokenScopes.includes(scope));
 
-      resolve(hasAllScopes);
-    });
+    this.logger.info(
+      '[verifyScope] Token scopes: %s | Has all required scopes: %s',
+      tokenScopes.join(', '),
+      hasAllScopes,
+    );
+
+    return hasAllScopes;
   }
 
   async validateScopes(requestedScopes: string[]): Promise<IScopeValidationResult> {
-    return this.scopeManager.validateScopes(requestedScopes);
+    await this.ensureInitialized();
+    return this.scopeManager!.validateScopes(requestedScopes);
   }
 
-  protected getScopeManager(): ScopeManager {
+  protected getScopeManager(): ScopeManager | null {
     return this.scopeManager;
   }
 
-  protected getUserDataFetcher(): UserDataFetcher {
+  protected getUserDataFetcher(): UserDataFetcher | null {
     return this.userDataFetcher;
   }
 }

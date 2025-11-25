@@ -320,3 +320,23 @@ export class OAuth2ClientController extends _OAuth2ClientController {
     super(repository);
   }
 }
+
+// --------------------------------------------------------------------------------
+import { OAuth2Scope } from '../models';
+import { OAuth2ScopeRepository } from '../repositories';
+
+const _OAuth2ScopeController = defineCrudController({
+  entity: OAuth2Scope,
+  repository: { name: OAuth2ScopeRepository.name },
+  controller: { basePath: '/oauth2/scopes' },
+});
+
+@api({ basePath: '/oauth2/scopes' })
+export class OAuth2ScopeController extends _OAuth2ScopeController {
+  constructor(
+    @inject('repositories.OAuth2ScopeRepository')
+    protected repository: OAuth2ScopeRepository,
+  ) {
+    super(repository);
+  }
+}
