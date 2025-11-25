@@ -13,4 +13,12 @@ export class BaseHelper {
     this._scope = opts.scope ?? '';
     this.identifier = opts.identifier ?? '';
   }
+
+  getIdentifier() {
+    return this.identifier;
+  }
+
+  getLogger() {
+    return this.logger;
+  }
 }

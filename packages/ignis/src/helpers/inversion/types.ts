@@ -62,6 +62,13 @@ export interface IInjectableMetadata {
   tags?: Record<string, any>;
 }
 
+export interface IModelMetadata {
+  type: 'entity' | 'view';
+  skipMigrate?: boolean;
+}
+
+export interface IDataSourceMetadata {}
+
 /* export interface IMiddlewareMetadata {
   handler: Function;
   priority?: number;

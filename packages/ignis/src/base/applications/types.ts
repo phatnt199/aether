@@ -1,11 +1,14 @@
-import { AnyObject, IClass, ValueOrPromise } from '@/common/types';
+import { ValueOrPromise } from '@/common/types';
 import type { OpenAPIHono } from '@hono/zod-openapi';
-import type { Context } from 'hono';
+import type { Context, Env, Schema } from 'hono';
 import { IPRestrictionRules as IIPRestrictionRules } from 'hono/ip-restriction';
-import { BaseComponent } from '../components';
-import { IDataSource } from '../datasources';
-import { IRepository } from '../repositories';
-import { IService } from '../services';
+import {
+  IComponentMixin,
+  IControllerMixin,
+  IRepositoryMixin,
+  IServiceMixin,
+  IStaticServeMixin,
+} from '../mixins/types';
 
 // ------------------------------------------------------------------------------
 // Common Middleware Options
@@ -13,6 +16,7 @@ import { IService } from '../services';
 export interface IBaseMiddlewareOptions {
   enable: boolean;
   path?: string;
+  [extra: string | symbol]: any;
 }
 
 // ------------------------------------------------------------------------------
@@ -79,13 +83,13 @@ export type TNodeServerInstance = any; // Will be set at runtime from @hono/node
 
 // ------------------------------------------------------------------------------
 export interface IMiddlewareConfigs {
+  requestId?: IRequestIdOptions;
   compress?: ICompressOptions;
   cors?: ICORSOptions;
   csrf?: ICSRFOptions;
   bodyLimit?: IBodyLimitOptions;
-  requestId?: IRequestIdOptions;
   ipRestriction?: IBaseMiddlewareOptions & IIPRestrictionRules;
-  [extra: string | symbol]: IBaseMiddlewareOptions;
+  [extra: string | symbol]: any;
 }
 
 export interface IApplicationConfigs {
@@ -93,7 +97,7 @@ export interface IApplicationConfigs {
   port?: number;
   path: { base: string; isStrict: boolean };
 
-  middlewares: IMiddlewareConfigs;
+  // middlewares: IMiddlewareConfigs;
 
   autoLoad?: {
     dirs: {
@@ -108,38 +112,42 @@ export interface IApplicationConfigs {
   [key: string]: any;
 }
 
+export interface IApplicationInfo {
+  name: string;
+  version: string;
+  description: string;
+  author?: { name: string; email: string; url?: string };
+  [extra: string | symbol]: any;
+}
+
 // ------------------------------------------------------------------------------
-export interface IApplication {
+export interface IApplication<
+  AppEnv extends Env = Env,
+  AppSchema extends Schema = Schema,
+  BasePath extends string = '/',
+> {
   initialize(): ValueOrPromise<void>;
 
-  staticConfigure(): ValueOrPromise<void>;
   setupMiddlewares(): ValueOrPromise<void>;
-  preConfigure(): ValueOrPromise<void>;
-  postConfigure(): ValueOrPromise<void>;
 
   getProjectConfigs(): IApplicationConfigs;
   getProjectRoot(): string;
   getRootRouter(): OpenAPIHono;
+
+  getServer(): OpenAPIHono<AppEnv, AppSchema, BasePath>;
   getServerHost(): string;
   getServerPort(): number;
   getServerAddress(): string;
-  getApplicationVersion(): ValueOrPromise<string>;
 
   start(): ValueOrPromise<void>;
   stop(): ValueOrPromise<void>;
 }
 
 // ------------------------------------------------------------------------------
-export interface IRestApplication extends IApplication {
-  component<T extends BaseComponent = any, O extends AnyObject = AnyObject>(
-    ctor: IClass<T>,
-    args?: O,
-  ): IApplication;
-  controller<T>(ctor: IClass<T>): IApplication;
-  repository<T extends IRepository>(ctor: IClass<T>): IApplication;
-  service<T extends IService>(ctor: IClass<T>): IApplication;
-  dataSource<T extends IDataSource>(ctor: IClass<T>): IApplication;
-  static(opts: { restPath?: string; folderPath: string }): IApplication;
-
-  registerComponents(): ValueOrPromise<void>;
-}
+export interface IRestApplication
+  extends IApplication,
+    IComponentMixin,
+    IControllerMixin,
+    IRepositoryMixin,
+    IServiceMixin,
+    IStaticServeMixin {}

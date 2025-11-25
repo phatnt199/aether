@@ -1,9 +1,6 @@
+import { Container } from '@/helpers/inversion';
+
 // ----------------------------------------------------------------------------------------------------------------------------------------
-// Basic Types
-// ----------------------------------------------------------------------------------------------------------------------------------------
-export type NumberIdType = number;
-export type StringIdType = string;
-export type IdType = string | number;
 export type TNullable = undefined | null | void;
 
 export type AnyType = any;
@@ -18,15 +15,15 @@ export type ValueOptionalExcept<T, K extends keyof T> = Pick<T, K> & Partial<Omi
 export type ClassProps<T> = ValueOf<T>;
 
 export type TConstructor<T> = new (...args: any[]) => T;
+
+export type TAbstractConstructor<T> = abstract new (...args: any[]) => T;
 export interface IClass<T> {
   new (...args: any[]): T;
-
   [property: string]: any;
 }
 
-export type TMixinTarget<T> = TConstructor<{
-  [P in keyof T]: T[P];
-}>;
+export type TMixinTarget<T> = TConstructor<{ [P in keyof T]: T[P] }>;
+export type TAbstractMixinTarget<T> = TAbstractConstructor<{ [P in keyof T]: T[P] }>;
 
 export type TStringConstValue<T extends IClass<any>> = Extract<ValueOf<T>, string>;
 export type TNumberConstValue<T extends IClass<any>> = Extract<ValueOf<T>, number>;
@@ -80,7 +77,6 @@ export type TObjectFromFieldMappings<
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Domain Types
 // ----------------------------------------------------------------------------------------------------------------------------------------
-
 export type TPermissionEffect = 'allow' | 'deny';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -92,5 +88,11 @@ export type TInjectionGetter = <T>(key: string | symbol) => T;
 // Provider
 // ----------------------------------------------------------------------------------------------------------------------------------------
 export interface IProvider<T> {
-  value(): ValueOrPromise<T>;
+  value(container?: Container): T;
 }
+
+export const isClassProvider = <T>(target: any): target is IClass<IProvider<T>> => {
+  return (
+    typeof target === 'function' && target.prototype && typeof target.prototype.value === 'function'
+  );
+};

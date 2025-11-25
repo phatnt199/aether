@@ -61,6 +61,8 @@ export class HTTP {
       NotFound: 404,
       MethodNotAllowed: 405,
       RequestTimeout: 408,
+      ContentTooLarge: 413,
+      URITooLong: 414,
       UnsupportedMediaType: 415,
       UnprocessableEntity: 422,
     },
@@ -91,3 +93,24 @@ export class RuntimeModules {
   static readonly BUN = 'bun';
 }
 export type TRuntimeModule = TConstValue<typeof RuntimeModules>;
+
+// ------------------------------------------------------------------------------
+export class DataTypes {
+  static readonly NUMBER = 'NUMBER';
+  static readonly TEXT = 'TEXT';
+  static readonly BYTE = 'BYTE';
+  static readonly JSON = 'JSON';
+  static readonly BOOLEAN = 'BOOLEAN';
+
+  static readonly SCHEME_SET = new Set([
+    this.NUMBER,
+    this.TEXT,
+    this.BYTE,
+    this.JSON,
+    this.BOOLEAN,
+  ]);
+
+  static isValid(orgType: string): boolean {
+    return this.SCHEME_SET.has(orgType);
+  }
+}

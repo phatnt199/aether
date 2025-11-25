@@ -1,5 +1,5 @@
-import { AnyObject, IdType } from '@/common/types';
-import { TBaseIdEntity, TBaseTzEntity } from '../models';
+import { AnyObject } from '@/common/types';
+import { IdType, TBaseIdEntity } from '../models';
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
 // Repository Interfaces
@@ -55,10 +55,10 @@ export interface IPersistableRepository<E extends TBaseIdEntity> extends IReposi
   replaceById(id: IdType, data: DataObject<E>, options?: AnyObject): Promise<void>;
 }
 
-export interface ITzRepository<E extends TBaseTzEntity> extends IPersistableRepository<E> {
+/* export interface ITzRepository<E extends TBaseTzEntity> extends IPersistableRepository<E> {
   mixTimestamp(entity: DataObject<E>, options?: { newInstance: boolean }): DataObject<E>;
   mixUserAudit(
     entity: DataObject<E>,
     options?: { newInstance: boolean; authorId: IdType },
   ): DataObject<E>;
-}
+} */

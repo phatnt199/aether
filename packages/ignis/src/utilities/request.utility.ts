@@ -1,8 +1,7 @@
+import { getError } from '@/helpers/error';
 import { Context } from 'hono';
-import get from 'lodash/get';
 import fs from 'node:fs';
 import path from 'node:path';
-import { getError } from '@/helpers/error';
 
 // -------------------------------------------------------------------------
 export interface IRequestedRemark {
@@ -90,16 +89,16 @@ export const parseMultipartBody = async (opts: IParseMultipartOptions): Promise<
 };
 
 // -------------------------------------------------------------------------
-export const getRequestId = (opts: { request: Request }) => {
+/* export const getRequestId = (opts: { request: Request }) => {
   return get(opts.request, 'requestId');
-};
+}; */
 
 // -------------------------------------------------------------------------
-export const getRequestIp = (opts: { request: Request }) => {
+/* export const getRequestIp = (opts: { request: Request }) => {
   return get(opts.request, 'requestForwardedIp') ?? 'N/A';
-};
+}; */
 
 // -------------------------------------------------------------------------
-export const getRequestRemark = (opts: { request: Request }): IRequestedRemark | undefined => {
+/* export const getRequestRemark = (opts: { request: Request }): IRequestedRemark | undefined => {
   return get(opts.request, 'requestedRemark');
-};
+}; */

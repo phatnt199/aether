@@ -1,5 +1,6 @@
 import { BaseController, IControllerOptions } from '@/base/controllers';
 import { HTTP, ValueOrPromise } from '@/common';
+import { jsonContent } from '@/utilities/schema.utility';
 import { z } from '@hono/zod-openapi';
 
 export class HealthCheckController extends BaseController {
@@ -11,23 +12,27 @@ export class HealthCheckController extends BaseController {
   }
 
   override binding(): ValueOrPromise<void> {
+    const HealthCheckOkSchema = z.object({ status: z.string() }).openapi({
+      description: 'HealthCheck Schema',
+      examples: [{ status: 'ok' }],
+    });
+
     this.defineRoute({
       configs: {
         method: 'get',
         path: '/',
         responses: {
-          [HTTP.ResultCodes.RS_2.Ok]: {
+          [HTTP.ResultCodes.RS_2.Ok]: jsonContent({
+            schema: HealthCheckOkSchema,
             description: 'Health check status',
-            content: {
-              'application/json': {
-                schema: z.object({ status: z.string() }),
-              },
-            },
-          },
+          }),
         },
       },
-      handler: c => {
-        return c.json({ status: 'ok' }, 200);
+      handler: context => {
+        return context.json<z.infer<typeof HealthCheckOkSchema>>(
+          { status: 'ok' },
+          HTTP.ResultCodes.RS_2.Ok,
+        );
       },
     });
   }

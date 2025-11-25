@@ -9,6 +9,12 @@ export class Statuses {
   static readonly FAIL = '106_FAIL';
 }
 
+export class MigrationStatuses {
+  static readonly UNKNOWN = Statuses.UNKNOWN;
+  static readonly SUCCESS = Statuses.SUCCESS;
+  static readonly FAIL = Statuses.FAIL;
+}
+
 export class CommonStatuses {
   static readonly UNKNOWN = Statuses.UNKNOWN;
   static readonly ACTIVATED = Statuses.ACTIVATED;
@@ -26,5 +32,20 @@ export class CommonStatuses {
 
   static isValid(scheme: string): boolean {
     return this.SCHEME_SET.has(scheme);
+  }
+}
+
+export class UserStatuses extends CommonStatuses {}
+
+export class RoleStatuses extends CommonStatuses {}
+
+export class UserTypes {
+  static readonly SYSTEM = 'SYSTEM';
+  static readonly LINKED = 'LINKED';
+
+  static readonly SCHEME_SET = new Set([this.SYSTEM, this.LINKED]);
+
+  static isValid(orgType: string): boolean {
+    return this.SCHEME_SET.has(orgType);
   }
 }

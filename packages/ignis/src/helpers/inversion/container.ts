@@ -1,5 +1,5 @@
 import { BaseHelper } from '@/base/helpers';
-import { TConstValue, type IClass } from '@/common/types';
+import { IProvider, isClassProvider, TConstValue, type IClass } from '@/common/types';
 import { ApplicationError, getError } from '@/helpers/error';
 import { MetadataRegistry } from './registry';
 import { BindingScopes, BindingValueTypes, TBindingScope } from './types';
@@ -14,7 +14,7 @@ export class Binding<T = any> extends BaseHelper {
   private resolver:
     | { type: 'class'; value: IClass<T> }
     | { type: 'value'; value: T }
-    | { type: 'provider'; value: (container: Container) => T };
+    | { type: 'provider'; value: ((container?: Container) => T) | IClass<IProvider<T>> };
 
   private cachedInstance?: T;
 
@@ -45,7 +45,7 @@ export class Binding<T = any> extends BaseHelper {
     return this;
   }
 
-  toProvider(value: (container: Container) => T): this {
+  toProvider(value: ((container: Container) => T) | IClass<IProvider<T>>): this {
     this.resolver = { type: BindingValueTypes.PROVIDER, value };
     return this;
   }
@@ -96,7 +96,14 @@ export class Binding<T = any> extends BaseHelper {
         break;
       }
       case BindingValueTypes.PROVIDER: {
-        instance = this.resolver.value(container);
+        const provider = this.resolver.value;
+        if (!isClassProvider(provider)) {
+          instance = provider(container);
+          break;
+        }
+
+        const p = new provider();
+        instance = p.value();
         break;
       }
       case BindingValueTypes.CLASS: {
@@ -195,11 +202,13 @@ export class Container extends BaseHelper {
 
     // 2. Handle property injection
     const propertyMetadata = MetadataRegistry.getPropertiesMetadata({ target: instance as object });
-    if (propertyMetadata && propertyMetadata.size > 0) {
-      for (const [propertyKey, metadata] of propertyMetadata.entries()) {
-        const dep = this.get({ key: metadata.bindingKey, isOptional: metadata.optional ?? false });
-        (instance as any)[propertyKey] = dep;
-      }
+    if (!propertyMetadata?.size) {
+      return instance;
+    }
+
+    for (const [propertyKey, metadata] of propertyMetadata.entries()) {
+      const dep = this.get({ key: metadata.bindingKey, isOptional: metadata.optional ?? false });
+      (instance as any)[propertyKey] = dep;
     }
 
     return instance;

@@ -6,26 +6,36 @@ import { getError } from '@/helpers/error';
 import { Container } from '@/helpers/inversion';
 import { int, toBoolean } from '@/utilities/parse.utility';
 import { OpenAPIHono } from '@hono/zod-openapi';
+import { Env, Schema } from 'hono';
 import { showRoutes as showApplicationRoutes } from 'hono/dev';
 import isEmpty from 'lodash/isEmpty';
 import path from 'node:path';
+import { defaultAPIHook } from '../middlewares';
 import {
   IApplication,
   IApplicationConfigs,
+  IApplicationInfo,
   TBunServerInstance,
   TNodeServerInstance,
 } from './types';
 
 // ------------------------------------------------------------------------------
-export abstract class AbstractApplication extends Container implements IApplication {
+export abstract class AbstractApplication<
+    AppEnv extends Env = Env,
+    AppSchema extends Schema = {},
+    BasePath extends string = '/',
+  >
+  extends Container
+  implements IApplication<AppEnv, AppSchema, BasePath>
+{
   protected server:
     | {
-        hono: OpenAPIHono;
+        hono: OpenAPIHono<AppEnv, AppSchema, BasePath>;
         runtime: typeof RuntimeModules.BUN;
         instance?: TBunServerInstance;
       }
     | {
-        hono: OpenAPIHono;
+        hono: OpenAPIHono<AppEnv, AppSchema, BasePath>;
         runtime: typeof RuntimeModules.NODE;
         instance?: TNodeServerInstance;
       };
@@ -42,16 +52,16 @@ export abstract class AbstractApplication extends Container implements IApplicat
     this.configs = Object.assign({}, config, {
       host: config.host || process.env.HOST || process.env.APP_ENV_SERVER_HOST || 'localhost',
       port: config.port || int(process.env.PORT) || int(process.env.APP_ENV_SERVER_PORT) || 3000,
-      basePath: config.basePath || '/',
     });
 
     this.projectRoot = this.getProjectRoot();
     this.logger.info('[constructor] Project root: %s', this.projectRoot);
 
-    this.rootRouter = new OpenAPIHono({ strict: true });
-    const honoServer = new OpenAPIHono({
+    const honoServer = new OpenAPIHono<AppEnv, AppSchema, BasePath>({
       strict: this.configs.strictPath ?? true,
-    }).basePath(this.configs.basePath!);
+      defaultHook: defaultAPIHook,
+    });
+    this.rootRouter = new OpenAPIHono({ strict: true });
 
     this.server = {
       hono: honoServer,
@@ -60,13 +70,14 @@ export abstract class AbstractApplication extends Container implements IApplicat
   }
 
   // ------------------------------------------------------------------------------
-  abstract staticConfigure(): void;
   abstract setupMiddlewares(opts?: {
     middlewares?: Record<string | symbol, any>;
   }): ValueOrPromise<void>;
+
+  abstract staticConfigure(): void;
   abstract preConfigure(): ValueOrPromise<void>;
   abstract postConfigure(): ValueOrPromise<void>;
-  abstract getApplicationVersion(): ValueOrPromise<string>;
+  abstract getAppInfo(): ValueOrPromise<IApplicationInfo>;
 
   // ------------------------------------------------------------------------------
   getProjectConfigs(): IApplicationConfigs {
@@ -93,7 +104,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
     return `${this.getServerHost()}:${this.getServerPort()}`;
   }
 
-  getServer(): OpenAPIHono {
+  getServer(): OpenAPIHono<AppEnv, AppSchema, BasePath> {
     return this.server.hono;
   }
 
@@ -102,9 +113,13 @@ export abstract class AbstractApplication extends Container implements IApplicat
   }
 
   async initialize() {
-    this.bind({ key: CoreBindings.APPLICATION_INSTANCE }).toProvider(() => this);
-    this.bind({ key: CoreBindings.APPLICATION_SERVER }).toProvider(() => this.server);
-    this.bind({ key: CoreBindings.APPLICATION_ROOT_ROUTER }).toValue(() => this.server);
+    this.bind<typeof this>({ key: CoreBindings.APPLICATION_INSTANCE }).toProvider(() => this);
+    this.bind<typeof this.server>({ key: CoreBindings.APPLICATION_SERVER }).toProvider(
+      () => this.server,
+    );
+    this.bind<typeof this.rootRouter>({ key: CoreBindings.APPLICATION_ROOT_ROUTER }).toProvider(
+      () => this.rootRouter,
+    );
 
     this.validateEnvs();
     this.staticConfigure();
@@ -165,13 +180,20 @@ export abstract class AbstractApplication extends Container implements IApplicat
     );
   }
 
+  // ------------------------------------------------------------------------------
   protected startBunModule() {
     return new Promise((resolve, reject) => {
       const port = this.getServerPort();
       const host = this.getServerHost();
       const server = this.getServer();
 
-      Promise.resolve(Bun.serve({ port, fetch: server.fetch, hostname: host }))
+      Promise.resolve(
+        Bun.serve({
+          port,
+          hostname: host,
+          fetch: server.fetch,
+        }),
+      )
         .then(rs => {
           this.server.instance = rs;
           this.inspectRoutes();
@@ -229,7 +251,7 @@ export abstract class AbstractApplication extends Container implements IApplicat
     await this.setupMiddlewares();
 
     const server = this.getServer();
-    server.route('/', this.rootRouter);
+    server.route(this.configs.path.base, this.rootRouter);
 
     switch (this.server.runtime) {
       case RuntimeModules.BUN: {

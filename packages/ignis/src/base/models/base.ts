@@ -1,49 +1,30 @@
-import type { IdType, NumberIdType, StringIdType } from '@/common/types';
-import {
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-  type PgTableWithColumns,
-} from 'drizzle-orm/pg-core';
+import { pgSchema, pgTable } from 'drizzle-orm/pg-core';
+import { BaseHelper } from '../helpers';
+import { enrichId, enrichTz, enrichUserAudit } from './enrichers';
+import { TColumns } from './types';
 
 // -------------------------------------------------------------------------------------------
 // Base Entity with Drizzle ORM support
 // -------------------------------------------------------------------------------------------
-export abstract class Entity {
-  protected ormProvider: 'drizzle-orm' = 'drizzle-orm' as const;
-  protected _table?: PgTableWithColumns<any>;
+export abstract class Entity extends BaseHelper {
+  protected schema: string;
+  protected name: string;
+  protected columns: TColumns;
 
-  /**
-   * Get the Drizzle table schema for this entity
-   * Should be implemented by child classes
-   */
-  abstract getTable(): PgTableWithColumns<any>;
+  constructor(opts: { schema?: string; name: string; columns?: TColumns }) {
+    super({ scope: opts.name });
 
-  /**
-   * Build and return the table schema
-   * This method can be overridden for custom table building logic
-   */
-  build(): PgTableWithColumns<any> {
-    if (!this._table) {
-      this._table = this.getTable();
-    }
-    return this._table;
+    this.schema = opts.schema ?? 'public';
+    this.name = opts.name;
+    this.columns = opts.columns;
   }
-}
 
-// -------------------------------------------------------------------------------------------
-// Base Entity with ID support
-// -------------------------------------------------------------------------------------------
-export abstract class BaseEntity<ID extends IdType = IdType> extends Entity {
-  id!: ID;
-
-  constructor(data?: Partial<BaseEntity<ID>>) {
-    super();
-    if (data) {
-      Object.assign(this, data);
+  build() {
+    if (this.schema !== 'public') {
+      return pgSchema(this.schema).table(this.name, this.columns);
     }
+
+    return pgTable(this.name, this.columns);
   }
 
   toObject() {
@@ -58,14 +39,14 @@ export abstract class BaseEntity<ID extends IdType = IdType> extends Entity {
 // -------------------------------------------------------------------------------------------
 // Number ID Entity
 // -------------------------------------------------------------------------------------------
-export abstract class BaseNumberIdEntity extends BaseEntity<NumberIdType> {
-  protected createTableWithSerial<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: serial('id').primaryKey(),
-      ...columns,
+export class BaseNumberIdEntity extends Entity {
+  constructor(opts: { schema: string; name: string; columns?: TColumns }) {
+    super({
+      schema: opts.schema,
+      name: opts.name,
+      columns: enrichId(opts.columns, {
+        id: { columnName: 'id', dataType: 'number' },
+      }),
     });
   }
 }
@@ -73,65 +54,39 @@ export abstract class BaseNumberIdEntity extends BaseEntity<NumberIdType> {
 // -------------------------------------------------------------------------------------------
 // String ID Entity
 // -------------------------------------------------------------------------------------------
-export abstract class BaseStringIdEntity extends BaseEntity<StringIdType> {
-  protected createTableWithTextId<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: text('id').primaryKey(),
-      ...columns,
+export class BaseStringIdEntity extends Entity {
+  constructor(opts: { schema?: string; name: string; columns?: TColumns }) {
+    super({
+      schema: opts.schema,
+      name: opts.name,
+      columns: enrichId(opts.columns, {
+        id: { columnName: 'id', dataType: 'string' },
+      }),
     });
   }
 }
 
-export type TBaseIdEntity = BaseNumberIdEntity | BaseStringIdEntity;
+export type TBaseIdEntity = BaseNumberIdEntity['columns'] | BaseStringIdEntity['columns'];
 
 // -------------------------------------------------------------------------------------------
 // Timestamp Entities (with createdAt and modifiedAt)
 // -------------------------------------------------------------------------------------------
 export abstract class BaseNumberTzEntity extends BaseNumberIdEntity {
-  createdAt?: Date;
-  modifiedAt?: Date;
-
-  /**
-   * Helper to create a table with serial ID and timestamp columns
-   */
-  protected override createTableWithSerial<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: serial('id').primaryKey(),
-      ...columns,
-      createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
-      modifiedAt: timestamp('modified_at', { mode: 'date' })
-        .defaultNow()
-        .notNull()
-        .$onUpdate(() => new Date()),
+  constructor(opts: { schema?: string; name: string; columns?: TColumns }) {
+    super({
+      schema: opts.schema,
+      name: opts.name,
+      columns: enrichTz(opts.columns, {}),
     });
   }
 }
 
 export abstract class BaseStringTzEntity extends BaseStringIdEntity {
-  createdAt?: Date;
-  modifiedAt?: Date;
-
-  /**
-   * Helper to create a table with text ID and timestamp columns
-   */
-  protected override createTableWithTextId<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: text('id').primaryKey(),
-      ...columns,
-      createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
-      modifiedAt: timestamp('modified_at', { mode: 'date' })
-        .defaultNow()
-        .notNull()
-        .$onUpdate(() => new Date()),
+  constructor(opts: { schema?: string; name: string; columns?: TColumns }) {
+    super({
+      schema: opts.schema,
+      name: opts.name,
+      columns: enrichTz(opts.columns, {}),
     });
   }
 }
@@ -142,51 +97,21 @@ export type TBaseTzEntity = BaseNumberTzEntity | BaseStringTzEntity;
 // User Audit Entities (with createdBy and modifiedBy)
 // -------------------------------------------------------------------------------------------
 export abstract class BaseNumberUserAuditTzEntity extends BaseNumberTzEntity {
-  createdBy?: number;
-  modifiedBy?: number;
-
-  /**
-   * Helper to create a table with serial ID, timestamp, and user audit columns
-   */
-  protected override createTableWithSerial<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: serial('id').primaryKey(),
-      ...columns,
-      createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
-      modifiedAt: timestamp('modified_at', { mode: 'date' })
-        .defaultNow()
-        .notNull()
-        .$onUpdate(() => new Date()),
-      createdBy: integer('created_by'),
-      modifiedBy: integer('modified_by'),
+  constructor(opts: { schema?: string; name: string; columns?: TColumns }) {
+    super({
+      schema: opts.schema,
+      name: opts.name,
+      columns: enrichUserAudit(opts.columns),
     });
   }
 }
 
 export abstract class BaseStringUserAuditTzEntity extends BaseStringTzEntity {
-  createdBy?: string;
-  modifiedBy?: string;
-
-  /**
-   * Helper to create a table with text ID, timestamp, and user audit columns
-   */
-  protected override createTableWithTextId<T extends Record<string, any>>(
-    tableName: string,
-    columns: T,
-  ): PgTableWithColumns<any> {
-    return pgTable(tableName, {
-      id: text('id').primaryKey(),
-      ...columns,
-      createdAt: timestamp('created_at', { mode: 'date' }).defaultNow().notNull(),
-      modifiedAt: timestamp('modified_at', { mode: 'date' })
-        .defaultNow()
-        .notNull()
-        .$onUpdate(() => new Date()),
-      createdBy: text('created_by'),
-      modifiedBy: text('modified_by'),
+  constructor(opts: { schema?: string; name: string; columns?: TColumns }) {
+    super({
+      schema: opts.schema,
+      name: opts.name,
+      columns: enrichUserAudit(opts.columns),
     });
   }
 }

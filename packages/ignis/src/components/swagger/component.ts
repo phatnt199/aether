@@ -6,6 +6,7 @@ import { Binding } from '@/helpers/inversion';
 import { validateModule } from '@/utilities/module.utility';
 import { SwaggerBindingKeys } from './keys';
 import { ISwaggerOptions } from './types';
+import { OpenAPIObjectConfigure } from '@hono/zod-openapi';
 
 const DEFAULT_SWAGGER_OPTIONS: ISwaggerOptions = {
   restOptions: {
@@ -54,37 +55,55 @@ export class SwaggerComponent extends BaseComponent {
     const { restOptions, explorer } = swaggerOptions;
 
     // OpenAPI Documentation URL
-    explorer.info.version = await this.application.getApplicationVersion();
+    const appInfo = await this.application.getAppInfo();
+    explorer.info = {
+      title: appInfo.name,
+      version: appInfo.version,
+      description: appInfo.description,
+      contact: appInfo.author,
+    };
 
     // Application Server Urls
     if (!explorer.servers?.length) {
       explorer.servers = [
         {
-          url: ['http://', this.application.getServerAddress(), configs.basePath ?? ''].join(''),
-          description: 'Application Server URL',
+          url: ['http://', this.application.getServerAddress(), configs.path.base ?? ''].join(''),
+          description: 'Local Application Server URL',
         },
       ];
     }
 
+    const basePath = [restOptions.path.base.startsWith('/') ? '' : '/', restOptions.path.base];
     const docPath = [
-      restOptions.path.base.startsWith('/') ? '' : '/',
-      restOptions.path.base,
+      ...basePath,
       restOptions.path.doc.startsWith('/') ? '' : '/',
       restOptions.path.doc,
     ].join('');
 
-    rootRouter.doc(docPath, explorer);
+    const uiPath = [
+      ...basePath,
+      restOptions.path.ui.startsWith('/') ? '' : '/',
+      restOptions.path.ui,
+    ].join('');
 
+    rootRouter.doc(docPath, explorer as OpenAPIObjectConfigure<any, any>);
     rootRouter.get(
-      [
-        restOptions.path.base.startsWith('/') ? '' : '/',
-        restOptions.path.base,
-        restOptions.path.ui.startsWith('/') ? '' : '/',
-        restOptions.path.ui,
-      ].join(''),
+      uiPath,
       swaggerUI({
-        url: [configs.basePath ?? '', docPath].join(''),
+        title: appInfo.name,
+        url: [configs.path.base, configs.basePath ?? '', docPath].join(''),
       }),
     );
+
+    rootRouter.openAPIRegistry.registerComponent('securitySchemes', 'jwt', {
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+    });
+
+    rootRouter.openAPIRegistry.registerComponent('securitySchemes', 'basic', {
+      type: 'http',
+      scheme: 'basic',
+    });
   }
 }
