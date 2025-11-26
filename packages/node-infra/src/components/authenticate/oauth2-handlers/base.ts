@@ -215,27 +215,27 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     });
   }
 
-  saveToken(token: Token, client: Client, user: User): Promise<Token | Falsey> {
-    return new Promise((resolve, reject) => {
-      const scopes = this.scopeManager.normalizeScopes(token.scope);
+  async saveToken(token: Token, client: Client, user: User): Promise<Token | Falsey> {
+    await this.ensureInitialized();
 
-      this._saveToken({
-        token: token.accessToken,
-        type: AuthenticationTokenTypes.TYPE_ACCESS_TOKEN,
-        client,
-        user,
-        scopes,
-        details: token,
-      })
-        .then(() => {
-          resolve({ ...token, client, user });
-        })
-        .catch(reject);
+    const scopes = this.scopeManager!.normalizeScopes(token.scope);
+
+    await this._saveToken({
+      token: token.accessToken,
+      type: AuthenticationTokenTypes.TYPE_ACCESS_TOKEN,
+      client,
+      user,
+      scopes,
+      details: token,
     });
+
+    return { ...token, client, user };
   }
 
   async _getToken(opts: { type: string; token: string }) {
     const { type, token } = opts;
+
+    await this.ensureInitialized();
 
     const oauth2TokenRepository = this.injectionGetter<OAuth2TokenRepository>(
       'repositories.OAuth2TokenRepository',
