@@ -15,7 +15,9 @@ export class ScopeParser {
   private readonly MINIMUM_PARTS = 3;
   private readonly SEPARATOR = ':';
 
-  constructor(scope?: string) {
+  constructor(opts: { scope?: string }) {
+    const { scope } = opts;
+
     this.logger = LoggerFactory.getLogger([scope ?? ScopeParser.name]);
   }
 

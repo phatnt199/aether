@@ -32,7 +32,9 @@ export class UserDataFetcher {
   private scopeManager: ScopeManager;
   private relationMetadata: Map<string, IRelationMetadata>;
 
-  constructor(options: IUserDataFetcherOptions, scope?: string) {
+  constructor(opts: { options: IUserDataFetcherOptions; scope?: string }) {
+    const { options, scope } = opts;
+
     this.logger = LoggerFactory.getLogger([scope ?? UserDataFetcher.name]);
     this.injectionGetter = options.injectionGetter;
     this.userRepositoryKey = 'repositories.UserRepository';

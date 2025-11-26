@@ -45,10 +45,10 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     this.authServiceKey = opts.authServiceKey;
 
     // Initialize scope service
-    this.scopeService = new OAuth2ScopeService(
-      { injectionGetter: this.injectionGetter },
-      `${this.constructor.name}:OAuth2ScopeService`,
-    );
+    this.scopeService = new OAuth2ScopeService({
+      options: { injectionGetter: this.injectionGetter },
+      scope: `${this.constructor.name}:OAuth2ScopeService`,
+    });
 
     // Start async initialization but don't wait
     this.initPromise = this.initializeServices();
@@ -74,20 +74,20 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
       const defaultScopes = oauth2Options?.restOptions?.defaultScopes ?? [];
 
       // Initialize scope manager
-      this.scopeManager = new ScopeManager(
+      this.scopeManager = new ScopeManager({
         availableScopes,
         defaultScopes,
-        `${this.constructor.name}:ScopeManager`,
-      );
+        scope: `${this.constructor.name}:ScopeManager`,
+      });
 
       // Initialize user data fetcher
-      this.userDataFetcher = new UserDataFetcher(
-        {
+      this.userDataFetcher = new UserDataFetcher({
+        options: {
           injectionGetter: this.injectionGetter,
           scopeManager: this.scopeManager,
         },
-        `${this.constructor.name}:UserDataFetcher`,
-      );
+        scope: `${this.constructor.name}:UserDataFetcher`,
+      });
 
       this.logger.info('[initializeServices] Services initialized successfully');
     } catch (error) {

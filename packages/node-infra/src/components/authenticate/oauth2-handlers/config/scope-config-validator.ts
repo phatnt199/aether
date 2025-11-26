@@ -21,7 +21,8 @@ export interface IScopeConfigValidationResult {
 export class ScopeConfigValidator {
   private logger: ApplicationLogger;
 
-  constructor(scope?: string) {
+  constructor(opts: { scope?: string }) {
+    const { scope } = opts;
     this.logger = LoggerFactory.getLogger([scope ?? ScopeConfigValidator.name]);
   }
 

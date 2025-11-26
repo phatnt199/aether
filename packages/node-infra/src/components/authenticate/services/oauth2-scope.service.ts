@@ -18,7 +18,8 @@ export class OAuth2ScopeService {
   private cacheTimestamp: number = 0;
   private cacheTTL: number = 60000; // 1 minute cache TTL
 
-  constructor(options: IOAuth2ScopeServiceOptions, scope?: string) {
+  constructor(opts: { options: IOAuth2ScopeServiceOptions; scope?: string }) {
+    const { options, scope } = opts;
     this.logger = LoggerFactory.getLogger([scope ?? OAuth2ScopeService.name]);
     this.injectionGetter = options.injectionGetter;
     this.repositoryKey = options.repositoryKey ?? 'repositories.OAuth2ScopeRepository';

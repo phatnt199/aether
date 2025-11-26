@@ -22,9 +22,10 @@ export class ScopeValidator {
   private parser: ScopeParser;
   private options: IScopeValidatorOptions;
 
-  constructor(options: IScopeValidatorOptions, scope?: string) {
+  constructor(opts: { options: IScopeValidatorOptions; scope?: string }) {
+    const { options, scope } = opts;
     this.logger = LoggerFactory.getLogger([scope ?? ScopeValidator.name]);
-    this.parser = new ScopeParser(scope);
+    this.parser = new ScopeParser({ scope });
     this.options = {
       supportedResources: [OAuth2Resources.USER],
       supportedActions: [OAuth2Actions.READ],

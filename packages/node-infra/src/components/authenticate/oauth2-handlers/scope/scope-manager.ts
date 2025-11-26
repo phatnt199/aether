@@ -12,9 +12,15 @@ export class ScopeManager {
   private parser: ScopeParser;
   private validator: ScopeValidator;
 
-  constructor(availableScopes: IScopeDefinition[], defaultScopes: string[], scope?: string) {
+  constructor(opts: {
+    availableScopes: IScopeDefinition[];
+    defaultScopes: string[];
+    scope?: string;
+  }) {
+    const { availableScopes, defaultScopes, scope } = opts;
+
     this.logger = LoggerFactory.getLogger([scope ?? ScopeManager.name]);
-    this.parser = new ScopeParser(scope);
+    this.parser = new ScopeParser({ scope });
 
     const validatorOptions: IScopeValidatorOptions = {
       availableScopes,
@@ -23,7 +29,7 @@ export class ScopeManager {
       supportedActions: ['read'],
     };
 
-    this.validator = new ScopeValidator(validatorOptions, scope);
+    this.validator = new ScopeValidator({ options: validatorOptions, scope });
 
     this.logger.info(
       '[constructor] Initialized | Available scopes: %d | Default scopes: %s',
