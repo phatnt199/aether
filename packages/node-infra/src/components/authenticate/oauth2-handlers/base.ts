@@ -217,6 +217,15 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
 
   saveToken(token: Token, client: Client, user: User): Promise<Token | Falsey> {
     return new Promise((resolve, reject) => {
+      this.ensureInitialized();
+      if (!this.scopeManager) {
+        reject(
+          getError({
+            message: '[saveToken] scopeManager is not initialized.',
+          }),
+        );
+        return;
+      }
       const scopes = this.scopeManager.normalizeScopes(token.scope);
 
       this._saveToken({
