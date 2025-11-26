@@ -494,7 +494,9 @@ export class UserDataFetcher {
 
     const groupByField = metadata.groupBy;
     if (!groupByField) {
-      this.logger.warn(`flattenHasManyRelation (${relationName}) skipped: no groupBy field configured`);
+      this.logger.warn(
+        `flattenHasManyRelation (${relationName}) skipped: no groupBy field configured`,
+      );
       return;
     }
 
