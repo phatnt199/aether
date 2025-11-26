@@ -394,7 +394,7 @@ export class UserDataFetcher {
           break;
         }
         default: {
-          console.warn(`Unknown relation type for ${relationName}: ${metadata.type}`);
+          this.logger.warn(`Unknown relation type for ${relationName}: ${metadata.type}`);
           break;
         }
       }
