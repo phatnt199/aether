@@ -1,24 +1,35 @@
 import { BaseHelper } from '@/base/base.helper';
+import { AnyType } from '@/common';
 import {
   IMailMessage,
   IMailSendResult,
   IMailTransport,
   TNodemailerConfig,
 } from '@/components/mail';
-import nodemailer, { Transporter } from 'nodemailer';
-import type Mail from 'nodemailer/lib/mailer';
+import { validateModule } from '@/utilities';
 
 export class NodemailerTransportHelper extends BaseHelper implements IMailTransport {
-  private transporter: Transporter;
+  private transporter: AnyType;
 
   constructor(config: TNodemailerConfig) {
     super({ scope: NodemailerTransportHelper.name });
+
+    this.configure(config);
+  }
+
+  configure(config: TNodemailerConfig) {
+    validateModule({
+      scope: NodemailerTransportHelper.name,
+      modules: ['nodemailer'],
+    });
+
+    const nodemailer = require('nodemailer');
     this.transporter = nodemailer.createTransport(config);
   }
 
   async send(message: IMailMessage): Promise<IMailSendResult> {
     try {
-      const mailOptions: Mail.Options = {
+      const mailOptions = {
         from: message.from,
         to: Array.isArray(message.to) ? message.to.join(', ') : message.to,
         cc: message.cc,

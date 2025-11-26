@@ -1,4 +1,5 @@
 import { BaseHelper } from '@/base/base.helper';
+import { AnyType } from '@/common';
 import {
   IMailAttachment,
   IMailMessage,
@@ -6,19 +7,28 @@ import {
   IMailTransport,
   TMailgunConfig,
 } from '@/components/mail';
-import Mailgun from 'mailgun.js';
-import type { Interfaces, MailgunMessageData, MessagesSendResult } from 'mailgun.js/definitions';
+import { validateModule } from '@/utilities';
 import { Stream } from 'node:stream';
 
 export class MailgunTransportHelper extends BaseHelper implements IMailTransport {
-  private client: Interfaces.IMessagesClient;
+  private client: AnyType; // IMessagesClient from mailgun.js
   private domain: string;
 
   constructor(config: TMailgunConfig) {
     super({ scope: MailgunTransportHelper.name });
 
+    this.configure(config);
+  }
+
+  configure(config: TMailgunConfig) {
+    validateModule({
+      scope: MailgunTransportHelper.name,
+      modules: ['mailgun.js'],
+    });
+
     this.domain = config.domain;
 
+    const Mailgun = require('mailgun.js');
     const mailgun = new Mailgun(FormData);
     const client = mailgun.client(config);
 
@@ -27,7 +37,7 @@ export class MailgunTransportHelper extends BaseHelper implements IMailTransport
 
   async send(message: IMailMessage): Promise<IMailSendResult> {
     try {
-      const mailgunMessage: MailgunMessageData = {
+      const mailgunMessage: AnyType = {
         from: message.from,
         to: Array.isArray(message.to) ? message.to : [message.to],
         subject: message.subject,
@@ -61,7 +71,7 @@ export class MailgunTransportHelper extends BaseHelper implements IMailTransport
       }
 
       this.logger.debug('[send] Sending email with Mailgun to: %s', mailgunMessage.to);
-      const result: MessagesSendResult = await this.client.create(this.domain, mailgunMessage);
+      const result: AnyType = await this.client.create(this.domain, mailgunMessage);
 
       return {
         success: true,

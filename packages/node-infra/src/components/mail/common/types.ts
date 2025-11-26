@@ -1,5 +1,4 @@
 import type { AnyType, TConstValue } from '@/common';
-import type { MailgunClientOptions } from 'mailgun.js/definitions';
 import { Readable } from 'node:stream';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
 import { IBullMQMailExecutorOpts, IInternalQueueMailExecutorOpts } from '../helpers';
@@ -44,7 +43,8 @@ export type TMailOptions =
 
 export type TNodemailerConfig = SMTPTransport | SMTPTransport.Options | string;
 
-export type TMailgunConfig = MailgunClientOptions & { domain: string };
+// MailgunClientOptions & {domain: string}
+export type TMailgunConfig = AnyType & { domain: string };
 
 export interface IMailAttachment {
   filename?: string;
