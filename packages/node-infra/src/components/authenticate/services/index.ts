@@ -6,3 +6,4 @@ export * from './jwt-token.service';
 
 export * from './oauth2.strategy';
 export * from './oauth2.service';
+export * from './oauth2-scope.service';

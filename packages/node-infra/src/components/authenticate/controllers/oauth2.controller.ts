@@ -89,7 +89,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
 
     // -----------------------------------------------------------------------------------------------------------------
     this.expressApp.get('/auth', (request, response) => {
-      const { c, r } = request.query;
+      const { c, r, scope } = request.query;
 
       if (!c) {
         response.render('pages/auth', {
@@ -104,6 +104,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
         action: authAction,
         c: decodeURIComponent(c.toString()),
         r: decodeURIComponent(r?.toString() ?? ''),
+        scope: scope ? decodeURIComponent(scope.toString()) : '',
       };
 
       response.render('pages/auth', {
@@ -114,7 +115,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
 
     // -----------------------------------------------------------------------------------------------------------------
     this.expressApp.post('/auth', (request, response) => {
-      const { username, password, token: clientToken, redirectUrl } = request.body;
+      const { username, password, token: clientToken, redirectUrl, scope } = request.body;
 
       const requiredProps = [
         { key: 'username', value: username },
@@ -142,6 +143,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
       const oauth2Service = this.injectionGetter<OAuth2Service>('services.OAuth2Service');
 
       const decryptedClient = oauth2Service.decryptClientToken({ token: clientToken });
+
       oauth2Service
         .doOAuth2({
           context: { request, response },
@@ -152,6 +154,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
             clientId: decryptedClient.clientId,
           },
           redirectUrl,
+          scopes: scope ? scope.split(' ').filter(Boolean) : undefined,
         })
         .then(rs => {
           const { accessToken, accessTokenExpiresAt, client } = rs.oauth2TokenRs;
@@ -313,6 +316,26 @@ export class OAuth2ClientController extends _OAuth2ClientController {
   constructor(
     @inject('repositories.OAuth2ClientRepository')
     protected repository: OAuth2ClientRepository,
+  ) {
+    super(repository);
+  }
+}
+
+// --------------------------------------------------------------------------------
+import { OAuth2Scope } from '../models';
+import { OAuth2ScopeRepository } from '../repositories';
+
+const _OAuth2ScopeController = defineCrudController({
+  entity: OAuth2Scope,
+  repository: { name: OAuth2ScopeRepository.name },
+  controller: { basePath: '/oauth2/scopes' },
+});
+
+@api({ basePath: '/oauth2/scopes' })
+export class OAuth2ScopeController extends _OAuth2ScopeController {
+  constructor(
+    @inject('repositories.OAuth2ScopeRepository')
+    protected repository: OAuth2ScopeRepository,
   ) {
     super(repository);
   }

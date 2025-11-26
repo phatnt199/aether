@@ -63,8 +63,10 @@ export class OAuth2Service extends BaseService {
     clientId: string;
     clientSecret: string;
     redirectUrl: string;
+    scope?: string; // (e.g., "user:read:basic user:read:profile:firstName")
   }): Promise<{ requestPath: string }> {
-    const { clientId, clientSecret, redirectUrl } = opts;
+    const { clientId, clientSecret, redirectUrl, scope } = opts;
+    this.logger.debug('[OAuth2 Scopes] Generating request path with scopes: %s', scope);
 
     return new Promise((resolve, reject) => {
       this.oauth2ClientRepository
@@ -104,6 +106,10 @@ export class OAuth2Service extends BaseService {
 
           if (redirectUrl) {
             urlParam.set('r', encodeURIComponent(redirectUrl));
+          }
+
+          if (scope) {
+            urlParam.set('scope', encodeURIComponent(scope));
           }
 
           resolve({
@@ -148,8 +154,9 @@ export class OAuth2Service extends BaseService {
     authServiceKey: string;
     signInRequest: SignInRequest;
     redirectUrl?: string;
+    scopes?: string[]; // Array of hierarchical scopes (e.g., ['user:read:basic', 'user:read:profile:firstName'])
   }) {
-    const { context, authServiceKey, signInRequest, redirectUrl } = opts;
+    const { context, authServiceKey, signInRequest, redirectUrl, scopes } = opts;
 
     const authService = this.application.getSync<IAuthService>(authServiceKey);
 
@@ -158,13 +165,13 @@ export class OAuth2Service extends BaseService {
     if (!tokenValue) {
       throw getError({ message: `[auth] Failed to get token value!` });
     }
-
+    this.logger.debug('[doOAuth2] SignIn successful | Scopes: %s', scopes?.join(' '));
     const authorizationCodeRequest = new Request(context.request);
     authorizationCodeRequest.body = {
       client_id: signInRequest.clientId, // eslint-disable-line @typescript-eslint/naming-convention
       response_type: 'code', // eslint-disable-line @typescript-eslint/naming-convention
       grant_type: 'authorization_code', // eslint-disable-line @typescript-eslint/naming-convention
-      scope: 'profile',
+      scope: scopes && scopes.length > 0 ? scopes.join(' ') : '',
       access_token: tokenValue, // eslint-disable-line @typescript-eslint/naming-convention
       redirect_uri: redirectUrl, // eslint-disable-line @typescript-eslint/naming-convention
     };

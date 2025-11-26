@@ -16,6 +16,45 @@ export interface ITokenPayload extends IJWTTokenPayload {}
 export type TGetTokenExpiresFn = () => ValueOrPromise<number>;
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
+export interface IScopeRelationDefinition {
+  relation: string; // Relation name (e.g., 'profile', 'credentials', 'identifiers')
+  type?: 'hasOne' | 'hasMany'; // Relation type - hasOne for 1:1 relations, hasMany for 1:many
+  fields?: string[]; // Fields to include from the relation
+  groupBy?: string; // For hasMany relations, field to group by (e.g., 'scheme' for identifiers)
+  fieldAliases?: Record<string, string[]>; // Map scope aliases to actual fields (e.g., { 'name': ['firstName', 'lastName'] })
+}
+
+export interface IScopeDefinition {
+  identifier: string;
+  name: string;
+  description?: string;
+  fields?: string[]; // Fields to fetch from base User entity
+  relations?: IScopeRelationDefinition[]; // Relations to include (e.g., profile, credentials)
+}
+
+export interface IScopeValidationResult {
+  valid: boolean;
+  grantedScopes: string[];
+  invalidScopes?: string[];
+}
+
+export interface IScopeFetchResult {
+  userId: IdType;
+  data: AnyObject;
+  scopes: string[];
+}
+
+// Parsed scope structure for hierarchical format
+// Example: "user:read:basic" -> { resource: 'user', action: 'read', path: ['basic'] }
+// Example: "user:read:profile:firstName" -> { resource: 'user', action: 'read', path: ['profile', 'firstName'] }
+export interface IParsedScope {
+  original: string;
+  resource: string; // e.g., 'user'
+  action: string; // e.g., 'read', 'write'
+  path: string[]; // e.g., ['basic'], ['profile', 'firstName'], ['id']
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------
 export interface IAuthenticateTokenOptions {
   tokenSecret: string;
   tokenExpiresIn: number;
@@ -44,6 +83,8 @@ export interface IAuthenticateOAuth2RestOptions {
   authorizePath?: string;
   oauth2ServiceKey?: string;
   useImplicitGrant?: boolean;
+  availableScopes?: IScopeDefinition[];
+  defaultScopes?: string[];
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------
@@ -159,6 +200,7 @@ export class SignUpRequest {
         clientId: 'example_id',
         clientSecret: 'example_secret',
         redirectUrl: 'example_redirect_url',
+        scope: '',
       },
     ],
   },
@@ -172,6 +214,9 @@ export class OAuth2PathRequest {
 
   @property({ type: 'string' })
   redirectUrl: string;
+
+  @property({ type: 'string' })
+  scope?: string;
 }
 
 // -------------------------------------------------------------------

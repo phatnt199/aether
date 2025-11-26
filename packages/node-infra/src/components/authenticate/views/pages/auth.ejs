@@ -23,7 +23,7 @@
         <br />
 
         <% if (payload.c) { %>
-          <form method="post" action=<%- payload.action %>>
+          <form id="authForm" method="post" action=<%- payload.action %>>
             <p>
             <label for="username">Username:</label>
             <input type="text" name="username" />
@@ -37,8 +37,12 @@
             <input type="hidden" name="token" value=<%- payload.c %>>
             <input type="hidden" name="redirectUrl" value=<%- payload.r %>>
 
+            <% if (payload.scope) { %>
+            <input type="hidden" name="scope" value="<%- payload.scope %>">
+            <% } %>
+
             <p>
-            <input type="submit" value="Login">
+            <input type="submit" id="submitBtn" value="Login">
             </p>
           </form>
         <% } %>

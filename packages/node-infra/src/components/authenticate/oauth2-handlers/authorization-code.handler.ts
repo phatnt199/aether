@@ -42,7 +42,7 @@ export class OAuth2AuthorizationCodeHandler
     });
   }
 
-  saveAuthorizationCode(
+  async saveAuthorizationCode(
     code: Pick<
       AuthorizationCode,
       | 'authorizationCode'
@@ -55,19 +55,41 @@ export class OAuth2AuthorizationCodeHandler
     client: Client,
     user: User,
   ): Promise<AuthorizationCode | Falsey> {
-    return new Promise((resolve, reject) => {
-      this._saveToken({
-        token: code.authorizationCode,
-        type: AuthenticationTokenTypes.TYPE_AUTHORIZATION_CODE,
-        client,
-        user,
-        details: code,
-      })
-        .then(() => {
-          resolve({ ...code, client, user });
-        })
-        .catch(reject);
+    // Normalize scopes using ScopeManager to ensure consistency
+    const requestedScopes: string[] = this.getScopeManager()?.normalizeScopes(code.scope) ?? [];
+
+    // Validate scopes against configuration
+    const validationResult = await this.validateScopes(requestedScopes);
+
+    if (!validationResult.valid) {
+      this.logger.warn(
+        '[OAuth2 Scope] Invalid scopes requested | Requested: %s | Invalid: %s',
+        requestedScopes.join(', '),
+        validationResult.invalidScopes?.join(', ') ?? 'N/A',
+      );
+      // Optionally reject invalid scopes, or just use granted ones
+      // For now, we'll use only the granted scopes
+    }
+
+    const scopes = validationResult.grantedScopes;
+    this.logger.debug(
+      '[OAuth2 Scope] Saving code: %s for client: %s and user: %s with scopes: %s',
+      code.authorizationCode,
+      client.id,
+      user,
+      scopes.join(', ') || '(none - will use defaults)',
+    );
+
+    await this._saveToken({
+      token: code.authorizationCode,
+      type: AuthenticationTokenTypes.TYPE_AUTHORIZATION_CODE,
+      client,
+      user,
+      scopes,
+      details: code,
     });
+
+    return { ...code, client, user };
   }
 
   revokeAuthorizationCode(code: AuthorizationCode): Promise<boolean> {
