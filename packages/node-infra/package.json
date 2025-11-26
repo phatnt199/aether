@@ -147,6 +147,18 @@
     "winston-daily-rotate-file": "^5.0.0",
     "winston-transport": "^4.9.0"
   },
+  "peerDependencies": {
+    "nodemailer": "^7.0.10",
+    "mailgun.js": "^12.1.1"
+  },
+  "peerDependenciesMeta": {
+    "nodemailer": {
+      "optional": true
+    },
+    "mailgun.js": {
+      "optional": true
+    }
+  },
   "devDependencies": {
     "@minimaltech/eslint-node": "^0.2.1",
     "@types/express": "4.17.21",
@@ -155,6 +167,7 @@
     "@types/mocha": "^10.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.7.2",
+    "@types/nodemailer": "^7.0.4",
     "eslint": "^9.36.0",
     "prettier": "^3.6.2",
     "source-map-support": "^0.5.21",
