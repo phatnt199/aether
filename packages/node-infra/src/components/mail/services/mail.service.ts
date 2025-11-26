@@ -136,12 +136,13 @@ export class MailService extends BaseService implements IMailService {
         to: recipients,
         subject:
           options?.subject ??
-          this.templateEngine.render({
-            templateData: templateData.subject,
-            data,
-            requireValidate: options?.requireValidate,
-          }) ??
-          'No Subject',
+          (templateData?.subject !== undefined
+            ? this.templateEngine.render({
+                templateData: templateData.subject,
+                data,
+                requireValidate: options?.requireValidate,
+              })
+            : 'No Subject'),
         html,
         ...options,
       };

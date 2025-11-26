@@ -9,6 +9,7 @@ export const validateModule = (opts: { scope?: string; modules: Array<string> })
     } catch (error) {
       LoggerFactory.getLogger([scope]).error(
         "[validateModule] Failed to import '%s' | Error: %s",
+        module,
         error,
       );
       throw getError({

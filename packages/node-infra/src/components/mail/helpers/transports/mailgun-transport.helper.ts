@@ -61,7 +61,7 @@ export class MailgunTransportHelper extends BaseHelper implements IMailTransport
         mailgunMessage.attachment = message.attachments.map((att: IMailAttachment) => {
           const attachment: {
             filename?: string;
-            data: string | Buffer<ArrayBufferLike> | Stream.Readable;
+            data: string | Buffer | Stream.Readable;
           } = {
             filename: att.filename,
             data: att.path ?? att.content,

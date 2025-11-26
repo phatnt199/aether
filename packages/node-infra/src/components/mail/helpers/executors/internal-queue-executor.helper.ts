@@ -111,6 +111,11 @@ export class InternalQueueMailExecutorHelper extends BaseHelper implements IMail
   }
 
   private async processJob(job: IQueueJobPayload): Promise<void> {
+    if (!this.processor) {
+      this.logger.error('[processJob] Processor not set | jobId: %s', job.id);
+      return;
+    }
+
     const maxAttempts = job.options?.attempts ?? 3;
 
     this.logger.info(
@@ -125,6 +130,7 @@ export class InternalQueueMailExecutorHelper extends BaseHelper implements IMail
       await this.processor(job.email);
       this.logger.info('[processJob] Job completed successfully | jobId: %s', job.id);
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : error;
       job.attempts++;
 
       if (job.attempts < maxAttempts) {
@@ -136,7 +142,7 @@ export class InternalQueueMailExecutorHelper extends BaseHelper implements IMail
           job.attempts,
           maxAttempts,
           backoffDelay,
-          error.message,
+          errorMsg,
         );
 
         // Re-enqueue with delay
@@ -151,7 +157,7 @@ export class InternalQueueMailExecutorHelper extends BaseHelper implements IMail
           '[processJob] Job failed permanently after %d attempts | jobId: %s | error: %s',
           maxAttempts,
           job.id,
-          error.message,
+          errorMsg,
         );
       }
     }

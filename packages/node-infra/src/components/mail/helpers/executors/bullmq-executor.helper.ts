@@ -276,8 +276,8 @@ export class BullMQMailExecutorHelper extends BaseHelper implements IMailQueueEx
       delay: options?.delay,
       attempts: options?.attempts ?? 3,
       backoff: {
-        type: options?.backoff.type ?? 'exponential',
-        delay: options?.backoff.delay ?? 1000,
+        type: options?.backoff?.type ?? 'exponential',
+        delay: options?.backoff?.delay ?? 1000,
       },
       removeOnComplete: true,
       removeOnFail: false,
