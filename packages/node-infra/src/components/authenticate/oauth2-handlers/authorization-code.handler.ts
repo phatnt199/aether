@@ -81,7 +81,11 @@ export class OAuth2AuthorizationCodeHandler
 
     const scopes = validationResult.grantedScopes;
     this.logger.debug(
-      `[OAuth2 Scope] Saving code: ${code.authorizationCode} for client: ${client.id} and user: ${user} with scopes: ${scopes.join(', ') || '(none - will use defaults)'}`,
+      '[OAuth2 Scope] Saving code: %s for client: %s and user: %s with scopes: %s',
+      code.authorizationCode,
+      client.id,
+      user,
+      scopes.join(', ') || '(none - will use defaults)',
     );
 
     await this._saveToken({
