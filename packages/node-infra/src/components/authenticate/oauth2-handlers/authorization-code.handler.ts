@@ -55,16 +55,8 @@ export class OAuth2AuthorizationCodeHandler
     client: Client,
     user: User,
   ): Promise<AuthorizationCode | Falsey> {
-    // Extract scopes from code
-    const scopeValue: string | string[] | undefined = code.scope as string | string[] | undefined;
-    let requestedScopes: string[];
-    if (Array.isArray(scopeValue)) {
-      requestedScopes = scopeValue.filter(Boolean);
-    } else if (typeof scopeValue === 'string' && scopeValue.trim() !== '') {
-      requestedScopes = scopeValue.split(' ').filter(Boolean);
-    } else {
-      requestedScopes = [];
-    }
+    // Normalize scopes using ScopeManager to ensure consistency
+    const requestedScopes: string[] = this.getScopeManager()?.normalizeScopes(code.scope) ?? [];
 
     // Validate scopes against configuration
     const validationResult = await this.validateScopes(requestedScopes);
