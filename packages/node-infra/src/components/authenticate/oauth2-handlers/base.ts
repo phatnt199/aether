@@ -163,7 +163,7 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     });
   }
 
-  async generateAccessToken(client: Client, user: User, scopes: string[]): Promise<string> {
+  async generateAccessToken(client: Client, user: User, _scope: string[]): Promise<string> {
     const service = this.injectionGetter<JWTTokenService>('services.JWTTokenService');
 
     const userId = get(user, 'id');
@@ -185,7 +185,6 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
         roles: userInformation?.roles ?? [],
         provider: client.provider,
         clientId: client.id,
-        scopes,
       },
     });
 
@@ -341,7 +340,6 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     return {
       accessToken,
       accessTokenExpiresAt: new Date(int(tokenPayload['exp']) * 1000),
-      scope: tokenPayload['scopes'],
       client: Object.assign({}, oauth2Client!.toObject() as OAuth2Client, {
         id: oauth2Client.id.toString(),
       }),
@@ -349,10 +347,10 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     };
   }
 
-  async verifyScope(token: Token, requiredScopes: string[]): Promise<boolean> {
+  async verifyScope(token: Token, requiredScopes?: string[]): Promise<boolean> {
     await this.ensureInitialized();
 
-    this.logger.info('[verifyScope] Token: %j | Required scopes: %s', token, requiredScopes);
+    this.logger.info('[verifyScope] Token: %j | Required scopes: %s', token, requiredScopes ?? []);
 
     if (!token) {
       return false;
@@ -377,9 +375,9 @@ export abstract class AbstractOAuth2AuthenticationHandler implements IOAuth2Auth
     return hasAllScopes;
   }
 
-  async validateScopes(requestedScopes: string[]): Promise<IScopeValidationResult> {
+  async validateScopes(requestedScopes?: string[]): Promise<IScopeValidationResult> {
     await this.ensureInitialized();
-    return this.scopeManager!.validateScopes(requestedScopes);
+    return this.scopeManager!.validateScopes(requestedScopes ?? []);
   }
 
   protected getScopeManager(): ScopeManager | null {

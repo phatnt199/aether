@@ -104,7 +104,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
         action: authAction,
         c: decodeURIComponent(c.toString()),
         r: decodeURIComponent(r?.toString() ?? ''),
-        scope: decodeURIComponent(scope.toString() ?? ''),
+        scope: scope ? decodeURIComponent(scope.toString()) : '',
       };
 
       response.render('pages/auth', {
@@ -154,7 +154,7 @@ export class DefaultOAuth2ExpressServer extends AbstractExpressRequestHandler {
             clientId: decryptedClient.clientId,
           },
           redirectUrl,
-          scopes: scope.split(' ').filter(Boolean),
+          scopes: scope ? scope.split(' ').filter(Boolean) : undefined,
         })
         .then(rs => {
           const { accessToken, accessTokenExpiresAt, client } = rs.oauth2TokenRs;
