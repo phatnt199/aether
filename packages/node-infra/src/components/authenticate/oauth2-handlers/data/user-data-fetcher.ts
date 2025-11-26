@@ -394,7 +394,7 @@ export class UserDataFetcher {
           break;
         }
         default: {
-          console.warn(`Unknown relation type for ${relationName}: ${metadata.type}`);
+          this.logger.warn(`Unknown relation type for ${relationName}: ${metadata.type}`);
           break;
         }
       }
@@ -494,7 +494,7 @@ export class UserDataFetcher {
 
     const groupByField = metadata.groupBy;
     if (!groupByField) {
-      console.warn(`flattenHasManyRelation (${relationName}) skipped: no groupBy field configured`);
+      this.logger.warn(`flattenHasManyRelation (${relationName}) skipped: no groupBy field configured`);
       return;
     }
 
