@@ -171,6 +171,7 @@ export const vietnameseMessages: TranslationMessages = {
       email: 'Phải là địa chỉ email hợp lệ',
       oneOf: 'Phải chọn một trong số lựa chọn sau: %{options}',
       regex: 'Phải phù hợp với định dạng (regexp): %{pattern}',
+      unique: 'Giá trị này phải là duy nhất',
     },
     saved_queries: {
       label: 'Các truy vấn đã lưu',
