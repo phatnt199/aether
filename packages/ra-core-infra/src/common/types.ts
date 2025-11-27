@@ -96,7 +96,6 @@ export type TRequestType = Extract<ValueOf<typeof RequestTypes>, string>;
 export interface IGetRequestPropsParams {
   resource: string;
   body?: any;
-  file?: File;
   bodyType?: TRequestBodyType;
 }
 

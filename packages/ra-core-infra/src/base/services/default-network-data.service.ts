@@ -90,7 +90,7 @@ export class DefaultNetworkRequestService extends BaseService {
 
   //-------------------------------------------------------------
   getRequestProps(params: IGetRequestPropsParams) {
-    const { bodyType, body, file, resource } = params;
+    const { bodyType, body, resource } = params;
     const headers = this.getRequestHeader({ resource });
 
     const rs: IGetRequestPropsResult = { headers, body };
@@ -120,8 +120,28 @@ export class DefaultNetworkRequestService extends BaseService {
 
         const formData = new FormData();
 
-        if (file) {
-          formData.append('file', file, file.name);
+        for (const key in body) {
+          const val = body[key] as File | File[] | FileList | undefined;
+          if (!val) {
+            continue;
+          }
+
+          if (val instanceof FileList) {
+            Array.from(val).forEach(item => {
+              formData.append(key, item, item.name);
+            });
+            continue;
+          }
+
+          if (Array.isArray(val)) {
+            val.forEach(item => {
+              formData.append(key, item, item.name);
+            });
+            continue;
+          }
+
+          formData.append(key, val, val.name);
+          continue;
         }
 
         rs.body = formData;
