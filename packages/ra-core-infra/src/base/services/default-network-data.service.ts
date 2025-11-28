@@ -221,11 +221,10 @@ export class DefaultNetworkRequestService extends BaseService {
       configs: {},
     });
 
-    const jsonRs = await rs.json();
-
     const status = rs.status;
 
     if (status < 200 || status >= 300) {
+      const jsonRs = await rs.json();
       throw getError(jsonRs?.error);
     }
 
@@ -258,6 +257,7 @@ export class DefaultNetworkRequestService extends BaseService {
           break;
         }
 
+        const jsonRs = await rs.json();
         tempRs = {
           ...tempRs,
           response: { ...tempRs.response, data: jsonRs as ReturnType },

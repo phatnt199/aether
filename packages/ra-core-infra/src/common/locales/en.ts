@@ -158,7 +158,7 @@ export const englishMessages = {
       logged_out: 'Your session has ended, please reconnect.',
       not_authorized: "You're not authorized to access this resource.",
       application_update_available: 'A new version is available.',
-      offline: 'Không có kết nối mạng',
+      offline: 'No network connection',
     },
     validation: {
       required: 'Required',

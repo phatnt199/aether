@@ -1,6 +1,4 @@
-import { TranslationMessages } from 'react-admin';
-
-export const englishMessages: TranslationMessages = {
+export const englishMessages = {
   ra: {
     action: {
       add_filter: 'Add filter',
@@ -160,7 +158,7 @@ export const englishMessages: TranslationMessages = {
       logged_out: 'Your session has ended, please reconnect.',
       not_authorized: "You're not authorized to access this resource.",
       application_update_available: 'A new version is available.',
-      offline: 'You are now offline',
+      offline: 'No network connection',
     },
     validation: {
       required: 'Required',
