@@ -182,7 +182,12 @@ export interface IAuthProvider extends IReactAdminAuthProvider {
 
 // ----------------------------------------------------------------------
 export interface IAuthProviderOptions {
-  paths?: { signIn?: string; signUp?: string; checkAuth?: string };
+  paths?: {
+    afterLogin?: string;
+    signIn?: string;
+    signUp?: string;
+    checkAuth?: string;
+  };
 }
 
 // ----------------------------------------------------------------------

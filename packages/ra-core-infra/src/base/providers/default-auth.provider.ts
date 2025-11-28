@@ -1,4 +1,5 @@
 import { inject } from '@loopback/context';
+import { removeDoubleSlashes } from 'ra-core';
 
 import { DefaultAuthService } from '@/base/services';
 import {
@@ -39,7 +40,12 @@ export class DefaultAuthProvider<
         .then(rs => {
           const { userId, token } = rs.data;
           this.authService.saveAuth({ token, userId, username: params.username });
-          resolve(rs);
+          resolve({
+            ...rs,
+            redirectTo: removeDoubleSlashes(
+              `/${this.authProviderOptions.paths?.afterLogin ?? '/'}`,
+            ),
+          });
         })
         .catch(error => {
           console.log('[LOGIN]', error);
