@@ -155,4 +155,9 @@ export class MQTTClientHelper extends BaseHelper {
       });
     });
   }
+
+  // -------------------------------------------------------------------------------
+  getClient() {
+    return this.client;
+  }
 }
