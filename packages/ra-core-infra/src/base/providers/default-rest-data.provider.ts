@@ -57,6 +57,7 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
       name: 'default-application-network-service',
       baseUrl: this.restDataProviderOptions.url,
       noAuthPaths: this.restDataProviderOptions.noAuthPaths,
+      headers: this.restDataProviderOptions.headers,
     });
   }
 
