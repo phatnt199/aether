@@ -1,8 +1,8 @@
 import { DefaultNetworkRequestService } from './default-network-data.service';
 import { transformOpenApiError } from '@/utilities/openapi-error.utility';
 
-import type { Client } from 'openapi-fetch';
-import { PathsWithMethod } from 'openapi-typescript-helpers';
+import type { Client, MaybeOptionalInit } from 'openapi-fetch';
+import { PathsWithMethod, HttpMethod } from 'openapi-typescript-helpers';
 
 export class OpenApiNetworkService<
   TPaths extends Record<string, any>,
@@ -171,6 +171,33 @@ export class OpenApiNetworkService<
 
     const response = await client.DELETE(url, {
       ...(options as any),
+      headers: {
+        ...headers,
+        ...(options && 'headers' in options ? (options.headers as any) : {}),
+      },
+    } as any);
+
+    if (response.error) {
+      throw transformOpenApiError(response.error, response.response);
+    }
+
+    return response;
+  }
+
+  async send<
+    TMethod extends HttpMethod,
+    TPath extends PathsWithMethod<TPaths, TMethod>,
+    TInit extends MaybeOptionalInit<TPaths[TPath], TMethod> = MaybeOptionalInit<
+      TPaths[TPath],
+      TMethod
+    >,
+  >(method: TMethod, url: TPath, options?: TInit) {
+    const client = await this.getClient();
+    const resource = this.extractResource(url as string);
+    const headers = this.getRequestHeader({ resource });
+
+    const response = await client.request(method, url, {
+      ...options,
       headers: {
         ...headers,
         ...(options && 'headers' in options ? (options.headers as any) : {}),

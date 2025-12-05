@@ -517,4 +517,176 @@ describe('OpenApiNetworkService', () => {
       }
     });
   });
+
+  describe('send Method (Generic)', () => {
+    it('should successfully fetch using send with GET', async () => {
+      const response = await service.send('get', '/users');
+
+      expect(response.error).toBeUndefined();
+      expect(response.data).toEqual(mockUsers);
+    });
+
+    it('should successfully fetch with path params using send', async () => {
+      const response = await service.send('get', '/users/{id}', {
+        params: { path: { id: '1' } },
+      });
+
+      expect(response.error).toBeUndefined();
+      expect(response.data).toEqual(mockUser);
+    });
+
+    it('should successfully create using send with POST', async () => {
+      const response = await service.send('post', '/users', {
+        body: {
+          name: 'Alice Johnson',
+          email: 'alice@example.com',
+        },
+      });
+
+      expect(response.error).toBeUndefined();
+      expect(response.data).toMatchObject({
+        id: '3',
+        name: 'Alice Johnson',
+        email: 'alice@example.com',
+      });
+    });
+
+    it('should successfully update using send with PUT', async () => {
+      const response = await service.send('put', '/users/{id}', {
+        params: { path: { id: '1' } },
+        body: {
+          name: 'John Updated',
+          email: 'john.updated@example.com',
+        },
+      });
+
+      expect(response.error).toBeUndefined();
+      expect(response.data).toMatchObject({
+        id: '1',
+        name: 'John Updated',
+        email: 'john.updated@example.com',
+      });
+    });
+
+    it('should successfully patch using send with PATCH', async () => {
+      const response = await service.send('patch', '/users/{id}', {
+        params: { path: { id: '1' } },
+        body: {
+          name: 'John Patched',
+        },
+      });
+
+      expect(response.error).toBeUndefined();
+      expect(response.data).toMatchObject({
+        id: '1',
+        name: 'John Patched',
+        email: 'john@example.com',
+      });
+    });
+
+    it('should successfully delete using send with DELETE', async () => {
+      const response = await service.send('delete', '/users/{id}', {
+        params: { path: { id: '1' } },
+      });
+
+      expect(response.error).toBeUndefined();
+      expect(response.response.status).toBe(204);
+    });
+
+    it('should include auth headers when using send', async () => {
+      let capturedHeaders: Headers | undefined;
+
+      server.use(
+        http.get(`${BASE_URL}/users`, ({ request }) => {
+          capturedHeaders = request.headers;
+          return HttpResponse.json(mockUsers);
+        }),
+      );
+
+      await service.send('get', '/users');
+
+      expect(capturedHeaders?.get('authorization')).toBe(`Bearer ${mockAuthToken.value}`);
+      expect(capturedHeaders?.get('x-auth-provider')).toBe(mockAuthToken.provider);
+    });
+
+    it('should merge custom headers with auth headers in send', async () => {
+      let capturedHeaders: Headers | undefined;
+
+      server.use(
+        http.post(`${BASE_URL}/users`, ({ request }) => {
+          capturedHeaders = request.headers;
+          return HttpResponse.json({ id: '3' }, { status: 201 });
+        }),
+      );
+
+      await service.send('post', '/users', {
+        body: { name: 'Test', email: 'test@example.com' },
+        headers: { 'X-Idempotency-Key': 'unique-key' },
+      });
+
+      expect(capturedHeaders?.get('authorization')).toBeTruthy();
+      expect(capturedHeaders?.get('X-Idempotency-Key')).toBe('unique-key');
+      expect(capturedHeaders?.get('Timezone')).toBeTruthy();
+    });
+
+    it('should handle errors correctly with send', async () => {
+      server.use(errorHandlers.serverError);
+
+      try {
+        await service.send('get', '/users');
+        expect.unreachable('Should have thrown error');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        expect((error as ApplicationError).statusCode).toBe(500);
+        expect((error as ApplicationError).message).toContain('went wrong');
+      }
+    });
+
+    it('should handle 404 errors with send', async () => {
+      try {
+        await service.send('get', '/users/{id}', {
+          params: { path: { id: 'non-existent' } },
+        });
+        expect.unreachable('Should have thrown error');
+      } catch (error) {
+        expect(error).toBeInstanceOf(ApplicationError);
+        expect((error as ApplicationError).statusCode).toBe(404);
+      }
+    });
+
+    it('should extract resource correctly in send', async () => {
+      const extractSpy = mock(service['extractResource'].bind(service));
+      const originalExtract = service['extractResource'].bind(service);
+      service['extractResource'] = extractSpy;
+
+      await service.send('get', '/users/{id}', {
+        params: { path: { id: '1' } },
+      });
+
+      expect(extractSpy).toHaveBeenCalledWith('/users/{id}');
+
+      service['extractResource'] = originalExtract;
+    });
+
+    it('should skip auth headers for noAuthPaths with send', async () => {
+      const publicService = new OpenApiNetworkService<ApiPaths>({
+        name: 'PublicService',
+        baseUrl: BASE_URL,
+        noAuthPaths: ['/users'],
+      });
+
+      let capturedHeaders: Headers | undefined;
+
+      server.use(
+        http.get(`${BASE_URL}/users`, ({ request }) => {
+          capturedHeaders = request.headers;
+          return HttpResponse.json(mockUsers);
+        }),
+      );
+
+      await publicService.send('get', '/users');
+
+      expect(capturedHeaders?.get('authorization')).toBeNull();
+    });
+  });
 });
