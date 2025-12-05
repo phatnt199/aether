@@ -11,6 +11,9 @@ export class CoreBindings {
   static readonly REST_DATA_PROVIDER_OPTIONS = '@app/application/options/rest/data';
 
   static readonly I18N_PROVIDER_OPTIONS = '@app/application/options/i18n';
+
+  static readonly OPENAPI_DATA_PROVIDER = '@app/application/data/openapi/default';
+  static readonly OPENAPI_DATA_PROVIDER_OPTIONS = '@app/application/options/openapi/data';
 }
 
 export class LocalStorageKeys {
