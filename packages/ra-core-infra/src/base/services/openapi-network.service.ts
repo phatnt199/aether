@@ -7,7 +7,6 @@ import { PathsWithMethod } from 'openapi-typescript-helpers';
 export class OpenApiNetworkService<
   TPaths extends Record<string, any>,
 > extends DefaultNetworkRequestService {
-  /** Cached openapi-fetch client instance (null until first request) */
   protected client: Client<TPaths> | null = null;
 
   /** In-flight client initialization promise to prevent duplicate imports */
@@ -45,7 +44,6 @@ export class OpenApiNetworkService<
         this.logger.info('[getClient] OpenAPI client initialized | BaseURL: %s', this.baseUrl);
         return this.client;
       } catch (error) {
-        // Clear promise on failure to allow retry on next call
         this.clientPromise = null;
         this.logger.error('[getClient] Failed to import openapi-fetch:', error);
         throw new Error(
@@ -71,7 +69,7 @@ export class OpenApiNetworkService<
     return path;
   }
 
-  async GET<TPath extends PathsWithMethod<TPaths, 'get'>>(
+  async get<TPath extends PathsWithMethod<TPaths, 'get'>>(
     url: TPath,
     options?: Parameters<Client<TPaths>['GET']>[1],
   ) {
@@ -94,7 +92,7 @@ export class OpenApiNetworkService<
     return response;
   }
 
-  async POST<TPath extends PathsWithMethod<TPaths, 'post'>>(
+  async post<TPath extends PathsWithMethod<TPaths, 'post'>>(
     url: TPath,
     options?: Parameters<Client<TPaths>['POST']>[1],
   ) {
@@ -117,7 +115,7 @@ export class OpenApiNetworkService<
     return response;
   }
 
-  async PUT<TPath extends PathsWithMethod<TPaths, 'put'>>(
+  async put<TPath extends PathsWithMethod<TPaths, 'put'>>(
     url: TPath,
     options?: Parameters<Client<TPaths>['PUT']>[1],
   ) {
@@ -140,7 +138,7 @@ export class OpenApiNetworkService<
     return response;
   }
 
-  async PATCH<TPath extends PathsWithMethod<TPaths, 'patch'>>(
+  async patch<TPath extends PathsWithMethod<TPaths, 'patch'>>(
     url: TPath,
     options?: Parameters<Client<TPaths>['PATCH']>[1],
   ) {
@@ -163,7 +161,7 @@ export class OpenApiNetworkService<
     return response;
   }
 
-  async DELETE<TPath extends PathsWithMethod<TPaths, 'delete'>>(
+  async delete<TPath extends PathsWithMethod<TPaths, 'delete'>>(
     url: TPath,
     options?: Parameters<Client<TPaths>['DELETE']>[1],
   ) {
@@ -184,9 +182,5 @@ export class OpenApiNetworkService<
     }
 
     return response;
-  }
-
-  async getRawClient(): Promise<Client<TPaths>> {
-    return this.getClient();
   }
 }
