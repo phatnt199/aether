@@ -10,13 +10,15 @@ export type TUseTranslateKeysDefault = TFullPaths<typeof englishMessages>;
 
 export type TUseTranslateKeys = TUseTranslateKeysDefault | keyof IUseTranslateKeysOverrides;
 
+export type TUseTranslateFn = (key: TUseTranslateKeys, options?: AnyType) => string;
+
 export const useTranslate = () => {
   // --------------------------------------------------
   const i18nProvider = useI18nProvider();
 
   // --------------------------------------------------
-  const translate = React.useCallback(
-    (key: TUseTranslateKeys, options?: any) => {
+  const translate: TUseTranslateFn = React.useCallback(
+    (key: TUseTranslateKeys, options?: AnyType) => {
       return i18nProvider.translate(key, options) as string;
     },
     [i18nProvider],

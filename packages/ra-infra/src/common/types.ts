@@ -26,6 +26,7 @@ import {
   UserIdentity,
 } from 'react-admin';
 import { Environments, RequestBodyTypes, RequestMethods, RequestTypes } from './constants';
+import { DefaultFetchNetworkRequestService } from '@/base';
 
 //-----------------------------------------------------------
 export type NumberIdType = number;
@@ -165,6 +166,8 @@ export interface IDataProvider<TResource extends string = string>
     resource: TResource;
     params: ISendParams;
   }) => Promise<ISendResponse<ReturnType>>;
+
+  getNetworkService(): DefaultFetchNetworkRequestService;
 }
 
 export interface IReactAdminAuthProvider {

@@ -1,4 +1,5 @@
 import isEmpty from 'lodash/isEmpty';
+import merge from 'lodash/merge';
 
 import {
   AnyType,
@@ -12,8 +13,8 @@ import {
   TRequestMethod,
   TRequestType,
 } from '@/common';
-import { getError } from '@/utilities';
 import { NodeFetchNetworkRequest } from '@/helpers';
+import { getError } from '@/utilities';
 import { BaseService } from './base.service';
 
 export class DefaultNetworkRequestService extends BaseService {
@@ -63,6 +64,11 @@ export class DefaultNetworkRequestService extends BaseService {
   setAuthToken(opts: { type?: string; value: string }) {
     const { type, value } = opts;
     this.authToken = { type, value };
+  }
+
+  //-------------------------------------------------------------
+  setHeaders(headers: HeadersInit) {
+    this.headers = merge(this.headers, headers);
   }
 
   //-------------------------------------------------------------

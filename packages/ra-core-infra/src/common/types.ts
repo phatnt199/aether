@@ -27,6 +27,7 @@ import {
 } from 'ra-core';
 
 import { Environments, RequestBodyTypes, RequestMethods, RequestTypes } from './constants';
+import { DefaultNetworkRequestService } from '@/base';
 
 //-----------------------------------------------------------
 export type NumberIdType = number;
@@ -165,6 +166,8 @@ export interface IDataProvider<TResource extends string = string>
     resource: TResource;
     params: ISendParams;
   }) => Promise<ISendResponse<ReturnType>>;
+
+  getNetworkService(): DefaultNetworkRequestService;
 }
 
 export interface IReactAdminAuthProvider {

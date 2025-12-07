@@ -62,6 +62,11 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
   }
 
   //---------------------------------------------------------------------------
+  getNetworkService() {
+    return this.networkService;
+  }
+
+  //---------------------------------------------------------------------------
   getListHelper<RecordType extends RaRecord = AnyType>(opts: {
     resource: TResource;
     type: TRequestType;
@@ -517,6 +522,9 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
       },
       send: (opts: { resource: TResource; params: ISendParams }) => {
         return this.send(opts);
+      },
+      getNetworkService: () => {
+        return this.getNetworkService();
       },
     };
   }

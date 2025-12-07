@@ -13,6 +13,7 @@ import {
 import { NodeFetchNetworkRequest } from '@/helpers';
 import { getError } from '@/utilities';
 import isEmpty from 'lodash/isEmpty';
+import merge from 'lodash/merge';
 
 export class DefaultFetchNetworkRequestService extends NodeFetchNetworkRequest {
   protected authToken?: { type?: string; value: string };
@@ -61,6 +62,11 @@ export class DefaultFetchNetworkRequestService extends NodeFetchNetworkRequest {
   setAuthToken(opts: { type?: string; value: string }) {
     const { type, value } = opts;
     this.authToken = { type, value };
+  }
+
+  //-------------------------------------------------------------
+  setHeaders(headers: HeadersInit) {
+    this.headers = merge(this.headers, headers);
   }
 
   //-------------------------------------------------------------
