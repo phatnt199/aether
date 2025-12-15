@@ -7,13 +7,23 @@ Minimal Technology ReactJS Core Infrastructure - A React Admin Core framework bu
 ### Installation
 
 ```bash
-npm install @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
+npm install @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter reflect-metadata
 # or
-yarn add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
+yarn add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter reflect-metadata
 # or
-pnpm add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
+pnpm add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter reflect-metadata
 # or
-bun add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
+bun add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter reflect-metadata
+```
+
+### Setup (Required)
+
+Since this package uses reflect-metadata, you need to configure:
+
+**Configure your `application.ts`:**
+
+```typescript
+import 'reflect-metadata';
 ```
 
 ### Customization
@@ -51,6 +61,7 @@ import { useTranslate } from '@minimaltech/ra-core-infra';
 
 ## 📚 Documentation
 
+- [Setup](https://github.com/phatnt199/aether/wiki/Setup) - **Read this first!**
 - [Project WIKI](https://github.com/phatnt199/aether/wiki)
 
 ## ⚡ Features
@@ -93,4 +104,5 @@ Report issues at [GitHub Issues](https://github.com/phatnt199/aether/issues)
 
 Please checkout these references for more guiding:
 
+- [Setup Guide](https://github.com/phatnt199/aether/wiki/Setup) ⭐ **Important!**
 - [Project WIKI](https://github.com/phatnt199/aether/wiki)

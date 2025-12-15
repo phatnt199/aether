@@ -189,11 +189,12 @@
     },
     "packages/ra-core-infra": {
       "name": "@minimaltech/ra-core-infra",
-      "version": "0.0.2-12",
+      "version": "0.0.3-2",
       "dependencies": {
         "@reduxjs/toolkit": "^2.9.1",
         "ra-i18n-polyglot": "^5.12.1",
         "react-router-dom": "^7.9.4",
+        "reflect-metadata": "^0.2.2",
       },
       "devDependencies": {
         "@minimaltech/eslint-react": "^0.2.1-2",
