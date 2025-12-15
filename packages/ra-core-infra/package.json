@@ -13,6 +13,7 @@
     "ReactJS",
     "loopback",
     "loopback-application",
+    "venizia",
     "infrastructure",
     "minimaltech",
     "minimaltek",
@@ -103,8 +104,8 @@
     "vite": "^7.1.10"
   },
   "peerDependencies": {
-    "@loopback/context": "^8.0.2",
     "@loopback/filter": "^6.0.2",
+    "@venizia/ignis-inversion": "^0.0.1-8",
     "axios": "^1.13.2",
     "ra-core": ">=5.12.2",
     "react": ">=18.0",

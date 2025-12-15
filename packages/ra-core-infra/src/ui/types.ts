@@ -1,10 +1,10 @@
-import { Context } from '@loopback/context';
 import { Store } from '@reduxjs/toolkit';
+import { Container } from '@venizia/ignis-inversion';
 import { CoreAdminProps, ResourceProps } from 'ra-core';
 import { RouteProps } from 'react-router-dom';
 
 export interface IApplication extends Omit<CoreAdminProps, 'children'> {
-  context: Context;
+  container: Container;
 
   enableDebug?: boolean;
   reduxStore: Store;

@@ -1,4 +1,4 @@
-import { inject } from '@loopback/context';
+import { Container, inject } from '@venizia/ignis-inversion';
 import { removeDoubleSlashes } from 'ra-core';
 
 import { DefaultAuthService } from '@/base/services';
@@ -9,7 +9,6 @@ import {
   IAuthProviderOptions,
   IDataProvider,
   RequestMethods,
-  ValueOrPromise,
 } from '@/common';
 import { BaseProvider } from './base.provider';
 
@@ -17,11 +16,11 @@ export class DefaultAuthProvider<
   TResource extends string = string,
 > extends BaseProvider<IAuthProvider> {
   constructor(
-    @inject(CoreBindings.DEFAULT_REST_DATA_PROVIDER)
+    @inject({ key: CoreBindings.DEFAULT_REST_DATA_PROVIDER })
     protected restDataProvider: IDataProvider<TResource>,
-    @inject(CoreBindings.AUTH_PROVIDER_OPTIONS)
+    @inject({ key: CoreBindings.AUTH_PROVIDER_OPTIONS })
     protected authProviderOptions: IAuthProviderOptions,
-    @inject(CoreBindings.DEFAULT_AUTH_SERVICE)
+    @inject({ key: CoreBindings.DEFAULT_AUTH_SERVICE })
     protected authService: DefaultAuthService,
   ) {
     super({ scope: DefaultAuthProvider.name });
@@ -43,7 +42,7 @@ export class DefaultAuthProvider<
           resolve({
             ...rs,
             redirectTo: removeDoubleSlashes(
-              `/${this.authProviderOptions.paths?.afterLogin ?? '/'}`,
+              `/${this.authProviderOptions.endpoints?.afterLogin ?? '/'}`,
             ),
           });
         })
@@ -139,7 +138,7 @@ export class DefaultAuthProvider<
   }
 
   // -------------------------------------------------------------
-  override value(): ValueOrPromise<IAuthProvider> {
+  override value(_container: Container): IAuthProvider {
     return {
       login: (params: AnyType) => this.login(params),
       logout: (params: AnyType) => this.logout(params),

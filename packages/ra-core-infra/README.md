@@ -1,79 +1,38 @@
 # @minimaltech/ra-core-infra
 
-Minimal Technology ReactJS Core Infrastructure - A React Admin Core framework built on LoopBack 4 for browser applications.
+Minimal Technology ReactJS Core Infrastructure - A React Admin Core framework built on Venizia and LoopBack 4 for browser applications.
 
 ## 🚀 Quick Start
 
 ### Installation
 
 ```bash
-npm install @minimaltech/ra-core-infra @loopback/context @loopback/filter
+npm install @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
 # or
-yarn add @minimaltech/ra-core-infra @loopback/context @loopback/filter
+yarn add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
 # or
-pnpm add @minimaltech/ra-core-infra @loopback/context @loopback/filter
+pnpm add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
+# or
+bun add @minimaltech/ra-core-infra @venizia/ignis-inversion @loopback/filter
 ```
 
-### Browser Setup (Required for Vite!)
+### Customization
 
-Since this package uses LoopBack 4 (which requires Node.js APIs), you need to install and configure polyfills:
+#### Hooks
 
-**1. Install the polyfill plugin:**
-
-```bash
-npm install -D vite-plugin-node-polyfills
-# or
-yarn add -D vite-plugin-node-polyfills
-# or
-pnpm add -D vite-plugin-node-polyfills
-```
-
-**2. Configure your `vite.config.ts`:**
-
-```typescript
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { nodePolyfills } from 'vite-plugin-node-polyfills';
-
-export default defineConfig({
-  plugins: [
-    react(),
-    nodePolyfills({
-      include: ['buffer', 'process'],
-      globals: {
-        Buffer: true,
-        global: true,
-        process: true,
-      },
-    }),
-  ],
-});
-```
-
-**That's it!** The plugin automatically handles all Node.js polyfills (Buffer, process, global).
-
-**📖 [Complete Vite Setup Guide](./VITE_SETUP.md)** | [Browser Compatibility](https://github.com/phatnt199/aether/wiki/Browser-Compatibility-Setup)
-
-## Customization
-
-### Hooks
-
-#### `useInjectable`
+##### `useInjectable`
 
 If you're using TypeScript, you'll need to specify your new keys, using [module augmentation](https://www.typescriptlang.org/docs/handbook/declaration-merging.html#module-augmentation).
 
 ```typescript
 declare module '@minimaltech/ra-core-infra' {
-  interface IUseTranslateKeysOverrides
-    extends Record<TFullPaths<typeof yourEnglishMessages>, unknown> {}
-
   interface IUseInjectableKeysOverrides {
     ['services.yourServices']: true;
   }
 }
 ```
 
-#### `useTranslate`
+##### `useTranslate`
 
 If you're need to `useTranslate` with key suggestion from your language files.
 
@@ -92,15 +51,14 @@ import { useTranslate } from '@minimaltech/ra-core-infra';
 
 ## 📚 Documentation
 
-- [Browser Compatibility Setup](https://github.com/phatnt199/aether/wiki/Browser-Compatibility-Setup) - **Read this first!**
 - [Project WIKI](https://github.com/phatnt199/aether/wiki)
 
 ## ⚡ Features
 
 - 🎯 React Admin Core integration
-- 💉 Dependency Injection with LoopBack 4
+- 💉 Dependency Injection with Venizia
 - 🔍 Advanced data filtering
-- 🌐 Browser-compatible (with polyfills)
+- 🌐 Browser-compatible
 - 📦 Tree-shakeable ES modules
 - 🌍 i18n support
 
@@ -108,7 +66,8 @@ import { useTranslate } from '@minimaltech/ra-core-infra';
 
 - React 18+
 - React Admin Core 5+
-- LoopBack 4 (Context & Filter)
+- LoopBack 4 (Context)
+- Venizia (Ignis Inversion)
 - TypeScript
 
 ## 📦 What's Included
@@ -134,5 +93,4 @@ Report issues at [GitHub Issues](https://github.com/phatnt199/aether/issues)
 
 Please checkout these references for more guiding:
 
-- [Browser Setup Guide](https://github.com/phatnt199/aether/wiki/Browser-Compatibility-Setup) ⭐ **Important!**
 - [Project WIKI](https://github.com/phatnt199/aether/wiki)
