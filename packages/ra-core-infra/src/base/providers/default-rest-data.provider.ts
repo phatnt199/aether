@@ -1,4 +1,4 @@
-import { inject } from '@loopback/context';
+import { Container, inject } from '@venizia/ignis-inversion';
 import omit from 'lodash/omit';
 import {
   CreateParams,
@@ -37,7 +37,6 @@ import {
   RequestTypes,
   TRequestMethod,
   TRequestType,
-  ValueOrPromise,
 } from '@/common';
 import { getError } from '@/utilities';
 import { BaseProvider } from './base.provider';
@@ -48,7 +47,7 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
   protected networkService: DefaultNetworkRequestService;
 
   constructor(
-    @inject(CoreBindings.REST_DATA_PROVIDER_OPTIONS)
+    @inject({ key: CoreBindings.REST_DATA_PROVIDER_OPTIONS })
     protected restDataProviderOptions: IRestDataProviderOptions,
   ) {
     super({ scope: DefaultRestDataProvider.name });
@@ -491,7 +490,7 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
     return response;
   }
 
-  override value(): ValueOrPromise<IDataProvider<TResource>> {
+  override value(_container: Container): IDataProvider<TResource> {
     return {
       getList: (resource, params) => {
         return this.getList({ resource, params });

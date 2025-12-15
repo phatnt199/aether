@@ -1,5 +1,5 @@
-import { BindingTag, Constructor, DynamicValueProviderClass } from '@loopback/context';
 import { Filter, Where } from '@loopback/filter';
+import { TClass } from '@venizia/ignis-inversion';
 import {
   CreateParams,
   CreateResult,
@@ -26,8 +26,8 @@ import {
   UserIdentity,
 } from 'ra-core';
 
-import { Environments, RequestBodyTypes, RequestMethods, RequestTypes } from './constants';
 import { DefaultNetworkRequestService } from '@/base';
+import { Environments, RequestBodyTypes, RequestMethods, RequestTypes } from './constants';
 
 //-----------------------------------------------------------
 export type NumberIdType = number;
@@ -185,8 +185,10 @@ export interface IAuthProvider extends IReactAdminAuthProvider {
 
 // ----------------------------------------------------------------------
 export interface IAuthProviderOptions {
-  paths?: {
+  endpoints?: {
     afterLogin?: string;
+  };
+  paths?: {
     signIn?: string;
     signUp?: string;
     checkAuth?: string;
@@ -232,12 +234,8 @@ export interface ICoreRaApplication {
   bindContext(): ValueOrPromise<void>;
 
   // ------------------------------------------------------------------------------
-  injectable<T>(
-    scope: string,
-    value: DynamicValueProviderClass<T> | Constructor<T>,
-    tags?: Array<BindingTag>,
-  ): void;
-  service<T>(value: DynamicValueProviderClass<T> | Constructor<T>): void;
+  injectable<T>(scope: string, value: TClass<T>, tags?: Array<string>): void;
+  service<T>(value: TClass<T>): void;
 
   // ------------------------------------------------------------------------------
   start(): ValueOrPromise<void>;

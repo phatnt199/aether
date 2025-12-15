@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { Context } from '@loopback/context';
+import { Container } from '@venizia/ignis-inversion';
 
 import { Logger } from '@/helpers';
 
 export const ApplicationContext = React.createContext<{
-  context: Context | null;
-  registry: Context | null;
+  container: Container | null;
+  registry: Container | null;
   logger: Logger | null;
 }>({
-  context: null,
+  container: null,
   registry: null,
   logger: null,
 });

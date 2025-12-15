@@ -1,21 +1,21 @@
-import { inject } from '@loopback/context';
+import { Container, inject } from '@venizia/ignis-inversion';
 import { I18nProvider } from 'ra-core';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 
-import { CoreBindings, englishMessages, II18nProviderOptions, ValueOrPromise } from '@/common';
+import { CoreBindings, englishMessages, II18nProviderOptions } from '@/common';
 import { BaseProvider } from './base.provider';
 
 const [language] = (navigator?.language || 'en-US').split('-');
 
 export class DefaultI18nProvider extends BaseProvider<I18nProvider> {
   constructor(
-    @inject(CoreBindings.I18N_PROVIDER_OPTIONS)
+    @inject({ key: CoreBindings.I18N_PROVIDER_OPTIONS })
     protected i18nProviderOptions: II18nProviderOptions,
   ) {
     super({ scope: DefaultI18nProvider.name });
   }
 
-  override value(): ValueOrPromise<I18nProvider> {
+  override value(_container: Container): I18nProvider {
     const {
       i18nSources = { en: englishMessages },
       listLanguages = [{ locale: 'en', name: 'English' }],

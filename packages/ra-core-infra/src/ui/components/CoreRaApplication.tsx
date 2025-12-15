@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Context } from '@loopback/context';
 import { Store } from '@reduxjs/toolkit';
+import { Container } from '@venizia/ignis-inversion';
 import { CoreAdmin, CustomRoutes, I18nProvider, Resource } from 'ra-core';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Route } from 'react-router-dom';
@@ -13,14 +13,14 @@ import { IApplication } from '../types';
 
 const Wrapper: React.FC<{
   applicationName?: string;
-  context: Context;
+  container: Container;
   reduxStore: Store;
   suspense: React.ReactNode;
   enableDebug?: boolean;
   children: React.ReactNode;
 }> = ({
   applicationName = 'CoreRaApplication',
-  context,
+  container,
   reduxStore,
   suspense,
   enableDebug = false,
@@ -29,8 +29,8 @@ const Wrapper: React.FC<{
   return (
     <ApplicationContext.Provider
       value={{
-        context,
-        registry: context,
+        container,
+        registry: container,
         logger: Logger.getInstance({ scope: applicationName, enableDebug }),
       }}
     >
@@ -44,7 +44,7 @@ const Wrapper: React.FC<{
 // -----------------------------------------------------------------
 export const CoreRaApplication: React.FC<IApplication> = (props: IApplication) => {
   const {
-    context,
+    container,
     reduxStore,
     suspense,
     enableDebug = false,
@@ -57,17 +57,23 @@ export const CoreRaApplication: React.FC<IApplication> = (props: IApplication) =
 
   // -------------------------------------------------------------------------------
   const adminProps = React.useMemo(() => {
-    const dataProvider = context.getSync<IDataProvider>(CoreBindings.DEFAULT_REST_DATA_PROVIDER);
-    const authProvider = context.getSync<IAuthProvider>(CoreBindings.DEFAULT_AUTH_PROVIDER);
-    const i18nProvider = context.getSync<I18nProvider>(CoreBindings.DEFAULT_I18N_PROVIDER);
+    const dataProvider = container.get<IDataProvider>({
+      key: CoreBindings.DEFAULT_REST_DATA_PROVIDER,
+    });
+    const authProvider = container.get<IAuthProvider>({
+      key: CoreBindings.DEFAULT_AUTH_PROVIDER,
+    });
+    const i18nProvider = container.get<I18nProvider>({
+      key: CoreBindings.DEFAULT_I18N_PROVIDER,
+    });
 
     return { dataProvider, authProvider, i18nProvider, ...raProps };
-  }, [context, raProps]);
+  }, [container, raProps]);
 
   // -------------------------------------------------------------------------------
   return (
     <Wrapper
-      context={context}
+      container={container}
       reduxStore={reduxStore}
       suspense={suspense}
       enableDebug={enableDebug}

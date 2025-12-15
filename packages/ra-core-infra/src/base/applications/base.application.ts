@@ -1,9 +1,9 @@
-import { BindingTag, Constructor, Context, DynamicValueProviderClass } from '@loopback/context';
+import { Container, TClass } from '@venizia/ignis-inversion';
 
 import { ICoreRaApplication, ValueOrPromise } from '@/common';
 
 // --------------------------------------------------------------------------------
-export abstract class AbstractRaApplication extends Context implements ICoreRaApplication {
+export abstract class AbstractRaApplication extends Container implements ICoreRaApplication {
   abstract bindContext(): ValueOrPromise<void>;
 
   // ------------------------------------------------------------------------------
@@ -17,23 +17,14 @@ export abstract class AbstractRaApplication extends Context implements ICoreRaAp
   postConfigure(): ValueOrPromise<void> {}
 
   // ------------------------------------------------------------------------------
-  injectable<T>(
-    scope: string,
-    value: DynamicValueProviderClass<T> | Constructor<T>,
-    tags?: BindingTag[],
-  ) {
-    this.bind(`${scope}.${value.name}`)
-      .toInjectable(value)
-      .tag(...(tags ?? []), scope);
+  injectable<T>(scope: string, value: TClass<T>, tags?: Array<string>) {
+    this.bind({ key: `${scope}.${value.name}` })
+      .toClass(value)
+      .setTags(...(tags ?? []));
   }
 
   // ------------------------------------------------------------------------------
-  /* provider<T>(value: DynamicValueProviderClass<T> | Constructor<T>) {
-    this.injectable('providers', value);
-  } */
-
-  // ------------------------------------------------------------------------------
-  service<T>(value: DynamicValueProviderClass<T> | Constructor<T>) {
+  service<T>(value: TClass<T>) {
     this.injectable('services', value);
   }
 

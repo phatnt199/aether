@@ -1,14 +1,7 @@
-import { Provider } from '@loopback/context';
+import { Container, IProvider } from '@venizia/ignis-inversion';
 
-import { ValueOrPromise } from '@/common';
-import { Logger } from '@/helpers';
+import { BaseHelper } from '@/helpers/base.helper';
 
-export abstract class BaseProvider<T> implements Provider<T> {
-  protected logger: Logger;
-
-  constructor(opts: { scope: string }) {
-    this.logger = new Logger({ scope: opts.scope });
-  }
-
-  abstract value(): ValueOrPromise<T>;
+export abstract class BaseProvider<T> extends BaseHelper implements IProvider<T> {
+  abstract value(container: Container): T;
 }
