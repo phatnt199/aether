@@ -60,6 +60,7 @@ type IdType = string | number
 ```
 
 **Usage**:
+
 ```typescript
 interface User {
   id: IdType;  // Can be string or number
@@ -70,25 +71,6 @@ const userId: IdType = '123';        // ✓ OK
 const numericId: IdType = 456;       // ✓ OK
 const invalidId: IdType = true;      // ✗ Error
 ```
-
----
-
-### AnyType
-
-Alias for `any` type.
-
-```typescript
-type AnyType = any
-```
-
-**Usage**:
-```typescript
-function processData(data: AnyType) {
-  // Works with any type
-}
-```
-
----
 
 ### AnyObject
 
@@ -109,7 +91,7 @@ const config: AnyObject = {
 
 ---
 
-### ValueOrPromise<T>
+### ValueOrPromise\<T\>
 
 Value that can be synchronous or asynchronous.
 
@@ -129,7 +111,7 @@ function getData(): ValueOrPromise<User> {
 
 ---
 
-### ValueOf<T>
+### ValueOf\<T\>
 
 Extract all value types from an object.
 
@@ -152,7 +134,7 @@ type Color = ValueOf<typeof Colors>;  // 'red' | 'green' | 'blue'
 
 ## Utility Types
 
-### ValueOptional<T, K>
+### ValueOptional\<T, K\>
 
 Make specific properties optional.
 
@@ -181,7 +163,7 @@ const user: UserInput = {
 
 ---
 
-### ValueOptionalExcept<T, K>
+### ValueOptionalExcept\<T, K\>
 
 Make all properties optional except specified ones.
 
@@ -210,7 +192,7 @@ const update: UserUpdate = {
 
 ---
 
-### TPrettify<T>
+### TPrettify\<T\>
 
 Format complex type for better IDE display.
 
@@ -412,7 +394,7 @@ this.container.bind({
 
 ## Service Interfaces
 
-### ICrudService<E>
+### ICrudService\<E\>
 
 Generic CRUD service interface.
 
@@ -523,7 +505,7 @@ const response = await dataProvider.send({
 
 ---
 
-### ISendResponse<T>
+### ISendResponse\<T\>
 
 Response from custom HTTP requests.
 
@@ -604,7 +586,7 @@ const urlEncodedParams: ISendParams = {
 
 ## Path Types
 
-### TPaths<T>
+### TPaths\<T\>
 
 Generate all possible paths in an object (including intermediate paths).
 
@@ -643,7 +625,7 @@ getProperty(user, 'invalid.path');          // ✗ Error
 
 ---
 
-### TFullPaths<T>
+### TFullPaths\<T\>
 
 Generate only leaf paths in an object (excluding intermediate objects).
 
