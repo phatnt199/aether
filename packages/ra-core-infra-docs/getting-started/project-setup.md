@@ -38,71 +38,35 @@ bun add react react-dom react-router-dom
 Organize your project following this structure for scalability and maintainability:
 
 ```
-my-admin-app/
-├── public/                     # Static assets
-├── src/
-│   ├── application/            # Application layer (DI configuration)
-│   │   ├── application.ts      # Main application class
-│   │   ├── constants/          # Application constants
-│   │   │   ├── endpoints.ts
-│   │   │   ├── routes.ts
-│   │   │   └── common.ts
-│   │   ├── locales/            # i18n translations
-│   │   │   ├── en.ts
-│   │   │   └── vi.ts
-│   │   ├── providers/          # Custom providers
-│   │   │   └── auth.provider.ts
-│   │   └── services/           # Business logic services
-│   │       └── apis/           # API service classes
-│   │           ├── base-crud.api.ts
-│   │           └── product.api.ts
-│   │
-│   ├── components/             # Reusable UI components
-│   │   ├── ui/                 # Base UI components (buttons, inputs, etc.)
-│   │   └── features/           # Feature-specific components
-│   │
-│   ├── screens/                # Page components (routes)
-│   │   ├── home/
-│   │   ├── products/
-│   │   └── login/
-│   │
-│   ├── hooks/                  # Custom React hooks
-│   │   ├── api/                # API data hooks
-│   │   │   ├── use-get-data.ts
-│   │   │   └── use-mutation-data.ts
-│   │   └── view/               # View/UI hooks
-│   │
-│   ├── interfaces/             # TypeScript types and interfaces
-│   │   ├── models/             # Data models
-│   │   └── api/                # API request/response types
-│   │
-│   ├── utils/                  # Helper functions
-│   │   ├── format.ts
-│   │   └── validation.ts
-│   │
-│   ├── main.tsx                # Application entry point
-│   └── App.tsx                 # Root component
-│
-├── .env                        # Environment variables
-├── .env.example                # Environment variables template
-├── tsconfig.json               # TypeScript configuration
-├── tsconfig.app.json           # App TypeScript configuration
-├── vite.config.ts              # Vite configuration
-└── package.json                # Dependencies and scripts
+src/
+├── app/
+│   ├── providers/
+│   ├── routes/
+│   ├── locales/
+│   ├── services/
+│   ├── models(entities)/
+│   └── styles/
+├── pages/
+│   ├── home/
+│   │   ├── ui/
+│   │   └── index.ts
+│   └── profile/
+├── widgets/
+│   └── header/
+├── features/
+│   ├── add-to-cart/
+│   │   ├── ui/
+│   │   ├── model/
+│   │   ├── api/
+│   │   └── index.ts
+│   └── auth/
+└── shared/
+    ├── ui/
+    ├── api/
+    └── lib/
+
 ```
 
-## Create Directory Structure
-
-Run this command to create all directories at once:
-
-```bash
-mkdir -p src/application/{constants,locales,providers,services/apis}
-mkdir -p src/components/{ui,features}
-mkdir -p src/screens/{home,products,login}
-mkdir -p src/hooks/{api,view}
-mkdir -p src/interfaces/{models,api}
-mkdir -p src/utils
-```
 
 ## Configure Vite
 
@@ -283,50 +247,38 @@ Understanding the folder structure:
 The **core** of your app where dependency injection is configured:
 
 - **`application.ts`** - Extends `BaseRaApplication`, configures DI container
-- **`constants/`** - Application-wide constants (endpoints, routes)
 - **`providers/`** - Custom provider implementations (auth, data, i18n)
-- **`services/`** - Business logic and API communication
 
-### Component Layer (`src/components/`)
-
-Reusable UI components:
-
-- **`ui/`** - Base components (Button, Input, Card, etc.)
-- **`features/`** - Feature-specific components (ProductCard, UserProfile)
-
-### Screen Layer (`src/screens/`)
+### Pages Layer (`src/pages/`)
 
 Page-level components mapped to routes:
 
 - Each screen is a top-level feature (Home, Products, Login)
 - Screens compose components and hooks
 
-### Hook Layer (`src/hooks/`)
+### Widgets Layer (`src/widgets/`)
+Widget is a block of UI that can be reused across pages
 
-Custom React hooks:
+### features Layer (`src/features/`)
+Feature-specific components and logic. A good indication of a new feature when it is used accross multiple pages
 
-- **`api/`** - Data fetching hooks (useGetData, useMutationData)
-- **`view/`** - UI/View hooks (useModal, useToast)
+### shared Layer (`src/shared/`)
+Shared components and logic across the app
 
-### Interface Layer (`src/interfaces/`)
+### Dependency rules (import flow)
+- Top → Down Only: App → Pages → Widgets → Features → Entities → Shared
+- Same Layer: Slices cannot import from each other
+- Lower Risk: The lower the layer, the riskier changes become (more dependents)
+- Public API: All imports go through index.ts/js files
 
-TypeScript types and interfaces:
 
-- **`models/`** - Domain models (User, Product, Order)
-- **`api/`** - API request/response shapes
-
-### Utility Layer (`src/utils/`)
-
-Pure helper functions (no React dependencies):
-
-- Format functions (dates, currency)
-- Validation functions
-- Calculations
 
 ## Next Steps
 
 Now that your project structure is ready:
 
+- **[Feature slice architecture](https://feature-sliced.design/)** FSD - a pattern for building scalable and maintainable software
+- **[Feature slice architecture concept map](https://feature-slice-concept-map.netlify.app/)** Read concepts and patterns in a visual way
 - **[Create Your First Application](./first-application)** - Build a minimal working app
 - **[Configuration Guide](./configuration)** - Set up constants and configuration
 - **Skip to [Core Concepts](/core-concepts/)** - Understand the architecture
