@@ -238,5 +238,10 @@ export default defineConfig({
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2024-present MinimalTech'
     }
-  }
-})
+  },
+  vite: {
+    server: {
+      host: '0.0.0.0', // Listen on all network interfaces
+      port: 5173
+    }
+  }})

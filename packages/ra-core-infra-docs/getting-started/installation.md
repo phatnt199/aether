@@ -21,7 +21,7 @@ Before installing, ensure your system meets these requirements:
 # Core dependencies (required)
 bun add @minimaltech/ra-core-infra ra-core
 bun add @venizia/ignis-inversion reflect-metadata
-bun add @loopback/filter
+bun add -d @loopback/filter
 bun add react react-dom
 ```
 
@@ -31,18 +31,8 @@ bun add react react-dom
 # Core dependencies (required)
 npm install @minimaltech/ra-core-infra ra-core
 npm install @venizia/ignis-inversion reflect-metadata
-npm install @loopback/filter
+npm install --save-dev @loopback/filter
 npm install react react-dom
-```
-
-### Using yarn
-
-```bash
-# Core dependencies (required)
-yarn add @minimaltech/ra-core-infra ra-core
-yarn add @venizia/ignis-inversion reflect-metadata
-yarn add @loopback/filter
-yarn add react react-dom
 ```
 
 ## Understanding the Dependencies
