@@ -26,6 +26,33 @@ Since this package uses reflect-metadata, you need to configure:
 import 'reflect-metadata';
 ```
 
+### Helpers
+
+#### ⚛️ Redux Helpers (Typed Hooks)
+
+The `@minimaltech/ra-core-infra` provides factory functions to generate pre-typed React-Redux hooks. This approach decouples your Infrastructure layer from your Project’s specific `RootState` and `AppDispatch`, ensuring zero circular dependencies while maintaining full Type-Safety.
+
+```typescript
+import { createAppSelectors, createAppDispatch } from '@minimaltech/ra-core-infra';
+
+import { AppDispatch, RootState } from 'your-redux-store';
+
+export const { useAppDispatch, useMultipleAppDispatch } = createAppDispatch<AppDispatch>();
+
+export const { useAppSelector, useShallowEqualSelector, useDeepEqualSelector } =
+  createAppSelectors<RootState>();
+```
+
+Explain:
+
+| Hook                          | Description                                    | Use Case                                                               |
+| :---------------------------- | :--------------------------------------------- | :--------------------------------------------------------------------- |
+| **`useAppDispatch`**          | Standard Redux dispatch with project types.    | Dispatching a single action or thunk.                                  |
+| **`useMultipleAppDispatch`**  | Dispatches multiple actions in a single call.  | Batching logic (e.g., Resetting multiple slices at once).              |
+| **`useAppSelector`**          | Standard typed selector.                       | Accessing simple state slices.                                         |
+| **`useShallowEqualSelector`** | Selector with built-in **Shallow** comparison. | Selecting new Object/Array literals to prevent unnecessary re-renders. |
+| **`useDeepEqualSelector`**    | Selector with built-in **Deep** comparison.    | Accessing complex, nested data structures.                             |
+
 ### Customization
 
 #### Hooks
