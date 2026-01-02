@@ -47,7 +47,6 @@ export class DefaultAuthProvider<
           });
         })
         .catch(error => {
-          console.log('[LOGIN]', error);
           reject(error);
         });
     });
