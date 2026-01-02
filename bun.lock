@@ -226,6 +226,7 @@
         "react-dom": ">=18.0",
         "react-redux": "^9.1.2",
         "reflect-metadata": "^0.2.2",
+        "socket.io-client": "^4.8.3",
       },
     },
     "packages/ra-core-infra-docs": {
