@@ -242,17 +242,21 @@ export interface ICoreRaApplication {
 }
 
 // --------------------------------------------------
-type TDeepPath = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+type TDeepPath = [never, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 // --------------------------------------------------
-export type TPaths<T, DeepLevel extends number = 10> = DeepLevel extends never
+export type TPaths<T, DeepLevel extends number = 10> = DeepLevel extends 0
   ? never
-  : T extends Array<infer U>
-    ? TPaths<U>
+  : T extends Array<AnyType>
+    ? never
     : T extends object
       ? {
           [K in keyof T]-?: K extends string | number
-            ? `${K}` | `${K}.${TPaths<T[K], TDeepPath[DeepLevel]>}`
+            ? NonNullable<T[K]> extends Array<AnyType>
+              ? `${K}`
+              : NonNullable<T[K]> extends object
+                ? `${K}` | `${K}.${TPaths<NonNullable<T[K]>, TDeepPath[DeepLevel]>}`
+                : `${K}`
             : never;
         }[keyof T]
       : never;
