@@ -1,7 +1,8 @@
 #!/bin/sh
 
 echo "START | Building application..."
-tsc -p tsconfig.json && tsc-alias -p tsconfig.json
-# vite build
 
-echo "DONE | Build application"
+tsc -p tsconfig.json && \
+tsc-alias -p tsconfig.json && \
+echo "DONE | Build application" || \
+{ exit 1; }

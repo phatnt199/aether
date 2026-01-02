@@ -14,7 +14,10 @@ echo "\nCleaning up resources ..."
 bun run clean
 
 echo "\nBuilding latest release..."
-bun run build
+if ! bun run build; then
+    echo "❌ Build failed!"
+    exit 1
+fi
 
 echo "\nCalculating bundle size..."
 bun run size
