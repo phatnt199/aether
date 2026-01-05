@@ -50,7 +50,7 @@ function ProductList() {
 
   // Fetch data using service
   const { data: products } = useQuery(['products'], () =>
-    productApi.find()
+    productApi.find({})
   );
 
   return <div>{/* Render products */}</div>;
@@ -210,9 +210,9 @@ class AxiosNetworkRequest extends BaseNetworkRequest {
 1. User clicks "Load Products"
         ↓
 2. Component: ProductList
-   useQuery(['products'], () => productApi.find())
+   useQuery(['products'], () => productApi.find({}))
         ↓
-3. Service: ProductApi.find()
+3. Service: ProductApi.find({})
    Calls: this.dataProvider.getList('products', { filter })
         ↓
 4. Provider: DefaultRestDataProvider.getList()
@@ -324,7 +324,7 @@ Only use Redux for **UI state** that needs to be shared across many components. 
 ```typescript
 const { data, isLoading } = useQuery({
   queryKey: ['products'],
-  queryFn: () => productApi.find(),
+  queryFn: () => productApi.find({}),
   staleTime: 5 * 60 * 1000,  // 5 minutes
 });
 ```
