@@ -979,10 +979,8 @@ await networkService.doRequest({
 
 ## See Also
 
-- [HTTP Requests Guide](/guides/networking/http-requests) - Complete networking guide
 - [DefaultRestDataProvider](/api-reference/providers/default-rest-data-provider) - Data provider implementation
 - [Authentication Guide](/guides/authentication/) - Auth setup
-- [File Upload Guide](/guides/networking/file-uploads) - File handling
 
 ---
 

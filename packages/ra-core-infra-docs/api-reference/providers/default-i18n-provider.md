@@ -832,7 +832,6 @@ const messages = {
 
 ## See Also
 
-- [Internationalization Guide](/guides/i18n/) - Complete i18n guide
 - [useTranslate Hook](/api-reference/hooks/use-translate) - Translation hook
 - [React Admin Translation](https://marmelab.com/react-admin/Translation.html) - React Admin i18n
 - [Polyglot.js Documentation](https://airbnb.io/polyglot.js/) - Polyglot library docs

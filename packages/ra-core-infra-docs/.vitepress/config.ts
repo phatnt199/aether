@@ -9,7 +9,8 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Introduction', link: '/introduction' },
-      { text: 'Guide', link: '/getting-started/' },
+      { text: 'Getting started', link: '/getting-started/' },
+      { text: 'Guides', link: '/guides/' },
       { text: 'API', link: '/api-reference/' },
       { text: 'Tutorials', link: '/tutorials/' },
     ],
@@ -244,4 +245,8 @@ export default defineConfig({
       host: '0.0.0.0', // Listen on all network interfaces
       port: 5173
     }
-  }})
+  },
+  ignoreDeadLinks: [
+    "http://localhost:3000",
+  ]
+})

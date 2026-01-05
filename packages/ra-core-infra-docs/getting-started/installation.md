@@ -92,6 +92,8 @@ Create or update your `tsconfig.json`:
 }
 ```
 
+Alternative `tsconfig.json` for Vite: using Ignis-dev config
+
 ### Step 2: Configure tsconfig.app.json
 
 Create `tsconfig.app.json` for your application code:

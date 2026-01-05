@@ -487,8 +487,6 @@ The application lifecycle provides **structured initialization** in this order:
 
 - **[Project Structure](./project-structure)** - See recommended organization
 - **[Dependency Injection Guide](/guides/dependency-injection/)** - Deep dive into DI
-- **[Configuration](./getting-started/configuration)** - Learn configuration patterns
-
 ---
 
 **Ready for project structure?** Continue to [project structure →](./project-structure)
