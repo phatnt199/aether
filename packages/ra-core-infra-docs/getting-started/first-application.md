@@ -81,16 +81,18 @@ export class RaApplication extends BaseRaApplication {
 3. Bind configuration for the REST data provider
 4. Use environment variables for the API URL
 
-## Step 3: Create a Simple Service
+## Step 3: Create a Product Entity
 
-Create `src/application/services/apis/product.api.ts`:
+Create the product entity structure:
 
+```bash
+mkdir -p src/entities/product/{model,api}
+```
+
+Create three files for the entity:
+
+**1. Types** (`src/entities/product/model/product.types.ts`):
 ```typescript
-import { BaseCrudService, CoreBindings } from '@minimaltech/ra-core-infra';
-import type { IDataProvider } from '@minimaltech/ra-core-infra';
-import { inject } from '@venizia/ignis-inversion';
-
-// Product interface
 export interface IProduct {
   id: number;
   title: string;
@@ -99,11 +101,15 @@ export interface IProduct {
   category: string;
   image: string;
 }
+```
 
-/**
- * Product API Service
- * Handles all product-related API calls
- */
+**2. API Service** (`src/entities/product/api/productApi.ts`):
+```typescript
+import { BaseCrudService, CoreBindings } from '@minimaltech/ra-core-infra';
+import type { IDataProvider } from '@minimaltech/ra-core-infra';
+import { inject } from '@venizia/ignis-inversion';
+import type { IProduct } from '../model/product.types';
+
 export class ProductApi extends BaseCrudService<IProduct> {
   constructor(
     @inject({ key: CoreBindings.DEFAULT_REST_DATA_PROVIDER })
@@ -112,20 +118,21 @@ export class ProductApi extends BaseCrudService<IProduct> {
     super({
       scope: 'ProductApi',
       dataProvider,
-      serviceOptions: {
-        basePath: '/products',  // API endpoint: /products
-      },
+      serviceOptions: { basePath: '/products' },
     });
   }
 }
 ```
 
-**What's happening here?**
+**3. Public API** (`src/entities/product/index.ts`):
+```typescript
+export type { IProduct } from './model/product.types';
+export { ProductApi } from './api/productApi';
+```
 
-1. Define `IProduct` interface for type safety
-2. Extend `BaseCrudService` to get CRUD methods (find, findById, create, etc.)
-3. Use `@inject` decorator to get the data provider from DI container
-4. Configure the base path for this service
+::: tip
+`BaseCrudService` provides CRUD methods (find, findById, create, update, delete) automatically. The `@inject` decorator gets the data provider from the DI container.
+:::
 
 ## Step 4: Register the Service
 
@@ -194,26 +201,25 @@ export function ApplicationContext({ children }: Props) {
 }
 ```
 
-## Step 6: Create a Product List Component
+## Step 6: Create a Product List Page
 
-Create `src/screens/products/ProductList.tsx`:
+Create the page structure:
 
+```bash
+mkdir -p src/pages/product-list/ui
+```
+
+**Page Component** (`src/pages/product-list/ui/ProductListPage.tsx`):
 ```typescript
 import { useInjectable } from '@minimaltech/ra-core-infra';
 import { useQuery } from '@tanstack/react-query';
-import { ProductApi, IProduct } from '@/application/services/apis/product.api';
+import { ProductApi, IProduct } from '@/entities/product';
 
-/**
- * Product List Screen
- * Displays all products from the API
- */
-export function ProductList() {
-    // Inject ProductApi service using type-safe hook
+export function ProductListPage() {
     const productApi = useInjectable<ProductApi>({
         key: 'services.ProductApi',
     });
 
-    // Fetch products using TanStack Query
     const { data: products, isLoading, error } = useQuery<IProduct[]>({
         queryKey: ['products'],
         queryFn: () => productApi.find({}),
@@ -225,27 +231,25 @@ export function ProductList() {
     return (
         <div>
             <h1>Product List</h1>
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-    {products?.map((product) => (
-        <div key={product.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
-        <img src={product.image} alt={product.title} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
-    <h3>{product.title}</h3>
-    <p style={{ color: '#666' }}>${product.price}</p>
-    <p style={{ fontSize: '0.9rem', color: '#999' }}>{product.category}</p>
-    </div>
-    ))}
-    </div>
-    </div>
-);
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+                {products?.map((product) => (
+                    <div key={product.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+                        <img src={product.image} alt={product.title} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
+                        <h3>{product.title}</h3>
+                        <p style={{ color: '#666' }}>${product.price}</p>
+                        <p style={{ fontSize: '0.9rem', color: '#999' }}>{product.category}</p>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
 }
 ```
 
-**What's happening here?**
-
-1. Use `useInjectable` hook to get the ProductApi service
-2. Use TanStack Query's `useQuery` to fetch data
-3. Call `productApi.find()` which comes from `BaseCrudService`
-4. Render products with loading and error states
+**Public API** (`src/pages/product-list/index.ts`):
+```typescript
+export { ProductListPage } from './ui/ProductListPage';
+```
 
 ## Step 7: Set Up TanStack Query
 
@@ -254,8 +258,8 @@ Update `src/App.tsx`:
 ```typescript
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { ApplicationContext } from './application/ApplicationContext';
-import { ProductList } from './screens/products/ProductList';
+import { ApplicationContext } from './app/ApplicationContext';
+import { ProductListPage } from '@/pages/product-list';
 
 // Create a query client
 const queryClient = new QueryClient({
@@ -272,7 +276,7 @@ function App() {
     <ApplicationContext>
       <QueryClientProvider client={queryClient}>
         <div style={{ padding: '2rem' }}>
-          <ProductList />
+          <ProductListPage />
         </div>
       </QueryClientProvider>
     </ApplicationContext>

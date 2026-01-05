@@ -34,39 +34,171 @@ bun add react react-dom react-router-dom
 bun add -d prettier
 ```
 
-## Recommended Folder Structure
+## Recommended Folder Structure: Feature-Sliced Design
 
-Organize your project following this structure for scalability and maintainability:
+@ra-core-infra uses **Feature-Sliced Design (FSD)** - an architectural methodology that organizes code by business features rather than technical layers.
+
+### FSD Quick Overview
+
+**Layers (vertical hierarchy):**
+```
+app/       → Application initialization
+pages/     → Route-level components
+widgets/   → Composite UI blocks
+features/  → Business features
+entities/  → Business entities & data
+shared/    → Shared infrastructure
+```
+
+**Dependency Rule:** Higher layers can import from lower layers, never the reverse.
+
+### Complete FSD Structure for @ra-core-infra
+
+Here's the full structure showing where framework components belong:
 
 ```
 src/
-├── app/
-│   ├── providers/
-│   ├── routes/
-│   ├── locales/
-│   ├── services/
-│   ├── models(entities)/
-│   └── styles/
-├── pages/
+├── app/                              # Layer 1: Application
+│   ├── application.ts                # ⭐ RaApplication class (DI setup)
+│   ├── ApplicationContext.tsx        # ⭐ React context provider
+│   │
+│   ├── providers/                    # ⭐ Provider configurations
+│   │   ├── auth/
+│   │   │   └── authProvider.ts       # Custom auth provider
+│   │   ├── data/
+│   │   │   └── dataProvider.ts       # Custom data provider
+│   │   └── i18n/
+│   │       └── i18nProvider.ts       # Custom i18n provider
+│   │
+│   ├── routes/                       # Route definitions
+│   │   └── routes.tsx
+│   │
+│   ├── locales/                      # Internationalization
+│   │   ├── index.ts
+│   │   ├── en.ts
+│   │   └── vi.ts
+│   │
+│   └── styles/                       # Global styles
+│       ├── globals.css
+│       └── variables.css
+│
+├── pages/                            # Layer 2: Pages
 │   ├── home/
 │   │   ├── ui/
+│   │   │   └── HomePage.tsx
 │   │   └── index.ts
-│   └── profile/
-├── widgets/
-│   └── header/
-├── features/
-│   ├── add-to-cart/
+│   │
+│   ├── product-list/
 │   │   ├── ui/
-│   │   ├── model/
-│   │   ├── api/
+│   │   │   └── ProductListPage.tsx
 │   │   └── index.ts
-│   └── auth/
-└── shared/
-    ├── ui/
-    ├── api/
-    └── lib/
-
+│   │
+│   └── login/
+│       ├── ui/
+│       │   └── LoginPage.tsx
+│       └── index.ts
+│
+├── widgets/                          # Layer 3: Widgets
+│   ├── header/
+│   │   ├── ui/
+│   │   │   └── Header.tsx
+│   │   └── index.ts
+│   │
+│   └── product-grid/
+│       ├── ui/
+│       │   └── ProductGrid.tsx
+│       └── index.ts
+│
+├── features/                         # Layer 4: Features
+│   ├── auth/
+│   │   ├── ui/
+│   │   │   ├── LoginForm.tsx
+│   │   │   └── LogoutButton.tsx
+│   │   ├── model/
+│   │   │   └── useAuth.ts            # ⭐ Uses useInjectable
+│   │   └── index.ts
+│   │
+│   ├── product-filter/
+│   │   ├── ui/
+│   │   │   └── FilterPanel.tsx
+│   │   ├── model/
+│   │   │   └── useProductFilter.ts
+│   │   └── index.ts
+│   │
+│   └── add-to-cart/
+│       ├── ui/
+│       │   └── AddToCartButton.tsx
+│       ├── model/
+│       │   └── useAddToCart.ts
+│       └── index.ts
+│
+├── entities/                         # Layer 5: Entities
+│   ├── product/
+│   │   ├── ui/
+│   │   │   └── ProductCard.tsx
+│   │   ├── model/
+│   │   │   ├── product.types.ts
+│   │   │   ├── useProducts.ts
+│   │   │   └── useProduct.ts
+│   │   ├── api/
+│   │   │   └── productApi.ts         # ⭐ BaseCrudService
+│   │   └── index.ts                  # Public API
+│   │
+│   ├── user/
+│   │   ├── ui/
+│   │   │   └── UserAvatar.tsx
+│   │   ├── model/
+│   │   │   ├── user.types.ts
+│   │   │   └── useUsers.ts
+│   │   ├── api/
+│   │   │   └── userApi.ts            # ⭐ BaseCrudService
+│   │   └── index.ts
+│   │
+│   └── order/
+│       ├── ui/
+│       │   └── OrderStatus.tsx
+│       ├── model/
+│       │   ├── order.types.ts
+│       │   └── useOrders.ts
+│       ├── api/
+│       │   └── orderApi.ts           # ⭐ BaseCrudService
+│       └── index.ts
+│
+└── shared/                           # Layer 6: Shared
+    ├── ui/                           # Reusable components
+    │   ├── Button/
+    │   │   ├── Button.tsx
+    │   │   └── index.ts
+    │   ├── Input/
+    │   │   ├── Input.tsx
+    │   │   └── index.ts
+    │   └── Card/
+    │       ├── Card.tsx
+    │       └── index.ts
+    │
+    ├── api/                          # Base API clients
+    │   └── baseClient.ts
+    │
+    ├── lib/                          # Utility functions
+    │   ├── format.ts
+    │   ├── validation.ts
+    │   └── date.ts
+    │
+    └── config/                       # Shared constants
+        └── constants.ts
 ```
+
+::: tip @ra-core-infra Integration
+- **`app/application.ts`** - Extends `BaseRaApplication`, registers all services
+- **`app/providers/`** - Custom provider implementations (auth, data, i18n)
+- **`entities/*/api/`** - `BaseCrudService` implementations for data access
+- **`**/model/`** - Hooks using `useInjectable` to access services
+- **`index.ts`** - Every slice exports a public API for encapsulation
+:::
+
+::: tip Learn More
+For detailed FSD layer explanations, see [Project Structure Guide](../core-concepts/project-structure)
+:::
 
 
 ## Configure Vite
@@ -97,8 +229,8 @@ export default defineConfig({
 The `@` alias allows you to import from `src` without relative paths:
 
 ```typescript
-// Instead of: import { ProductService } from '../../../application/services/apis/product.api';
-import { ProductService } from '@/application/services/apis/product.api';
+// Instead of: import { ProductApi } from '../../../entities/product/api/productApi';
+import { ProductApi } from '@/entities/product';  // Uses public API (index.ts)
 ```
 :::
 
@@ -241,51 +373,68 @@ VITE v5.x.x  ready in xxx ms
 ➜  Network: http://192.168.x.x:3000/
 ```
 
-## Architecture Layers Explained
+## Understanding FSD Layers
 
-Understanding the folder structure:
+Your FSD structure is organized into 6 layers, each with a specific purpose:
 
-### Application Layer (`src/application/`)
+**Layer Hierarchy:**
+```
+app/       ─→ Application setup (DI, providers, routes)
+pages/     ─→ Route-level screens
+widgets/   ─→ Reusable UI compositions
+features/  ─→ Business features
+entities/  ─→ Business entities & data
+shared/    ─→ Shared utilities
+```
 
-The **core** of your app where dependency injection is configured:
+**Key FSD Principles:**
 
-- **`application.ts`** - Extends `BaseRaApplication`, configures DI container
-- **`providers/`** - Custom provider implementations (auth, data, i18n)
+1. **Dependency Flow**: Higher layers can import from lower layers only
+   ```typescript
+   // ✅ Valid: page imports from entity
+   import { useProducts } from '@/entities/product';
 
-### Pages Layer (`src/pages/`)
+   // ❌ Invalid: entity imports from page
+   import { ProductPage } from '@/pages/product-list';
+   ```
 
-Page-level components mapped to routes:
+2. **Slice Isolation**: Features at the same layer cannot import from each other
+   ```typescript
+   // ❌ Invalid: feature imports from another feature
+   import { useAuth } from '@/features/auth';  // FORBIDDEN!
+   ```
 
-- Each screen is a top-level feature (Home, Products, Login)
-- Screens compose components and hooks
+3. **Public API**: All slices export through `index.ts`
+   ```typescript
+   // ✅ Import through public API
+   import { ProductApi } from '@/entities/product';
 
-### Widgets Layer (`src/widgets/`)
-Widget is a block of UI that can be reused across pages
+   // ❌ Don't bypass public API
+   import { ProductApi } from '@/entities/product/api/productApi';
+   ```
 
-### features Layer (`src/features/`)
-Feature-specific components and logic. A good indication of a new feature when it is used accross multiple pages
-
-### shared Layer (`src/shared/`)
-Shared components and logic across the app
-
-### Dependency rules (import flow)
-- Top → Down Only: App → Pages → Widgets → Features → Entities → Shared
-- Same Layer: Slices cannot import from each other
-- Lower Risk: The lower the layer, the riskier changes become (more dependents)
-- Public API: All imports go through index.ts/js files
+::: tip Learn More
+For detailed FSD setup, code examples, and integration patterns, see:
+- **[Project Structure Guide](../core-concepts/project-structure)** - Comprehensive FSD guide
+- **[First Application](./first-application)** - Hands-on tutorial
+:::
 
 
 
 ## Next Steps
 
-Now that your project structure is ready:
+Now that you understand FSD structure and setup:
 
-- **[Feature slice architecture](https://feature-sliced.design/)** FSD - a pattern for building scalable and maintainable software
-- **[Feature slice architecture concept map](https://feature-slice-concept-map.netlify.app/)** Read concepts and patterns in a visual way
+- **[Project Structure Guide](../core-concepts/project-structure)** - Deep dive into FSD layers, integration patterns, and best practices
 - **[Create Your First Application](./first-application)** - Build a minimal working app
 - **[Configuration Guide](./configuration)** - Set up constants and configuration
-- **Skip to [Core Concepts](/core-concepts/)** - Understand the architecture
+- **[Architecture Overview](../core-concepts/architecture)** - Understand the layered architecture
+- **[Dependency Injection Guide](/guides/dependency-injection/)** - Master DI patterns
+
+**External FSD Resources:**
+- [Feature-Sliced Design Official](https://feature-sliced.design/) - FSD methodology
+- [FSD Concept Map](https://feature-slice-concept-map.netlify.app/) - Visual guide
 
 ---
 
-**Project structure ready?** Let's [build your first app →](./first-application)
+**Ready to build?** Let's [create your first app →](./first-application)
