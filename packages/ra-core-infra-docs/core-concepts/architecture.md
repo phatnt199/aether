@@ -294,7 +294,7 @@ class AxiosNetworkRequest extends BaseNetworkRequest {
 - Cross-cutting concerns
 
 ```typescript
-<CoreApplicationContext container={container}>
+<CoreApplicationContext value={{ container: applicationContext, registry: applicationContext, logger: null }}>
   <QueryClientProvider client={queryClient}>
     <App />
   </QueryClientProvider>
