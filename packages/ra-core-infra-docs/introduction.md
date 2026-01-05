@@ -105,15 +105,6 @@ Choose your HTTP client without changing application code:
 | Testability | ⚠️ Moderate | ✅ High (DI mocking) |
 | Bundle Size | ~150KB | ~50KB (core) |
 
-### vs Refine
-
-| Feature | Refine | @ra-core-infra |
-|---------|--------|----------------|
-| Framework Agnostic | ✅ Yes | ❌ React-only |
-| Dependency Injection | ❌ No | ✅ Yes (Venizia) |
-| LoopBack Filters | ❌ No | ✅ Yes |
-| React Admin Compat | ❌ No | ✅ Yes |
-| Learning Curve | Moderate | Moderate |
 
 ### vs Building from Scratch
 

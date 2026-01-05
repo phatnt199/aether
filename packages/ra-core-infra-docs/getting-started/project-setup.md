@@ -27,10 +27,11 @@ Follow the [Installation Guide](./installation) to install @ra-core-infra and it
 Quick reference:
 
 ```bash
-bun add @minimaltech/ra-core-infra ra-core
+bun add @minimaltech/ra-core-infra@0.0.3-2 ra-core
 bun add @venizia/ignis-inversion reflect-metadata
 bun add @loopback/filter
 bun add react react-dom react-router-dom
+bun add -d prettier
 ```
 
 ## Recommended Folder Structure
@@ -109,7 +110,7 @@ Create a `.env` file in your project root:
 
 ```bash
 # API Configuration
-VITE_API_URL=http://localhost:3001/api
+VITE_API_URL=https://fakestoreapi.com
 VITE_API_TIMEOUT=30000
 
 # Authentication
@@ -214,7 +215,9 @@ Update your `package.json` with useful scripts:
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   }
 }
 ```
