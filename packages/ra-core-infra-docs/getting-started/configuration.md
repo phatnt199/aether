@@ -24,7 +24,7 @@ Create `src/application/constants/endpoints.ts`:
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
-export const ENDPOINTS = {
+export const endpoints = {
   // Base API URL
   BASE_URL: API_BASE,
 
@@ -64,7 +64,7 @@ Create `src/application/constants/routes.ts`:
  * Centralize all frontend route paths
  */
 
-export const ROUTES = {
+export const routes = {
   // Public routes
   HOME: '/',
   LOGIN: '/login',
@@ -115,7 +115,7 @@ Create `src/application/constants/common.ts`:
  * Common Application Constants
  */
 
-export const COMMON = {
+export const common = {
   // Application
   APP_NAME: import.meta.env.VITE_APP_NAME || 'Admin Panel',
   APP_VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
@@ -171,7 +171,7 @@ export * from './common';
 
 ```typescript
 import { BaseRaApplication, CoreBindings, IRestDataProviderOptions } from '@minimaltech/ra-core-infra';
-import { ENDPOINTS } from './constants';
+import { endpoints } from './constants';
 
 export class RaApplication extends BaseRaApplication {
   bindContext(): void {
@@ -179,11 +179,11 @@ export class RaApplication extends BaseRaApplication {
     this.bind<IRestDataProviderOptions>({
       key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
     }).toValue({
-      url: ENDPOINTS.BASE_URL,
+      url: endpoints.BASE_URL,
       noAuthPaths: [
-        ENDPOINTS.AUTH.SIGN_IN,
-        ENDPOINTS.AUTH.SIGN_UP,
-        ENDPOINTS.PRODUCTS,
+        endpoints.AUTH.SIGN_IN,
+        endpoints.AUTH.SIGN_UP,
+        endpoints.PRODUCTS,
       ],
     });
   }
@@ -193,7 +193,7 @@ export class RaApplication extends BaseRaApplication {
 ### In Components
 
 ```typescript
-import { ROUTES, COMMON } from '@/application/constants';
+import { routes, COMMON } from '@/application/constants';
 
 export function ProductList() {
   const navigate = useNavigate();
@@ -213,7 +213,7 @@ export function ProductList() {
 ### In Services
 
 ```typescript
-import { ENDPOINTS, COMMON } from '@/application/constants';
+import { endpoints, common } from '@/application/constants';
 
 export class ProductApi extends BaseCrudService<IProduct> {
   constructor(
@@ -224,8 +224,8 @@ export class ProductApi extends BaseCrudService<IProduct> {
       scope: 'ProductApi',
       dataProvider,
       serviceOptions: {
-        basePath: ENDPOINTS.PRODUCTS,
-        timeout: COMMON.API_TIMEOUT,
+        basePath: endpoints.PRODUCTS,
+        timeout: common.API_TIMEOUT,
       },
     });
   }
@@ -322,61 +322,6 @@ interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
 ```
-
-Now you get autocomplete and type checking for environment variables!
-
-## Advanced Configuration Patterns
-
-### Feature Flags
-
-Create `src/application/constants/features.ts`:
-
-```typescript
-/**
- * Feature Flags Configuration
- * Enable/disable features based on environment
- */
-
-export const FEATURES = {
-  // Development features
-  DEVTOOLS: import.meta.env.VITE_ENABLE_DEVTOOLS === 'true',
-  DEBUG_LOGS: import.meta.env.VITE_ENABLE_DEBUG_LOGS === 'true',
-
-  // Application features
-  AUTHENTICATION: true,
-  MULTI_LANGUAGE: true,
-  DARK_MODE: true,
-  EXPORT_DATA: true,
-
-  // Beta features
-  BETA_DASHBOARD: import.meta.env.DEV,
-  BETA_AI_ASSISTANT: false,
-
-  // Payment features
-  STRIPE_ENABLED: !!import.meta.env.VITE_STRIPE_PUBLIC_KEY,
-} as const;
-
-// Helper function
-export function isFeatureEnabled(feature: keyof typeof FEATURES): boolean {
-  return FEATURES[feature] === true;
-}
-```
-
-Usage:
-
-```typescript
-import { FEATURES, isFeatureEnabled } from '@/application/constants/features';
-
-export function Dashboard() {
-  return (
-    <div>
-      {isFeatureEnabled('BETA_DASHBOARD') && <BetaDashboard />}
-      {FEATURES.DARK_MODE && <ThemeToggle />}
-    </div>
-  );
-}
-```
-
 ### Per-Environment Configuration
 
 Create `src/application/config/index.ts`:
@@ -442,58 +387,7 @@ console.log('Analytics enabled:', config.features.analytics);
 
 ## Best Practices
 
-### 1. Never Hardcode Sensitive Data
-
-❌ **Bad**:
-```typescript
-const apiKey = 'sk_live_1234567890';  // Never hardcode!
-```
-
-✅ **Good**:
-```typescript
-const apiKey = import.meta.env.VITE_API_KEY;
-```
-
-### 2. Use Constants for Repeated Values
-
-❌ **Bad**:
-```typescript
-fetch('http://localhost:3001/api/products');
-// ... later in another file
-fetch('http://localhost:3001/api/users');
-```
-
-✅ **Good**:
-```typescript
-import { ENDPOINTS } from '@/application/constants';
-
-fetch(`${ENDPOINTS.BASE_URL}${ENDPOINTS.PRODUCTS}`);
-fetch(`${ENDPOINTS.BASE_URL}${ENDPOINTS.USERS}`);
-```
-
-### 3. Provide Sensible Defaults
-
-```typescript
-const pageSize = parseInt(import.meta.env.VITE_PAGE_SIZE || '20');
-const apiTimeout = parseInt(import.meta.env.VITE_API_TIMEOUT || '30000');
-```
-
-### 4. Document Your Configuration
-
-Add comments to explain non-obvious configuration:
-
-```typescript
-export const COMMON = {
-  // Cache TTL in milliseconds (5 minutes)
-  CACHE_TTL: 5 * 60 * 1000,
-
-  // Number of retry attempts before giving up
-  MAX_RETRY_ATTEMPTS: 3,
-
-  // Exponential backoff multiplier for retries
-  RETRY_BACKOFF_MULTIPLIER: 2,
-} as const;
-```
+For more information, see [Ignis code style standard](https://venizia-ai.github.io/ignis/best-practices/code-style-standards/)
 
 ## Testing Configuration
 
@@ -518,11 +412,10 @@ describe('Configuration', () => {
 
 You now know how to:
 
-✅ **Organize constants** in a structured way
-✅ **Use environment variables** for different environments
-✅ **Create type-safe configuration** with TypeScript
-✅ **Implement feature flags** for conditional functionality
-✅ **Follow best practices** for configuration management
+- **Organize constants** in a structured way
+- **Use environment variables** for different environments
+- **Create type-safe configuration** with TypeScript
+- **Follow best practices** for configuration management
 
 ## Next Steps
 

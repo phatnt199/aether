@@ -6,11 +6,11 @@ Welcome to @ra-core-infra! This guide will help you set up and build your first 
 
 By the end of this section, you'll know how to:
 
-- ✅ Install @ra-core-infra and its dependencies
-- ✅ Set up a new Vite + React + TypeScript project
-- ✅ Create your first application with dependency injection
-- ✅ Configure data providers, auth providers, and services
-- ✅ Run a working CRUD application
+- Install @ra-core-infra and its dependencies
+- Set up a new Vite + React + TypeScript project
+- Create your first application with dependency injection
+- Configure data providers, auth providers, and services
+- Run a working CRUD application
 
 ## Prerequisites
 
