@@ -120,7 +120,13 @@ Create `tsconfig.app.json` for your application code:
 
     /* Decorators - CRITICAL */
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src"]
 }

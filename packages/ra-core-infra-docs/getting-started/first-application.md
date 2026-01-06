@@ -141,7 +141,7 @@ Update `src/application/application.ts` to register the service:
 ```typescript
 import { BaseRaApplication, CoreBindings, DefaultRestDataProvider } from '@minimaltech/ra-core-infra';
 import type { IRestDataProviderOptions } from '@minimaltech/ra-core-infra';
-import { ProductApi } from './services/apis/product.api';
+import { ProductApi } from '@/entities/product';
 import { BindingScopes } from '@venizia/ignis-inversion';
 
 export class RaApplication extends BaseRaApplication {
@@ -177,8 +177,8 @@ Create `src/application/ApplicationContext.tsx`:
 
 ```typescript
 import { ApplicationContext as CoreApplicationContext } from '@minimaltech/ra-core-infra';
-import { ReactNode } from 'react';
 import { RaApplication } from './application';
+import type { ReactNode } from 'react';
 
 let applicationContext = new RaApplication();
 await applicationContext.start();
@@ -213,7 +213,8 @@ mkdir -p src/pages/product-list/ui
 ```typescript
 import { useInjectable } from '@minimaltech/ra-core-infra';
 import { useQuery } from '@tanstack/react-query';
-import { ProductApi, IProduct } from '@/entities/product';
+import { ProductApi } from '@/entities/product';
+import type { IProduct } from '@/entities/product';
 
 export function ProductListPage() {
     const productApi = useInjectable<ProductApi>({
@@ -231,18 +232,18 @@ export function ProductListPage() {
     return (
         <div>
             <h1>Product List</h1>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-                {products?.map((product) => (
-                    <div key={product.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
-                        <img src={product.image} alt={product.title} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
-                        <h3>{product.title}</h3>
-                        <p style={{ color: '#666' }}>${product.price}</p>
-                        <p style={{ fontSize: '0.9rem', color: '#999' }}>{product.category}</p>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+    {products?.map((product) => (
+        <div key={product.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+        <img src={product.image} alt={product.title} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
+    <h3>{product.title}</h3>
+    <p style={{ color: '#666' }}>${product.price}</p>
+    <p style={{ fontSize: '0.9rem', color: '#999' }}>{product.category}</p>
+    </div>
+    ))}
+    </div>
+    </div>
+);
 }
 ```
 
