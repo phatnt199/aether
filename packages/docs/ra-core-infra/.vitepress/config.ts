@@ -6,6 +6,7 @@ export default withMermaid(
     defineConfig({
         title: "@ra-core-infra",
         description: "React Admin Core Infrastructure - Build production-ready admin apps with DI and type safety",
+        base: '/aether/ra-core-infra',
         themeConfig: {
             // https://vitepress.dev/reference/default-theme-config
             nav: [

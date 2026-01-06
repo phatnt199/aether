@@ -32,11 +32,17 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
+        working-directory: packages/docs/ra-core-infra
         run: bun install
 
       - name: Build Docs
         working-directory: packages/docs/ra-core-infra
-        run: bun run docs:build
+        run: bunx --bun vitepress build
+
+      - name: Prepare deployment structure
+        run: |
+          mkdir -p dist/ra-core-infra
+          cp -r packages/docs/ra-core-infra/.vitepress/dist/* dist/ra-core-infra/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -44,7 +50,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: packages/docs/ra-core-infra/.vitepress/dist
+          path: dist
 
   deploy:
     environment:
