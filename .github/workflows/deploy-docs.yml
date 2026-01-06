@@ -35,7 +35,8 @@ jobs:
         run: bun install
 
       - name: Build Docs
-        run: make docs
+        working-directory: packages/docs/ra-core-infra
+        run: bun run docs:build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -43,7 +44,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: packages/docs/site/.vitepress/dist
+          path: packages/docs/ra-core-infra/.vitepress/dist
 
   deploy:
     environment:
