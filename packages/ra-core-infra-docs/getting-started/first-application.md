@@ -320,30 +320,32 @@ You should see a grid of products loaded from the Fake Store API!
 
 Let's trace how data flows through your application:
 
-```
-1. Component: ProductList
-   ↓ useInjectable('services.ProductApi')
+```mermaid
+graph TB
+    Step1["1. Component: ProductList<br/><em>useInjectable('services.ProductApi')</em>"]
+    Step2["2. DI Container<br/><em>Returns ProductApi instance</em>"]
+    Step3["3. ProductApi.find()<br/><em>Calls BaseCrudService.find()</em>"]
+    Step4["4. BaseCrudService<br/><em>Uses injected DataProvider</em>"]
+    Step5["5. DefaultRestDataProvider<br/><em>Calls NetworkRequestService</em>"]
+    Step6["6. NetworkRequestService<br/><em>Makes HTTP GET /products</em>"]
+    Step7["7. API Response<br/><em>Flows back up the chain</em>"]
+    Step8["8. Component<br/><em>Renders products</em>"]
 
-2. DI Container
-   ↓ Returns ProductApi instance
+    Step1 -->|Request| Step2
+    Step2 -->|Inject| Step3
+    Step3 -->|Delegate| Step4
+    Step4 -->|Use Provider| Step5
+    Step5 -->|Call Network| Step6
+    Step6 -->|HTTP Request| Step7
+    Step7 -.->|Response| Step8
 
-3. ProductApi.find()
-   ↓ Calls BaseCrudService.find()
+    classDef requestStyle fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef responseStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef renderStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
 
-4. BaseCrudService
-   ↓ Uses injected DataProvider
-
-5. DefaultRestDataProvider
-   ↓ Calls NetworkRequestService
-
-6. NetworkRequestService
-   ↓ Makes HTTP GET /products
-
-7. API Response
-   ↓ Flows back up the chain
-
-8. Component
-   ↓ Renders products
+    class Step1,Step2,Step3,Step4,Step5,Step6 requestStyle
+    class Step7 responseStyle
+    class Step8 renderStyle
 ```
 
 ## What You've Learned
