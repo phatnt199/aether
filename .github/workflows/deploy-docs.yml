@@ -37,7 +37,7 @@ jobs:
 
       - name: Build Docs
         working-directory: packages/docs/ra-core-infra
-        run: bun run docs:build
+        run: bunx --bun vitepress build
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
