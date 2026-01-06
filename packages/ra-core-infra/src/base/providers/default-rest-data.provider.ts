@@ -28,11 +28,13 @@ import { DefaultNetworkRequestService } from '@/base/services';
 import {
   AnyType,
   CoreBindings,
+  IApplicationInfo,
   ICustomParams,
   IDataProvider,
   IRestDataProviderOptions,
   ISendParams,
   ISendResponse,
+  RequestCountData,
   RequestMethods,
   RequestTypes,
   TRequestMethod,
@@ -49,6 +51,8 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
   constructor(
     @inject({ key: CoreBindings.REST_DATA_PROVIDER_OPTIONS })
     protected restDataProviderOptions: IRestDataProviderOptions,
+    @inject({ key: CoreBindings.APPLICATION_INFO })
+    protected applicationInfo: IApplicationInfo,
   ) {
     super({ scope: DefaultRestDataProvider.name });
 
@@ -77,6 +81,7 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
 
     const paths = [resource];
     const response = this.networkService.doRequest<RecordType[]>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type,
       paths,
       query: { ...queryKey, filter },
@@ -155,7 +160,12 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
       }
     }
 
-    const request = this.networkService.getRequestProps({ resource });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
 
     const requestProps = {
       method: RequestMethods.GET as TRequestMethod,
@@ -182,7 +192,12 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
   }): Promise<GetOneResult<RecordType>> {
     const { resource, params } = opts;
 
-    const request = this.networkService.getRequestProps({ resource });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
     const filter = params?.meta?.filter || {};
     const queryKey: Record<string, AnyType> = {};
 
@@ -193,6 +208,7 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
     }
 
     const response = this.networkService.doRequest<RecordType>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type: RequestTypes.GET_ONE,
       method: RequestMethods.GET,
       query: { ...queryKey, filter: { ...omit(filter, 'params') } },
@@ -212,7 +228,12 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
   }): Promise<GetManyResult<RecordType>> {
     const { resource, params } = opts;
 
-    const request = this.networkService.getRequestProps({ resource });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
     const filter = params?.meta?.filter || {};
     const queryKey: Record<string, AnyType> = {};
 
@@ -223,6 +244,7 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
     }
 
     const response = this.networkService.doRequest<RecordType[]>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type: RequestTypes.GET_MANY,
       method: RequestMethods.GET,
       query: {
@@ -312,7 +334,12 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
       }
     }
 
-    const request = this.networkService.getRequestProps({ resource });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
 
     const requestProps = {
       method: RequestMethods.GET as TRequestMethod,
@@ -340,11 +367,15 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
     const { resource, params } = opts;
 
     const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
       resource,
       body: params.data,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
     });
 
     const response = this.networkService.doRequest<RecordType>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type: RequestTypes.UPDATE,
       method: RequestMethods.PATCH,
       paths: [resource, `${params.id}`],
@@ -368,9 +399,16 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
       throw getError({ message: '[updateMany] No IDs to execute update!' });
     }
 
-    const request = this.networkService.getRequestProps({ resource, body: data });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      body: data,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
 
     const response = this.networkService.doRequest<RecordType['id'][]>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type: RequestTypes.UPDATE_MANY,
       method: RequestMethods.PATCH,
       paths: [resource],
@@ -390,9 +428,16 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
   >(opts: { resource: TResource; params: CreateParams }): Promise<CreateResult<ResultRecordType>> {
     const { resource, params } = opts;
 
-    const request = this.networkService.getRequestProps({ resource, body: params.data });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      body: params.data,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
 
     const response = this.networkService.doRequest<ResultRecordType>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type: RequestTypes.CREATE,
       method: RequestMethods.POST,
       paths: [resource],
@@ -411,9 +456,15 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
   }): Promise<DeleteResult<RecordType>> {
     const { resource, params } = opts;
 
-    const request = this.networkService.getRequestProps({ resource });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
 
     const response = this.networkService.doRequest<RecordType>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type: RequestTypes.DELETE,
       method: RequestMethods.DELETE,
       paths: [resource, `${params.id}`],
@@ -438,13 +489,19 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
       throw getError({ message: '[deleteMany] No IDs to execute delete!' });
     }
 
-    const request = this.networkService.getRequestProps({ resource });
+    const request = this.networkService.getRequestProps({
+      requestCountData: RequestCountData.DATA_ONLY,
+      resource,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
 
     const rs = Promise.all(
       ids
         .map(id => [resource, `${id}`])
         .map(paths => {
           return this.networkService.doRequest<RecordType['id']>({
+            requestCountData: RequestCountData.DATA_ONLY,
             type: RequestTypes.DELETE_MANY,
             method: RequestMethods.DELETE,
             paths,
@@ -475,12 +532,19 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
       });
     }
 
-    const { method, query, ...rest } = params;
+    const { method, query, requestCountData, requestType, ...rest } = params;
 
-    const request = this.networkService.getRequestProps({ ...rest, resource });
+    const request = this.networkService.getRequestProps({
+      ...rest,
+      requestCountData,
+      resource,
+      restDataProviderOptions: this.restDataProviderOptions,
+      applicationInfo: this.applicationInfo,
+    });
 
     const response = this.networkService.doRequest<ReturnType>({
-      type: RequestTypes.SEND,
+      requestCountData,
+      type: requestType || RequestTypes.SEND,
       method,
       query,
       paths: [resource],

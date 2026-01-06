@@ -5,7 +5,7 @@ export class App {
   static readonly DEFAULT_DEBOUNCE_TIME = 500;
 }
 
-//--------------------------------------------------
+// --------------------------------------------------
 export class Authentication {
   // Jwt
   static readonly TYPE_BASIC = 'Basic';
@@ -16,7 +16,7 @@ export class Authentication {
   static readonly STRATEGY_JWT = 'jwt';
 }
 
-//--------------------------------------------------
+// --------------------------------------------------
 export class RequestMethods {
   static readonly HEAD = 'HEAD';
   static readonly OPTIONS = 'OPTIONS';
@@ -41,6 +41,7 @@ export class RequestMethods {
   }
 }
 
+// --------------------------------------------------
 export class RequestTypes {
   static readonly SEND = 'SEND';
 
@@ -73,6 +74,7 @@ export class RequestTypes {
   }
 }
 
+// --------------------------------------------------
 export class RequestBodyTypes {
   static readonly NONE = 'none';
   static readonly FORM_DATA = 'form-data';
@@ -93,7 +95,7 @@ export class RequestBodyTypes {
   }
 }
 
-//--------------------------------------------------
+// --------------------------------------------------
 export class Environments {
   static readonly DEVELOPMENT = 'development';
   static readonly PRODUCTION = 'production';
@@ -103,4 +105,53 @@ export class Environments {
   static isValid(input: string): boolean {
     return this.SCHEME_SET.has(input);
   }
+}
+
+// --------------------------------------------------
+export class HeaderConsts {
+  static readonly CONTENT_TYPE = 'content-type';
+
+  /**
+   * content-range: <unit> <range-start>-<range-end>/<size>
+   * @format unit start-end/total
+   * - unit: Usually bytes/items/records.
+   * - start: The zero-indexed position of the first byte/item/record in the range.
+   * - end: The zero-indexed position of the last byte/item/record in the range (inclusive).
+   * - total: The total length of the entity body (or * if unknown).
+   */
+  static readonly CONTENT_RANGE = 'content-range';
+
+  static readonly AUTHORIZATION = 'authorization';
+  static readonly X_AUTH_PROVIDER = 'x-auth-provider';
+  static readonly X_LOCALE = 'x-locale';
+
+  static readonly TIMEZONE = 'Timezone';
+  static readonly TIMEZONE_OFFSET = 'Timezone-Offset';
+
+  static readonly REQUEST_TRACING_ID = 'x-request-id';
+  static readonly REQUEST_DEVICE_INFO = 'x-device-info';
+  static readonly REQUEST_CHANNEL = 'x-request-channel';
+
+  static readonly REQUEST_COUNT_DATA = 'x-request-count';
+  static readonly RESPONSE_COUNT_DATA = 'x-response-count';
+
+  static readonly RESPONSE_FORMAT = 'x-response-format';
+}
+
+// --------------------------------------------------
+export class RequestChannel {
+  static readonly WEB = '100_WEB';
+}
+
+// --------------------------------------------------
+export class RequestCountData {
+  /**
+   * @description Only the data is returned in the response body
+   */
+  static readonly DATA_ONLY = '0';
+
+  /**
+   * @description Both data and count are returned in the response body
+   */
+  static readonly DATA_WITH_COUNT = '1';
 }
