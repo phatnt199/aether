@@ -27,7 +27,13 @@ import {
 } from 'ra-core';
 
 import { DefaultNetworkRequestService } from '@/base';
-import { Environments, RequestBodyTypes, RequestMethods, RequestTypes } from './constants';
+import {
+  Environments,
+  RequestBodyTypes,
+  RequestCountData,
+  RequestMethods,
+  RequestTypes,
+} from './constants';
 
 //-----------------------------------------------------------
 export type NumberIdType = number;
@@ -78,11 +84,13 @@ export interface IRequestProps {
 export interface ISendParams {
   id?: string | number;
   method?: TRequestMethod;
+  requestType?: TRequestType;
   bodyType?: TRequestBodyType;
   body?: any;
   file?: any;
   query?: { [key: string]: any };
   headers?: { [key: string]: string | number };
+  requestCountData?: TConstValue<typeof RequestCountData>;
   [key: string]: any;
 }
 
@@ -96,8 +104,11 @@ export type TRequestType = Extract<ValueOf<typeof RequestTypes>, string>;
 
 export interface IGetRequestPropsParams {
   resource: string;
+  requestCountData?: TConstValue<typeof RequestCountData>;
   body?: any;
   bodyType?: TRequestBodyType;
+  restDataProviderOptions: IRestDataProviderOptions;
+  applicationInfo: IApplicationInfo;
 }
 
 export interface IGetRequestPropsResult {
@@ -198,6 +209,9 @@ export interface IAuthProviderOptions {
 // ----------------------------------------------------------------------
 export interface IRestDataProviderOptions {
   url: string;
+  requestTracingId?: boolean | ((opts: { applicationInfo: IApplicationInfo }) => string);
+  requestTracingChannel?: string;
+
   noAuthPaths?: Array<string>;
   headers?: HeadersInit;
 }
@@ -275,3 +289,18 @@ export type TFullPaths<T, DeepLevel extends number = 10> = DeepLevel extends nev
             : never;
         }[keyof T]
       : never;
+
+// --------------------------------------------------
+export interface IApplicationInfo {
+  name: string;
+  version: string;
+  description: string;
+  author?: { name: string; email: string; url?: string };
+  [extra: string | symbol]: any;
+}
+
+// --------------------------------------------------
+export type TDataCount<T> = {
+  data: T;
+  count?: number;
+};

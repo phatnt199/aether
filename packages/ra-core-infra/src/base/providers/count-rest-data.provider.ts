@@ -1,6 +1,6 @@
 import { RaRecord } from 'ra-core';
 
-import { AnyType, RequestTypes, TRequestMethod, TRequestType } from '@/common';
+import { AnyType, RequestCountData, RequestTypes, TRequestMethod, TRequestType } from '@/common';
 import { DefaultRestDataProvider } from './default-rest-data.provider';
 
 export class CountRestDataProvider<
@@ -19,6 +19,7 @@ export class CountRestDataProvider<
     const paths = [resource];
 
     const response = this.networkService.doRequest<RecordType[]>({
+      requestCountData: RequestCountData.DATA_ONLY,
       type,
       paths,
       query: { ...queryKey, filter },
@@ -26,6 +27,7 @@ export class CountRestDataProvider<
     });
 
     const responseCount = this.networkService.doRequest({
+      requestCountData: RequestCountData.DATA_ONLY,
       type: RequestTypes.SEND,
       paths: [resource, 'count'],
       query: { ...queryKey, where: filter?.where },

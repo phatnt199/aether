@@ -8,8 +8,12 @@ import {
   IGetRequestPropsResult,
   LocalStorageKeys,
   RequestBodyTypes,
+  RequestChannel,
+  RequestCountData,
+  HeaderConsts,
   RequestMethods,
   RequestTypes,
+  TConstValue,
   TRequestMethod,
   TRequestType,
 } from '@/common';
@@ -76,8 +80,8 @@ export class DefaultNetworkRequestService extends BaseService {
     const { resource } = opts;
 
     const defaultHeaders = {
-      ['Timezone']: App.TIMEZONE,
-      ['Timezone-Offset']: `${App.TIMEZONE_OFFSET}`,
+      [HeaderConsts.TIMEZONE]: App.TIMEZONE,
+      [HeaderConsts.TIMEZONE_OFFSET]: `${App.TIMEZONE_OFFSET}`,
       ...this.headers,
     };
 
@@ -89,15 +93,33 @@ export class DefaultNetworkRequestService extends BaseService {
 
     return {
       ...defaultHeaders,
-      ['x-auth-provider']: authHeader.provider,
-      ['authorization']: authHeader.token,
+      [HeaderConsts.X_AUTH_PROVIDER]: authHeader.provider,
+      [HeaderConsts.AUTHORIZATION]: authHeader.token,
     };
   }
 
   //-------------------------------------------------------------
   getRequestProps(params: IGetRequestPropsParams) {
-    const { bodyType, body, resource } = params;
-    const headers = this.getRequestHeader({ resource });
+    const {
+      bodyType,
+      body,
+      resource,
+      restDataProviderOptions,
+      applicationInfo,
+      requestCountData = RequestCountData.DATA_ONLY,
+    } = params;
+    const requestTracingId = restDataProviderOptions.requestTracingId;
+    const channel = restDataProviderOptions.requestTracingChannel || RequestChannel.WEB;
+
+    const headers: Record<string, AnyType> = {
+      ...this.getRequestHeader({ resource }),
+      [HeaderConsts.REQUEST_CHANNEL]: channel,
+      [HeaderConsts.REQUEST_COUNT_DATA]: requestCountData,
+      [HeaderConsts.REQUEST_TRACING_ID]:
+        requestTracingId instanceof Function
+          ? requestTracingId({ applicationInfo })
+          : `${applicationInfo.name}_${crypto.randomUUID()}`,
+    };
 
     const rs: IGetRequestPropsResult = { headers, body };
 
@@ -105,7 +127,7 @@ export class DefaultNetworkRequestService extends BaseService {
       case RequestBodyTypes.FORM_URL_ENCODED: {
         rs.headers = {
           ...headers,
-          'Content-Type': 'application/x-www-form-urlencoded',
+          [HeaderConsts.CONTENT_TYPE]: 'application/x-www-form-urlencoded',
         };
 
         const formData = new FormData();
@@ -157,7 +179,7 @@ export class DefaultNetworkRequestService extends BaseService {
       default: {
         rs.headers = {
           ...headers,
-          'Content-Type': 'application/json',
+          [HeaderConsts.CONTENT_TYPE]: 'application/json',
         };
         rs.body = body;
         break;
@@ -169,31 +191,72 @@ export class DefaultNetworkRequestService extends BaseService {
 
   //-------------------------------------------------------------
   convertResponse<TData = AnyType>(opts: {
-    response: { data: TData; headers: Record<string, any> };
+    response: {
+      data: TData | { data: TData; count?: number };
+      headers: Record<string, AnyType>;
+    };
     type: string;
-  }): { data: TData; total?: number } {
+    requestCountData?: TConstValue<typeof RequestCountData>;
+  }): {
+    data: TData;
+    count?: number;
+    total?: number;
+  } {
     const {
       response: { data, headers },
       type,
+      requestCountData,
     } = opts;
 
     switch (type) {
       case RequestTypes.GET_LIST:
       case RequestTypes.GET_MANY_REFERENCE: {
+        if (requestCountData === RequestCountData.DATA_WITH_COUNT) {
+          if (!('data' in (data as AnyType)) || !('count' in (data as AnyType))) {
+            throw getError({
+              message: `[convertResponse] Invalid response format for requestCountData=${RequestCountData.DATA_WITH_COUNT} !`,
+            });
+          }
+
+          const dataFormatted = data as { data: TData; count?: number };
+
+          const _data = !Array.isArray(dataFormatted.data)
+            ? [dataFormatted.data]
+            : dataFormatted.data;
+
+          const contentRange =
+            (headers?.get('content-range') || headers?.get['Content-Range']) ?? `${_data.length}`;
+          const total = parseInt(contentRange?.split('/').pop(), 10);
+
+          return {
+            data: _data as TData,
+            count: dataFormatted?.count ?? _data.length,
+            total,
+          };
+        }
+
+        // --------------------------------------------------
         const _data = !Array.isArray(data) ? [data] : data;
 
-        // content-range: <unit> <range-start>-<range-end>/<size>
-        // TODO: Handle content range not use `getListVariant`
         const contentRange =
-          (headers?.get('content-range') || headers?.get['Content-Range']) ?? _data.length;
+          (headers?.get('content-range') || headers?.get['Content-Range']) ?? `${_data.length}`;
+        const total = parseInt(contentRange?.split('/').pop(), 10);
 
         return {
           data: _data as TData,
-          total: parseInt(contentRange.split('/').pop(), 10),
+          total,
         };
       }
       default: {
-        return { data };
+        if (requestCountData === RequestCountData.DATA_WITH_COUNT) {
+          return data as { data: TData; count?: number };
+        }
+
+        const responseCount = headers?.get(HeaderConsts.RESPONSE_COUNT_DATA);
+        return {
+          data: data as TData,
+          count: parseInt(responseCount, 10),
+        };
       }
     }
   }
@@ -206,9 +269,23 @@ export class DefaultNetworkRequestService extends BaseService {
       type: TRequestType;
       method: TRequestMethod;
       paths: string[];
+      requestCountData?: TConstValue<typeof RequestCountData>;
     },
-  ): Promise<{ data: ReturnType; total?: number }> {
-    const { baseUrl = this.baseUrl, type, method, paths, body, headers, query } = opts;
+  ): Promise<{
+    data: ReturnType;
+    count?: number;
+    total?: number; // GET_LIST || GET_MANY_REFERENCE
+  }> {
+    const {
+      baseUrl = this.baseUrl,
+      type,
+      method,
+      paths,
+      body,
+      headers,
+      query,
+      requestCountData,
+    } = opts;
 
     if (!baseUrl || isEmpty(baseUrl)) {
       throw getError({
@@ -234,46 +311,33 @@ export class DefaultNetworkRequestService extends BaseService {
       throw getError(jsonRs?.error || jsonRs);
     }
 
-    let tempRs: {
-      response: { data: ReturnType; headers: Record<string, any> };
-      type: string;
-    } = {
-      response: { data: {} as ReturnType, headers: rs.headers ?? {} },
-      type,
-    };
-
-    switch (status) {
-      case 204: {
-        tempRs = { ...tempRs, response: { ...tempRs.response, data: {} as ReturnType } };
-        break;
-      }
-      default: {
-        if (
-          [rs.headers?.get('content-type'), rs.headers?.get('Content-Type')].includes(
-            'application/octet-stream',
-          )
-        ) {
-          const blob = await rs.blob();
-
-          tempRs = {
-            ...tempRs,
-            response: { ...tempRs.response, data: blob as ReturnType },
-          };
-
-          break;
-        }
-
-        const jsonRs = await rs.json();
-        tempRs = {
-          ...tempRs,
-          response: { ...tempRs.response, data: jsonRs as ReturnType },
-        };
-
-        break;
-      }
+    if (status === 204) {
+      return { data: {} as ReturnType };
     }
 
-    const _rs = this.convertResponse<ReturnType>(tempRs);
-    return _rs;
+    if (
+      [rs.headers?.get('content-type'), rs.headers?.get('Content-Type')].includes(
+        'octet-stream', // application/octet-stream | binary/octet-stream
+      )
+    ) {
+      const blob = await rs.blob();
+
+      return {
+        data: blob as ReturnType,
+      };
+    }
+
+    const jsonRs = await rs.json();
+
+    const result = this.convertResponse<ReturnType>({
+      type,
+      requestCountData,
+      response: {
+        headers: rs.headers ?? {},
+        data: jsonRs as ReturnType,
+      },
+    });
+
+    return result;
   }
 }
