@@ -32,6 +32,7 @@ jobs:
           bun-version: latest
 
       - name: Install dependencies
+        working-directory: packages/docs/ra-core-infra
         run: bun install
 
       - name: Build Docs
