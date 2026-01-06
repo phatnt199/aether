@@ -325,7 +325,7 @@ Let's trace how data flows through your application:
 graph TB
     Step1["1. Component: ProductList<br/><em>useInjectable('services.ProductApi')</em>"]
     Step2["2. DI Container<br/><em>Returns ProductApi instance</em>"]
-    Step3["3. ProductApi.find()<br/><em>Calls BaseCrudService.find()</em>"]
+    Step3["3. ProductApi.find({})<br/><em>Calls BaseCrudService.find()</em>"]
     Step4["4. BaseCrudService<br/><em>Uses injected DataProvider</em>"]
     Step5["5. DefaultRestDataProvider<br/><em>Calls NetworkRequestService</em>"]
     Step6["6. NetworkRequestService<br/><em>Makes HTTP GET /products</em>"]

@@ -160,7 +160,7 @@ class UserService {
 
 ## Venizia DI Container
 
-@ra-core-infra uses **[@venizia/ignis-inversion](https://github.com/minimaltech/venizia)** - a TypeScript-first dependency injection container.
+@ra-core-infra uses **[@venizia/ignis-inversion](https://www.npmjs.com/package/@venizia/ignis-inversion)** - a TypeScript-first dependency injection container.
 
 ### Container Architecture
 

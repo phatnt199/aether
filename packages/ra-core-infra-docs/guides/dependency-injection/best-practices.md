@@ -728,7 +728,7 @@ export function App() {
   // React Query for data fetching
   const { data: products } = useQuery({
     queryKey: ['products'],
-    queryFn: () => productApi.find(),
+    queryFn: () => productApi.find({}),
   });
 
   return (

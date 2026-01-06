@@ -168,7 +168,7 @@ export function ProductList() {
 
   const { data: products } = useQuery({
     queryKey: ['products'],
-    queryFn: () => productApi.find(),
+    queryFn: () => productApi.find({}),
   });
 
   return <div>{/* Render products */}</div>;

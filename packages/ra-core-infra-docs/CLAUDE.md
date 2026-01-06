@@ -6,5 +6,6 @@ Include examples and screenshots where relevant
 Maintain a friendly, patient, and supportive tone
 Adhere to our brand voice and style guidelines
 Let me know if you have any other questions!”
+Target Audience: frontend engineers who are new to dependency injection
 
 

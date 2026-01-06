@@ -324,7 +324,7 @@ export function ProductList() {
   const productApi = useInjectable<ProductApi>({ key: 'services.ProductApi' });
   const { data: products } = useQuery({
     queryKey: ['products'],
-    queryFn: () => productApi.find(),
+    queryFn: () => productApi.find({}),
   });
 
   // Component logic

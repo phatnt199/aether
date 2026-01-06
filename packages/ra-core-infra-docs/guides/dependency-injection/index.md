@@ -130,7 +130,7 @@ export function ProductList() {
 
   const { data: products, isLoading } = useQuery<IProduct[]>({
     queryKey: ['products'],
-    queryFn: () => productApi.find(),
+    queryFn: () => productApi.find({}),
   });
 
   if (isLoading) return <div>Loading...</div>;
@@ -440,106 +440,114 @@ Here's a complete, copy-paste ready example:
 ```typescript
 // ==================== APPLICATION ====================
 // src/application/application.ts
-import { BaseRaApplication, CoreBindings, IRestDataProviderOptions } from '@minimaltech/ra-core-infra';
-import { BindingScopes } from '@venizia/ignis-inversion';
-import { ProductApi } from './services/product.api';
-import { UserApi } from './services/user.api';
+import {BaseRaApplication, CoreBindings} from '@minimaltech/ra-core-infra';
+import type {IRestDataProviderOptions} from '@minimaltech/ra-core-infra';
+import {BindingScopes} from '@venizia/ignis-inversion';
+import {ProductApi} from './services/product.api';
+import {UserApi} from './services/user.api';
 
 export class RaApplication extends BaseRaApplication {
-  bindContext(): void {
-    // Configuration
-    this.bind<IRestDataProviderOptions>({
-      key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
-    }).toValue({
-      url: import.meta.env.VITE_API_URL || 'https://dummyjson.com',
-      noAuthPaths: ['/products', '/users'],
-    });
+    bindContext(): void {
+        // Configuration
+        this.bind<IRestDataProviderOptions>({
+            key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
+        }).toValue({
+            url: import.meta.env.VITE_API_URL || 'https://dummyjson.com',
+            noAuthPaths: ['/products', '/users'],
+        });
 
-    // Services
-    this.service(ProductApi);
-    this.service(UserApi);
-  }
+        // Services
+        this.service(ProductApi);
+        this.service(UserApi);
+    }
 }
 
 // ==================== SERVICES ====================
 // src/application/services/product.api.ts
-import { BaseCrudService, CoreBindings, IDataProvider } from '@minimaltech/ra-core-infra';
-import { inject } from '@venizia/ignis-inversion';
+import {BaseCrudService, CoreBindings} from '@minimaltech/ra-core-infra';
+import type {IDataProvider} from '@minimaltech/ra-core-infra';
+import {inject} from '@venizia/ignis-inversion';
 
 export interface IProduct {
-  id: number;
-  title: string;
-  price: number;
-  thumbnail: string;
+    id: number;
+    title: string;
+    price: number;
+    thumbnail: string;
 }
 
 export class ProductApi extends BaseCrudService<IProduct> {
-  constructor(
-    @inject({ key: CoreBindings.DEFAULT_REST_DATA_PROVIDER })
-    protected dataProvider: IDataProvider
-  ) {
-    super({
-      scope: 'ProductApi',
-      dataProvider,
-      serviceOptions: { basePath: '/products' },
-    });
-  }
+    constructor(
+        @inject({key: CoreBindings.DEFAULT_REST_DATA_PROVIDER})
+        protected dataProvider: IDataProvider
+    ) {
+        super({
+            scope: 'ProductApi',
+            dataProvider,
+            serviceOptions: {basePath: '/products'},
+        });
+    }
 }
 
 // ==================== CONTEXT ====================
 // src/application/ApplicationContext.tsx
-import { CoreApplicationContext } from '@minimaltech/ra-core-infra';
-import React, { ReactNode } from 'react';
+import { ApplicationContext as CoreApplicationContext } from '@minimaltech/ra-core-infra';
 import { RaApplication } from './application';
+import type { ReactNode } from 'react';
 
-const app = new RaApplication();
-await app.start();
-const container = app.getContainer();
+let applicationContext = new RaApplication();
+await applicationContext.start();
+
 
 interface Props {
-  children: ReactNode;
+   children: ReactNode;
 }
 
+/**
+ * Application Context Provider
+ * Provides DI container to all child components
+ */
 export function ApplicationContext({ children }: Props) {
-  return (
-    <CoreApplicationContext container={container}>
-      {children}
-    </CoreApplicationContext>
-  );
+   return (
+       <CoreApplicationContext value={{ container: applicationContext, registry: applicationContext, logger: null }}>
+            {children}
+   </CoreApplicationContext>
+);
 }
 
 // ==================== COMPONENT ====================
 // src/screens/products/ProductList.tsx
-import { useInjectable } from '@minimaltech/ra-core-infra';
-import { useQuery } from '@tanstack/react-query';
-import { ProductApi, IProduct } from '@/application/services/product.api';
+import {useInjectable} from '@minimaltech/ra-core-infra';
+import {useQuery} from '@tanstack/react-query';
+import {ProductApi, IProduct} from '@/application/services/product.api';
 
 export function ProductList() {
-  const productApi = useInjectable<ProductApi>({
-    key: 'services.ProductApi',
-  });
+    const productApi = useInjectable<ProductApi>({
+        key: 'services.ProductApi',
+    });
 
-  const { data: products } = useQuery<IProduct[]>({
-    queryKey: ['products'],
-    queryFn: () => productApi.find(),
-  });
+    const {data: products} = useQuery<IProduct[]>({
+        queryKey: ['products'],
+        queryFn: () => productApi.find({}),
+    });
 
-  return (
-    <div>
-      {products?.map(product => (
-        <div key={product.id}>{product.title}</div>
-      ))}
+    return (
+        <div>
+            {products?.map(product => (
+                <div key = {product.id} > {product.title} < /div>
+            ))
+}
     </div>
-  );
+)
+    ;
 }
 
 // ==================== TYPE AUGMENTATION ====================
 // src/types/ra-core-infra.d.ts
 declare module '@minimaltech/ra-core-infra' {
-  interface IUseInjectableKeysOverrides {
-    'services.ProductApi': true;
-    'services.UserApi': true;
-  }
+    interface IUseInjectableKeysOverrides {
+        'services.ProductApi': true;
+        'services.UserApi': true;
+    }
 }
 ```
 
