@@ -6,11 +6,11 @@ Welcome to @ra-core-infra! This guide will help you set up and build your first 
 
 By the end of this section, you'll know how to:
 
-- ✅ Install @ra-core-infra and its dependencies
-- ✅ Set up a new Vite + React + TypeScript project
-- ✅ Create your first application with dependency injection
-- ✅ Configure data providers, auth providers, and services
-- ✅ Run a working CRUD application
+- Install @ra-core-infra and its dependencies
+- Set up a new Vite + React + TypeScript project
+- Create your first application with dependency injection
+- Configure data providers, auth providers, and services
+- Run a working CRUD application
 
 ## Prerequisites
 
@@ -58,17 +58,32 @@ import 'reflect-metadata';
 import { BaseRaApplication, CoreBindings } from '@minimaltech/ra-core-infra';
 
 class App extends BaseRaApplication {
-  bindContext() {
-    this.bind({ key: CoreBindings.REST_DATA_PROVIDER_OPTIONS })
-      .toValue({ url: 'https://api.example.com' });
-  }
+  bindContext(): void {
+        // Bind REST data provider options
+        this.bind<IRestDataProviderOptions>({
+            key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
+        }).toValue({
+            url: import.meta.env.VITE_API_URL || 'https://fakestoreapi.com',
+            noAuthPaths: ['/products', '/users'],
+        });
+
+        // Bind the default REST data provider
+        this.bind({
+            key: CoreBindings.DEFAULT_REST_DATA_PROVIDER,
+        }).toClass(DefaultRestDataProvider)
+            .setScope(BindingScopes.SINGLETON);
+
+        // Bind application services
+        this.bind({ key: 'services.ProductApi' })
+            .toClass(ProductApi)
+            .setScope(BindingScopes.SINGLETON);
+    }
 }
 
 const app = new App();
 await app.start();
 
 # 3. Use in React
-const container = app.getContainer();
 // ... wrap with CoreApplicationContext
 ```
 

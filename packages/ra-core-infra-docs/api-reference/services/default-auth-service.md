@@ -777,7 +777,6 @@ export function UserProvider({ children }) {
 - [Authentication Guide](/guides/authentication/) - Complete authentication guide
 - [DefaultAuthProvider](/api-reference/providers/default-auth-provider) - High-level auth provider
 - [Token Management](/guides/authentication/token-management) - Token handling guide
-- [Security Best Practices](/guides/security/best-practices) - Security guidelines
 
 ---
 

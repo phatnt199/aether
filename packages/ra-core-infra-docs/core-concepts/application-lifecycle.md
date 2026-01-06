@@ -4,20 +4,27 @@ Understanding the application lifecycle helps you know when and how to initializ
 
 ## Lifecycle Overview
 
-```
-1. new RaApplication()          // Constructor
-        ↓
-2. preConfigure()               // Pre-configuration hook
-        ↓
-3. bindContext()                // Service registration
-        ↓
-4. registerCoreBindings()       // Framework bindings
-        ↓
-5. postConfigure()              // Post-configuration hook
-        ↓
-6. app.start()                  // Finalization
-        ↓
-7. Application Ready            // Ready to use
+```mermaid
+graph TB
+    Step1["1. new RaApplication()<br/><em>Constructor</em>"]
+    Step2["2. preConfigure()<br/><em>Pre-configuration hook</em>"]
+    Step3["3. bindContext()<br/><em>Service registration</em>"]
+    Step4["4. registerCoreBindings()<br/><em>Framework bindings</em>"]
+    Step5["5. postConfigure()<br/><em>Post-configuration hook</em>"]
+    Step6["6. app.start()<br/><em>Finalization</em>"]
+    Step7["7. Application Ready<br/><em>Ready to use</em>"]
+
+    Step1 --> Step2
+    Step2 --> Step3
+    Step3 --> Step4
+    Step4 --> Step5
+    Step5 --> Step6
+    Step6 --> Step7
+
+    classDef stepStyle fill:#f0f7ff,stroke:#0066cc,stroke-width:2px
+    classDef readyStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    class Step1,Step2,Step3,Step4,Step5,Step6 stepStyle
+    class Step7 readyStyle
 ```
 
 ## Lifecycle Phases in Detail
@@ -255,9 +262,6 @@ export class RaApplication extends BaseRaApplication {
 ```typescript
 const app = new RaApplication();
 await app.start();  // Wait for all lifecycle phases to complete
-
-// Now app is ready
-const container = app.getContainer();
 ```
 
 ### Phase 7: Application Ready
@@ -279,16 +283,13 @@ import { RaApplication } from './application/application';
 import App from './App';
 
 // Create and start application
-const app = new RaApplication();
-await app.start();
-
-// Get container
-const container = app.getContainer();
+const applicationContext = new RaApplication();
+await applicationContext.start();
 
 // Render React app with container
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <CoreApplicationContext container={container}>
+    <CoreApplicationContext value={{ container: applicationContext, registry: applicationContext, logger: null }}>
       <App />
     </CoreApplicationContext>
   </React.StrictMode>
@@ -487,8 +488,6 @@ The application lifecycle provides **structured initialization** in this order:
 
 - **[Project Structure](./project-structure)** - See recommended organization
 - **[Dependency Injection Guide](/guides/dependency-injection/)** - Deep dive into DI
-- **[Configuration](./getting-started/configuration)** - Learn configuration patterns
-
 ---
 
 **Ready for project structure?** Continue to [project structure →](./project-structure)

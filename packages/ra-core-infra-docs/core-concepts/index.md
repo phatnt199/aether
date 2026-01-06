@@ -72,7 +72,7 @@ function ProductList() {
 // ✅ Good: Logic in service
 function ProductList() {
   const productApi = useInjectable<ProductApi>({ key: 'services.ProductApi' });
-  const { data: products } = useQuery(['products'], () => productApi.find());
+  const { data: products } = useQuery(['products'], () => productApi.find({}));
 
   return /* ... */;
 }

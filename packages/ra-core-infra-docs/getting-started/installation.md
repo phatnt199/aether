@@ -19,7 +19,7 @@ Before installing, ensure your system meets these requirements:
 
 ```bash
 # Core dependencies (required)
-bun add @minimaltech/ra-core-infra ra-core
+bun add @minimaltech/ra-core-infra@0.0.3-2 ra-core
 bun add @venizia/ignis-inversion reflect-metadata
 bun add -d @loopback/filter
 bun add react react-dom
@@ -29,7 +29,7 @@ bun add react react-dom
 
 ```bash
 # Core dependencies (required)
-npm install @minimaltech/ra-core-infra ra-core
+npm install @minimaltech/ra-core-infra@0.0.3-2 ra-core
 npm install @venizia/ignis-inversion reflect-metadata
 npm install --save-dev @loopback/filter
 npm install react react-dom
@@ -91,7 +91,6 @@ Create or update your `tsconfig.json`:
   }
 }
 ```
-
 ### Step 2: Configure tsconfig.app.json
 
 Create `tsconfig.app.json` for your application code:
@@ -121,7 +120,13 @@ Create `tsconfig.app.json` for your application code:
 
     /* Decorators - CRITICAL */
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
   "include": ["src"]
 }

@@ -439,7 +439,6 @@ function DebugPanel() {
 ## Related APIs
 
 - [useInjectable](/api-reference/hooks/use-injectable) - Inject specific services (recommended for most cases)
-- [ApplicationContext](/api-reference/core/application-context) - React context definition
 - [BaseRaApplication](/api-reference/core/base-ra-application) - Application setup
 - [Container](https://github.com/venizia/ignis-inversion) - Venizia DI container
 

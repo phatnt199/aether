@@ -8,10 +8,10 @@ Let's build a minimal working @ra-core-infra application from scratch. By the en
 
 A simple product listing application that:
 
-- ✅ Uses dependency injection with Venizia
-- ✅ Fetches data from a REST API
-- ✅ Displays products in a React component
-- ✅ Uses type-safe service injection
+- Uses dependency injection with Venizia
+- Fetches data from a REST API
+- Displays products in a React component
+- Uses type-safe service injection
 
 ## Prerequisites
 
@@ -47,22 +47,30 @@ If you forget this import or place it after other imports, decorators will fail 
 Create `src/application/application.ts`:
 
 ```typescript
-import { BaseRaApplication, CoreBindings, IRestDataProviderOptions } from '@minimaltech/ra-core-infra';
+import { BaseRaApplication, CoreBindings, DefaultRestDataProvider } from '@minimaltech/ra-core-infra';
+import type { IRestDataProviderOptions } from '@minimaltech/ra-core-infra';
+import { ProductApi } from './services/apis/product.api';
+import { BindingScopes } from '@venizia/ignis-inversion';
 
 export class RaApplication extends BaseRaApplication {
-  /**
-   * Configure dependency injection bindings
-   */
-  bindContext(): void {
-    // Configure the REST data provider with your API URL
-    this.bind<IRestDataProviderOptions>({
-      key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
-    }).toValue({
-      url: import.meta.env.VITE_API_URL || 'https://fakestoreapi.com',
-      // Endpoints that don't require authentication
-      noAuthPaths: ['/products', '/users'],
-    });
-  }
+    /**
+     * Configure dependency injection bindings
+     */
+    bindContext(): void {
+        // Bind REST data provider options
+        this.bind<IRestDataProviderOptions>({
+            key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
+        }).toValue({
+            url: import.meta.env.VITE_API_URL || 'https://fakestoreapi.com',
+            noAuthPaths: ['/products', '/users'],
+        });
+
+        // Bind the default REST data provider
+        this.bind({
+            key: CoreBindings.DEFAULT_REST_DATA_PROVIDER,
+        }).toClass(DefaultRestDataProvider)
+            .setScope(BindingScopes.SINGLETON);
+    }
 }
 ```
 
@@ -73,15 +81,18 @@ export class RaApplication extends BaseRaApplication {
 3. Bind configuration for the REST data provider
 4. Use environment variables for the API URL
 
-## Step 3: Create a Simple Service
+## Step 3: Create a Product Entity
 
-Create `src/application/services/apis/product.api.ts`:
+Create the product entity structure:
 
+```bash
+mkdir -p src/entities/product/{model,api}
+```
+
+Create three files for the entity:
+
+**1. Types** (`src/entities/product/model/product.types.ts`):
 ```typescript
-import { BaseCrudService, CoreBindings, IDataProvider } from '@minimaltech/ra-core-infra';
-import { inject } from '@venizia/ignis-inversion';
-
-// Product interface
 export interface IProduct {
   id: number;
   title: string;
@@ -90,11 +101,15 @@ export interface IProduct {
   category: string;
   image: string;
 }
+```
 
-/**
- * Product API Service
- * Handles all product-related API calls
- */
+**2. API Service** (`src/entities/product/api/productApi.ts`):
+```typescript
+import { BaseCrudService, CoreBindings } from '@minimaltech/ra-core-infra';
+import type { IDataProvider } from '@minimaltech/ra-core-infra';
+import { inject } from '@venizia/ignis-inversion';
+import type { IProduct } from '../model/product.types';
+
 export class ProductApi extends BaseCrudService<IProduct> {
   constructor(
     @inject({ key: CoreBindings.DEFAULT_REST_DATA_PROVIDER })
@@ -103,45 +118,56 @@ export class ProductApi extends BaseCrudService<IProduct> {
     super({
       scope: 'ProductApi',
       dataProvider,
-      serviceOptions: {
-        basePath: '/products',  // API endpoint: /products
-      },
+      serviceOptions: { basePath: '/products' },
     });
   }
 }
 ```
 
-**What's happening here?**
+**3. Public API** (`src/entities/product/index.ts`):
+```typescript
+export type { IProduct } from './model/product.types';
+export { ProductApi } from './api/productApi';
+```
 
-1. Define `IProduct` interface for type safety
-2. Extend `BaseCrudService` to get CRUD methods (find, findById, create, etc.)
-3. Use `@inject` decorator to get the data provider from DI container
-4. Configure the base path for this service
+::: tip
+`BaseCrudService` provides CRUD methods (find, findById, create, update, delete) automatically. The `@inject` decorator gets the data provider from the DI container.
+:::
 
 ## Step 4: Register the Service
 
 Update `src/application/application.ts` to register the service:
 
 ```typescript
-import { BaseRaApplication, CoreBindings, IRestDataProviderOptions } from '@minimaltech/ra-core-infra';
+import { BaseRaApplication, CoreBindings, DefaultRestDataProvider } from '@minimaltech/ra-core-infra';
+import type { IRestDataProviderOptions } from '@minimaltech/ra-core-infra';
+import { ProductApi } from '@/entities/product';
 import { BindingScopes } from '@venizia/ignis-inversion';
-import { ProductApi } from './services/apis/product.api';
 
 export class RaApplication extends BaseRaApplication {
-  bindContext(): void {
-    // Configure data provider
-    this.bind<IRestDataProviderOptions>({
-      key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
-    }).toValue({
-      url: import.meta.env.VITE_API_URL || 'https://fakestoreapi.com',
-      noAuthPaths: ['/products', '/users'],
-    });
+    /**
+     * Configure dependency injection bindings
+     */
+    bindContext(): void {
+        // Bind REST data provider options
+        this.bind<IRestDataProviderOptions>({
+            key: CoreBindings.REST_DATA_PROVIDER_OPTIONS,
+        }).toValue({
+            url: import.meta.env.VITE_API_URL || 'https://fakestoreapi.com',
+            noAuthPaths: ['/products', '/users'],
+        });
 
-    // Register ProductApi service
-    this.bind({ key: 'services.ProductApi' })
-      .toClass(ProductApi)
-      .setScope(BindingScopes.SINGLETON);
-  }
+        // Bind the default REST data provider
+        this.bind({
+            key: CoreBindings.DEFAULT_REST_DATA_PROVIDER,
+        }).toClass(DefaultRestDataProvider)
+            .setScope(BindingScopes.SINGLETON);
+
+        // Bind application services
+        this.bind({ key: 'services.ProductApi' })
+            .toClass(ProductApi)
+            .setScope(BindingScopes.SINGLETON);
+    }
 }
 ```
 
@@ -150,19 +176,16 @@ export class RaApplication extends BaseRaApplication {
 Create `src/application/ApplicationContext.tsx`:
 
 ```typescript
-import { CoreApplicationContext } from '@minimaltech/ra-core-infra';
-import React, { ReactNode } from 'react';
+import { ApplicationContext as CoreApplicationContext } from '@minimaltech/ra-core-infra';
 import { RaApplication } from './application';
+import type { ReactNode } from 'react';
 
-// Create and start the application
-const app = new RaApplication();
-await app.start();
+let applicationContext = new RaApplication();
+await applicationContext.start();
 
-// Get the DI container
-const container = app.getContainer();
 
 interface Props {
-  children: ReactNode;
+    children: ReactNode;
 }
 
 /**
@@ -170,67 +193,64 @@ interface Props {
  * Provides DI container to all child components
  */
 export function ApplicationContext({ children }: Props) {
-  return (
-    <CoreApplicationContext container={container}>
-      {children}
+    return (
+        <CoreApplicationContext value={{ container: applicationContext, registry: applicationContext, logger: null }}>
+    {children}
     </CoreApplicationContext>
-  );
+);
 }
 ```
 
-## Step 6: Create a Product List Component
+## Step 6: Create a Product List Page
 
-Create `src/screens/products/ProductList.tsx`:
+Create the page structure:
 
+```bash
+mkdir -p src/pages/product-list/ui
+```
+
+**Page Component** (`src/pages/product-list/ui/ProductListPage.tsx`):
 ```typescript
 import { useInjectable } from '@minimaltech/ra-core-infra';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
-import { IProduct, ProductApi } from '@/application/services/apis/product.api';
+import { ProductApi } from '@/entities/product';
+import type { IProduct } from '@/entities/product';
 
-/**
- * Product List Screen
- * Displays all products from the API
- */
-export function ProductList() {
-  // Inject ProductApi service using type-safe hook
-  const productApi = useInjectable<ProductApi>({
-    key: 'services.ProductApi',
-  });
+export function ProductListPage() {
+    const productApi = useInjectable<ProductApi>({
+        key: 'services.ProductApi',
+    });
 
-  // Fetch products using TanStack Query
-  const { data: products, isLoading, error } = useQuery<IProduct[]>({
-    queryKey: ['products'],
-    queryFn: () => productApi.find(),
-  });
+    const { data: products, isLoading, error } = useQuery<IProduct[]>({
+        queryKey: ['products'],
+        queryFn: () => productApi.find({}),
+    });
 
-  if (isLoading) return <div>Loading products...</div>;
-  if (error) return <div>Error loading products: {error.message}</div>;
+    if (isLoading) return <div>Loading products...</div>;
+    if (error) return <div>Error loading products: {error.message}</div>;
 
-  return (
-    <div>
-      <h1>Product List</h1>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
-        {products?.map((product) => (
-          <div key={product.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
-            <img src={product.image} alt={product.title} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
-            <h3>{product.title}</h3>
-            <p style={{ color: '#666' }}>${product.price}</p>
-            <p style={{ fontSize: '0.9rem', color: '#999' }}>{product.category}</p>
-          </div>
-        ))}
-      </div>
+    return (
+        <div>
+            <h1>Product List</h1>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1rem' }}>
+    {products?.map((product) => (
+        <div key={product.id} style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '8px' }}>
+        <img src={product.image} alt={product.title} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
+    <h3>{product.title}</h3>
+    <p style={{ color: '#666' }}>${product.price}</p>
+    <p style={{ fontSize: '0.9rem', color: '#999' }}>{product.category}</p>
     </div>
-  );
+    ))}
+    </div>
+    </div>
+);
 }
 ```
 
-**What's happening here?**
-
-1. Use `useInjectable` hook to get the ProductApi service
-2. Use TanStack Query's `useQuery` to fetch data
-3. Call `productApi.find()` which comes from `BaseCrudService`
-4. Render products with loading and error states
+**Public API** (`src/pages/product-list/index.ts`):
+```typescript
+export { ProductListPage } from './ui/ProductListPage';
+```
 
 ## Step 7: Set Up TanStack Query
 
@@ -239,8 +259,8 @@ Update `src/App.tsx`:
 ```typescript
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { ApplicationContext } from './application/ApplicationContext';
-import { ProductList } from './screens/products/ProductList';
+import { ApplicationContext } from './app/ApplicationContext';
+import { ProductListPage } from '@/pages/product-list';
 
 // Create a query client
 const queryClient = new QueryClient({
@@ -257,7 +277,7 @@ function App() {
     <ApplicationContext>
       <QueryClientProvider client={queryClient}>
         <div style={{ padding: '2rem' }}>
-          <ProductList />
+          <ProductListPage />
         </div>
       </QueryClientProvider>
     </ApplicationContext>
@@ -267,7 +287,7 @@ function App() {
 export default App;
 ```
 
-## Step 8: Type Augmentation (Optional but Recommended)
+## Step 8: Type Augmentation
 
 For TypeScript autocomplete, create `src/types/ra-core-infra.d.ts`:
 
@@ -301,41 +321,43 @@ You should see a grid of products loaded from the Fake Store API!
 
 Let's trace how data flows through your application:
 
-```
-1. Component: ProductList
-   ↓ useInjectable('services.ProductApi')
+```mermaid
+graph TB
+    Step1["1. Component: ProductList<br/><em>useInjectable('services.ProductApi')</em>"]
+    Step2["2. DI Container<br/><em>Returns ProductApi instance</em>"]
+    Step3["3. ProductApi.find({})<br/><em>Calls BaseCrudService.find()</em>"]
+    Step4["4. BaseCrudService<br/><em>Uses injected DataProvider</em>"]
+    Step5["5. DefaultRestDataProvider<br/><em>Calls NetworkRequestService</em>"]
+    Step6["6. NetworkRequestService<br/><em>Makes HTTP GET /products</em>"]
+    Step7["7. API Response<br/><em>Flows back up the chain</em>"]
+    Step8["8. Component<br/><em>Renders products</em>"]
 
-2. DI Container
-   ↓ Returns ProductApi instance
+    Step1 -->|Request| Step2
+    Step2 -->|Inject| Step3
+    Step3 -->|Delegate| Step4
+    Step4 -->|Use Provider| Step5
+    Step5 -->|Call Network| Step6
+    Step6 -->|HTTP Request| Step7
+    Step7 -.->|Response| Step8
 
-3. ProductApi.find()
-   ↓ Calls BaseCrudService.find()
+    classDef requestStyle fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef responseStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef renderStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
 
-4. BaseCrudService
-   ↓ Uses injected DataProvider
-
-5. DefaultRestDataProvider
-   ↓ Calls NetworkRequestService
-
-6. NetworkRequestService
-   ↓ Makes HTTP GET /products
-
-7. API Response
-   ↓ Flows back up the chain
-
-8. Component
-   ↓ Renders products
+    class Step1,Step2,Step3,Step4,Step5,Step6 requestStyle
+    class Step7 responseStyle
+    class Step8 renderStyle
 ```
 
 ## What You've Learned
 
 Congratulations! You've built your first @ra-core-infra application. You now understand:
 
-✅ **Dependency Injection** - Creating an app, binding services, injecting dependencies
-✅ **Service Layer** - Creating and using CRUD services
-✅ **Data Providers** - Configuring REST API communication
-✅ **React Integration** - Using `useInjectable` hook in components
-✅ **Type Safety** - TypeScript interfaces and type augmentation
+- **Dependency Injection** - Creating an app, binding services, injecting dependencies
+- **Service Layer** - Creating and using CRUD services
+- **Data Providers** - Configuring REST API communication
+- **React Integration** - Using `useInjectable` hook in components
+- **Type Safety** - TypeScript interfaces and type augmentation
 
 ## Troubleshooting
 
@@ -366,6 +388,16 @@ Congratulations! You've built your first @ra-core-infra application. You now und
 
 **Solution**: Add `import 'reflect-metadata';` as the **first line** in `src/main.tsx`.
 
+### "This syntax is not allowed when 'erasableSyntaxOnly' is enabled"
+**Solution**: Ensure that `tsconfig.json` has `"erasableSyntaxOnly": false` or remove the option entirely.
+
+### "Property 'env' does not exist on type 'ImportMeta'."
+**Solution**: Ensure that `tsconfig.json` has `"include": ["env.d.ts"]`
+
+`env.d.ts` should contain:
+```typescript
+/// <reference types="vite/client" />
+```
 For more issues, see [Troubleshooting](/troubleshooting/).
 
 ## Next Steps

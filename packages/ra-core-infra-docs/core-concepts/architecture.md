@@ -4,36 +4,23 @@
 
 ## High-Level Overview
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   User Interface                     │
-│              (React Components)                      │
-└─────────────────────────────────────────────────────┘
-                        ↓ ↑
-┌─────────────────────────────────────────────────────┐
-│              Application Context                     │
-│          (DI Container + Providers)                  │
-└─────────────────────────────────────────────────────┘
-                        ↓ ↑
-┌─────────────────────────────────────────────────────┐
-│                Service Layer                         │
-│         (Business Logic + Domain Models)             │
-└─────────────────────────────────────────────────────┘
-                        ↓ ↑
-┌─────────────────────────────────────────────────────┐
-│                Provider Layer                        │
-│       (Data, Auth, I18n Abstractions)                │
-└─────────────────────────────────────────────────────┘
-                        ↓ ↑
-┌─────────────────────────────────────────────────────┐
-│                Network Layer                         │
-│        (HTTP Client + Request Handling)              │
-└─────────────────────────────────────────────────────┘
-                        ↓ ↑
-┌─────────────────────────────────────────────────────┐
-│                External APIs                         │
-│             (REST, GraphQL, etc.)                    │
-└─────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    UI["User Interface<br/>(React Components)"]
+    Context["Application Context<br/>(DI Container + Providers)"]
+    Service["Service Layer<br/>(Business Logic + Domain Models)"]
+    Provider["Provider Layer<br/>(Data, Auth, I18n Abstractions)"]
+    Network["Network Layer<br/>(HTTP Client + Request Handling)"]
+    API["External APIs<br/>(REST, GraphQL, etc.)"]
+
+    UI <--> Context
+    Context <--> Service
+    Service <--> Provider
+    Provider <--> Network
+    Network <--> API
+
+    classDef layerStyle fill:#f9f9f9,stroke:#333,stroke-width:2px
+    class UI,Context,Service,Provider,Network,API layerStyle
 ```
 
 ## Layer Responsibilities
@@ -63,7 +50,7 @@ function ProductList() {
 
   // Fetch data using service
   const { data: products } = useQuery(['products'], () =>
-    productApi.find()
+    productApi.find({})
   );
 
   return <div>{/* Render products */}</div>;
@@ -223,9 +210,9 @@ class AxiosNetworkRequest extends BaseNetworkRequest {
 1. User clicks "Load Products"
         ↓
 2. Component: ProductList
-   useQuery(['products'], () => productApi.find())
+   useQuery(['products'], () => productApi.find({}))
         ↓
-3. Service: ProductApi.find()
+3. Service: ProductApi.find({})
    Calls: this.dataProvider.getList('products', { filter })
         ↓
 4. Provider: DefaultRestDataProvider.getList()
@@ -294,7 +281,7 @@ class AxiosNetworkRequest extends BaseNetworkRequest {
 - Cross-cutting concerns
 
 ```typescript
-<CoreApplicationContext container={container}>
+<CoreApplicationContext value={{ container: applicationContext, registry: applicationContext, logger: null }}>
   <QueryClientProvider client={queryClient}>
     <App />
   </QueryClientProvider>
@@ -337,7 +324,7 @@ Only use Redux for **UI state** that needs to be shared across many components. 
 ```typescript
 const { data, isLoading } = useQuery({
   queryKey: ['products'],
-  queryFn: () => productApi.find(),
+  queryFn: () => productApi.find({}),
   staleTime: 5 * 60 * 1000,  // 5 minutes
 });
 ```
@@ -531,11 +518,11 @@ function ProductList() {
 
 @ra-core-infra's architecture provides:
 
-✅ **Clear separation** between UI, business logic, and data access
-✅ **Dependency injection** for testability and flexibility
-✅ **Provider abstractions** for swappable implementations
-✅ **Service layer** for reusable business logic
-✅ **Multi-tier state management** for different state types
+- **Clear separation** between UI, business logic, and data access
+- **Dependency injection** for testability and flexibility
+- **Provider abstractions** for swappable implementations
+- **Service layer** for reusable business logic
+- **Multi-tier state management** for different state types
 
 ## Next Steps
 

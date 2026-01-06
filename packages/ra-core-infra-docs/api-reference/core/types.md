@@ -929,8 +929,6 @@ if (isValidId(maybeId)) {
 ## See Also
 
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/) - TypeScript documentation
-- [Utility Types Guide](/guides/typescript/utility-types) - Advanced utility types
-- [Type Safety Guide](/guides/typescript/type-safety) - Type-safe patterns
 
 ---
 
