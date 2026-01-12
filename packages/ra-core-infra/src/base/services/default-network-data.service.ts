@@ -316,9 +316,11 @@ export class DefaultNetworkRequestService extends BaseService {
     }
 
     if (
-      [rs.headers?.get('content-type'), rs.headers?.get('Content-Type')].includes(
-        'octet-stream', // application/octet-stream | binary/octet-stream
-      )
+      [rs.headers?.get('content-type'), rs.headers?.get('Content-Type')].some(h => {
+        return (
+          h?.endsWith('octet-stream') || h?.startsWith('image/') // application/octet-stream | binary/octet-stream || image/png | image/jpg
+        );
+      })
     ) {
       const blob = await rs.blob();
 
