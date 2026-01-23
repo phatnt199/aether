@@ -1,0 +1,142 @@
+import React from 'react';
+
+import { useQueryClient } from '@tanstack/react-query';
+import { removeDoubleSlashes, useAuthProvider, useBasename } from 'ra-core';
+import { Path, useLocation, useNavigate } from 'react-router-dom';
+
+const defaultAuthParams = {
+  loginUrl: '/login',
+  afterLoginUrl: '/',
+};
+
+/**
+ * Clone from ra-core, and not resetStore during logout
+ */
+export const useLogout = (): TLogout => {
+  const authProvider = useAuthProvider();
+  const queryClient = useQueryClient();
+  // const resetStore = useResetStore();
+  const navigate = useNavigate();
+  // useNavigate forces rerenders on every navigation, even if we don't use the result
+  // see https://github.com/remix-run/react-router/issues/7634
+  // so we use a ref to bail out of rerenders when we don't need to
+  const navigateRef = React.useRef(navigate);
+  const location = useLocation();
+  const locationRef = React.useRef(location);
+  const basename = useBasename();
+  const loginUrl = removeDoubleSlashes(`${basename}/${defaultAuthParams.loginUrl}`);
+
+  /*
+   * We need the current location to pass in the router state
+   * so that the login hook knows where to redirect to as next route after login.
+   *
+   * But if we used the location from useLocation as a dependency of the logout
+   * function, it would be rebuilt each time the user changes location.
+   * Consequently, that would force a rerender of all components using this hook
+   * upon navigation (CoreAdminRouter for example).
+   *
+   * To avoid that, we store the location in a ref.
+   */
+  React.useEffect(() => {
+    locationRef.current = location;
+    navigateRef.current = navigate;
+  }, [location, navigate]);
+
+  const logout: TLogout = React.useCallback(
+    (params = {}, redirectFromCaller, redirectToCurrentLocationAfterLogin = true) => {
+      if (authProvider) {
+        return authProvider.logout(params).then(redirectFromLogout => {
+          if (redirectFromLogout === false || redirectFromCaller === false) {
+            // resetStore();
+            queryClient.clear();
+            // do not redirect
+            return;
+          }
+
+          const finalRedirectTo = redirectFromCaller || redirectFromLogout || loginUrl;
+
+          if (finalRedirectTo?.startsWith('http')) {
+            // absolute link (e.g. https://my.oidc.server/login)
+            // resetStore();
+            queryClient.clear();
+            window.location.href = finalRedirectTo;
+            return finalRedirectTo;
+          }
+
+          // redirectTo is an internal location that may contain a query string, e.g. '/login?foo=bar'
+          // we must split it to pass a structured location to navigate()
+          const redirectToParts = finalRedirectTo.split('?');
+          const newLocation: Partial<Path> = {
+            pathname: redirectToParts[0],
+          };
+          let newLocationOptions = {};
+
+          if (
+            redirectToCurrentLocationAfterLogin &&
+            locationRef.current &&
+            locationRef.current.pathname
+          ) {
+            newLocationOptions = {
+              state: {
+                nextPathname: locationRef.current.pathname,
+                nextSearch: locationRef.current.search,
+              },
+            };
+          }
+          if (redirectToParts[1]) {
+            newLocation.search = redirectToParts[1];
+          }
+
+          // We need to navigate and reset the store after a litte delay to avoid a race condition
+          // between the store reset and the navigation.
+          //
+          // This would only happen when the `authProvider.getPermissions` method returns
+          // a resolved promise with no delay: If the store was reset before the navigation,
+          // the `usePermissions` query would reset, causing the `CoreAdminRoutes` component to
+          // rerender the `LogoutOnMount` component leading to an infinite loop.
+          setTimeout(() => {
+            navigateRef.current(newLocation, newLocationOptions);
+
+            // resetStore();
+            queryClient.clear();
+          }, 0);
+
+          return redirectFromLogout;
+        });
+      } else {
+        navigateRef.current(
+          {
+            pathname: loginUrl,
+          },
+          {
+            state: {
+              nextPathname: locationRef.current && locationRef.current.pathname,
+            },
+          },
+        );
+        // resetStore();
+        queryClient.clear();
+        return Promise.resolve();
+      }
+    },
+    [authProvider, loginUrl, queryClient],
+  );
+
+  return logout;
+};
+
+/**
+ * Log the current user out by calling the authProvider.logout() method,
+ * and redirect them to the login screen.
+ *
+ * @param {Object} params The parameters to pass to the authProvider
+ * @param {string} redirectTo The path name to redirect the user to (optional, defaults to login)
+ * @param {boolean} redirectToCurrentLocationAfterLogin Whether the button shall record the current location to redirect to it after login. true by default.
+ *
+ * @return {Promise} The authProvider response
+ */
+type TLogout = (
+  params?: any,
+  redirectTo?: string | false,
+  redirectToCurrentLocationAfterLogin?: boolean,
+) => Promise<any>;
