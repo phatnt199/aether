@@ -26,6 +26,7 @@ export const getError = (opts: {
 export const getClientError = (e: unknown) => {
   if (e instanceof ApplicationError) {
     return new ApplicationError({
+      statusCode: e.statusCode,
       messageCode: e?.messageCode ?? e.message,
       message: e.message,
     });
