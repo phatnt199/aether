@@ -7,20 +7,24 @@ export class ApplicationError extends Error {
    */
   messageArgs?: any;
 
+  extra?: any;
+
   constructor(opts: {
     statusCode?: number;
     messageCode?: string;
     message: string;
     payload?: any;
     messageArgs?: any;
+    extra?: any;
   }) {
-    const { message, messageCode, statusCode = 400, payload, messageArgs } = opts;
+    const { message, messageCode, statusCode = 400, payload, messageArgs, extra } = opts;
     super(message);
 
     this.statusCode = statusCode;
     this.messageCode = messageCode;
     this.payload = payload;
     this.messageArgs = messageArgs;
+    this.extra = extra;
   }
 }
 
@@ -30,6 +34,7 @@ export const getError = (opts: {
   message: string;
   payload?: any;
   messageArgs?: any;
+  extra?: any;
 }) => {
   const error = new ApplicationError(opts);
   return error;
@@ -42,6 +47,7 @@ export const getClientError = (e: unknown) => {
       messageCode: e?.messageCode ?? e.message,
       message: e.message,
       messageArgs: e.messageArgs,
+      extra: e.extra,
     });
   }
 
