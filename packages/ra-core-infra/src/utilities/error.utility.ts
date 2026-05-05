@@ -2,28 +2,31 @@ export class ApplicationError extends Error {
   statusCode: number;
   messageCode?: string;
   payload?: any;
-  /**
-   * @desc An optional field to provide arguments for the message code, which can be used for internationalization or detailed error messages.
-   */
-  messageArgs?: any;
 
-  extra?: any;
+  extra?: {
+    /**
+     * @desc An optional field to provide arguments for the message code, which can be used for internationalization or detailed error messages.
+     */
+    messageArgs?: any;
+    [key: string]: any;
+  };
 
   constructor(opts: {
     statusCode?: number;
     messageCode?: string;
     message: string;
     payload?: any;
-    messageArgs?: any;
-    extra?: any;
+    extra?: {
+      messageArgs?: any;
+      [key: string]: any;
+    };
   }) {
-    const { message, messageCode, statusCode = 400, payload, messageArgs, extra } = opts;
+    const { message, messageCode, statusCode = 400, payload, extra } = opts;
     super(message);
 
     this.statusCode = statusCode;
     this.messageCode = messageCode;
     this.payload = payload;
-    this.messageArgs = messageArgs;
     this.extra = extra;
   }
 }
@@ -33,8 +36,10 @@ export const getError = (opts: {
   messageCode?: string;
   message: string;
   payload?: any;
-  messageArgs?: any;
-  extra?: any;
+  extra?: {
+    messageArgs?: any;
+    [key: string]: any;
+  };
 }) => {
   const error = new ApplicationError(opts);
   return error;
@@ -46,7 +51,6 @@ export const getClientError = (e: unknown) => {
       statusCode: e.statusCode,
       messageCode: e?.messageCode ?? e.message,
       message: e.message,
-      messageArgs: e.messageArgs,
       extra: e.extra,
     });
   }
