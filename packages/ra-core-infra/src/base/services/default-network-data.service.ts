@@ -21,6 +21,33 @@ import { NodeFetchNetworkRequest } from '@/helpers';
 import { getError } from '@/utilities';
 import { BaseService } from './base.service';
 
+const parseFilenameFromContentDisposition = (header: string): string | undefined => {
+  if (!header) {
+    return undefined;
+  }
+
+  const extMatch = header.match(/filename\*\s*=\s*([^']*)'[^']*'([^;]+)/i);
+  if (extMatch) {
+    try {
+      return decodeURIComponent(extMatch[2].trim());
+    } catch {
+      return extMatch[2].trim();
+    }
+  }
+
+  const quotedMatch = header.match(/filename\s*=\s*"([^"]+)"/i);
+  if (quotedMatch) {
+    return quotedMatch[1];
+  }
+
+  const bareMatch = header.match(/filename\s*=\s*([^;]+)/i);
+  if (bareMatch) {
+    return bareMatch[1].trim();
+  }
+
+  return undefined;
+};
+
 export class DefaultNetworkRequestService extends BaseService {
   protected authToken?: { type?: string; value: string };
   protected noAuthPaths?: string[];
@@ -275,6 +302,8 @@ export class DefaultNetworkRequestService extends BaseService {
     data: ReturnType;
     count?: number;
     total?: number; // GET_LIST || GET_MANY_REFERENCE
+    filename?: string;
+    contentDisposition?: string;
   }> {
     const {
       baseUrl = this.baseUrl,
@@ -315,17 +344,27 @@ export class DefaultNetworkRequestService extends BaseService {
       return { data: {} as ReturnType };
     }
 
-    if (
-      [rs.headers?.get('content-type'), rs.headers?.get('Content-Type')].some(h => {
-        return (
-          h?.endsWith('octet-stream') || h?.startsWith('image/') // application/octet-stream | binary/octet-stream || image/png | image/jpg
-        );
-      })
-    ) {
+    const contentType = (
+      rs.headers?.get('content-type') ??
+      rs.headers?.get('Content-Type') ??
+      ''
+    ).toLowerCase();
+    const contentDisposition =
+      rs.headers?.get('content-disposition') ?? rs.headers?.get('Content-Disposition') ?? '';
+
+    const TEXTUAL_CONTENT_TYPE_RE =
+      /^(application\/(json|.*\+json|xml|.*\+xml|x-www-form-urlencoded|javascript|graphql)|text\/)/i;
+    const isAttachment = /^attachment/i.test(contentDisposition);
+    const isTextual = contentType !== '' && TEXTUAL_CONTENT_TYPE_RE.test(contentType);
+
+    if (isAttachment || !isTextual) {
       const blob = await rs.blob();
+      const filename = parseFilenameFromContentDisposition(contentDisposition);
 
       return {
         data: blob as ReturnType,
+        ...(filename ? { filename } : {}),
+        ...(contentDisposition ? { contentDisposition } : {}),
       };
     }
 
