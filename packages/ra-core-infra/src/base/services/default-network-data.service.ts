@@ -103,6 +103,18 @@ export class DefaultNetworkRequestService extends BaseService {
   }
 
   //-------------------------------------------------------------
+  removeHeaders(keys: string[]) {
+    if (!this.headers || !keys?.length) {
+      return;
+    }
+
+    const headers = this.headers as Record<string, AnyType>;
+    for (const key of keys) {
+      delete headers[key];
+    }
+  }
+
+  //-------------------------------------------------------------
   getRequestHeader(opts: { resource: string }) {
     const { resource } = opts;
 
