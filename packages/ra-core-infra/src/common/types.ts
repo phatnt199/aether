@@ -207,6 +207,13 @@ export interface IAuthProviderOptions {
 }
 
 // ----------------------------------------------------------------------
+export interface IAuthRecoveryOptions {
+  refreshToken?: () => Promise<void>;
+  onAuthFailure?: () => void | Promise<void>;
+  refreshTokenPath?: string;
+}
+
+// ----------------------------------------------------------------------
 export interface IRestDataProviderOptions {
   url: string;
   requestTracingId?: boolean | ((opts: { applicationInfo: IApplicationInfo }) => string);
@@ -214,6 +221,8 @@ export interface IRestDataProviderOptions {
 
   noAuthPaths?: Array<string>;
   headers?: HeadersInit;
+
+  authRecovery?: IAuthRecoveryOptions;
 }
 
 // ----------------------------------------------------------------------

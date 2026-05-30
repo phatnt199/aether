@@ -120,6 +120,7 @@ export class HeaderConsts {
    * - total: The total length of the entity body (or * if unknown).
    */
   static readonly CONTENT_RANGE = 'content-range';
+  static readonly CONTENT_DISPOSITION = 'content-disposition';
 
   static readonly AUTHORIZATION = 'authorization';
   static readonly X_AUTH_PROVIDER = 'x-auth-provider';
@@ -136,6 +137,11 @@ export class HeaderConsts {
   static readonly RESPONSE_COUNT_DATA = 'x-response-count';
 
   static readonly RESPONSE_FORMAT = 'x-response-format';
+
+  static readonly TEXTUAL_CONTENT_TYPE_RE =
+    /^(application\/(json|.*\+json|xml|.*\+xml|x-www-form-urlencoded|javascript|graphql)|text\/)/i;
+
+  static readonly ATTACHMENT_CONTENT_DISPOSITION_RE = /^attachment/i;
 }
 
 // --------------------------------------------------

@@ -2,20 +2,21 @@ import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
 
 import {
-  AnyType,
+  type AnyType,
   App,
-  IGetRequestPropsParams,
-  IGetRequestPropsResult,
+  HeaderConsts,
+  type IAuthRecoveryOptions,
+  type IGetRequestPropsParams,
+  type IGetRequestPropsResult,
   LocalStorageKeys,
   RequestBodyTypes,
   RequestChannel,
   RequestCountData,
-  HeaderConsts,
   RequestMethods,
   RequestTypes,
-  TConstValue,
-  TRequestMethod,
-  TRequestType,
+  type TConstValue,
+  type TRequestMethod,
+  type TRequestType,
 } from '@/common';
 import { NodeFetchNetworkRequest } from '@/helpers';
 import { getError } from '@/utilities';
@@ -54,23 +55,74 @@ export class DefaultNetworkRequestService extends BaseService {
   protected headers?: HeadersInit;
   protected networkRequest: NodeFetchNetworkRequest;
   protected baseUrl: string;
+  protected authRecovery?: IAuthRecoveryOptions;
+
+  private refreshing: Promise<boolean> | null = null;
 
   constructor(opts: {
     name: string;
     baseUrl?: string;
     headers?: HeadersInit;
     noAuthPaths?: string[];
+    authRecovery?: IAuthRecoveryOptions;
   }) {
     super({ scope: DefaultNetworkRequestService.name });
-    const { name, baseUrl = '', headers = {}, noAuthPaths } = opts;
+    const { name, baseUrl = '', headers = {}, noAuthPaths, authRecovery } = opts;
 
     this.headers = headers;
     this.noAuthPaths = noAuthPaths;
     this.baseUrl = baseUrl;
+    this.authRecovery = authRecovery;
     this.networkRequest = new NodeFetchNetworkRequest({
       name,
       networkOptions: { baseUrl, headers },
     });
+  }
+
+  //-------------------------------------------------------------
+  private ensureRefreshed(): Promise<boolean> {
+    const rec = this.authRecovery;
+    if (!rec?.refreshToken) {
+      return Promise.resolve(false);
+    }
+
+    this.refreshing ??= rec
+      .refreshToken()
+      .then(() => true)
+      .catch(async () => {
+        try {
+          await rec.onAuthFailure?.();
+        } catch {
+          console.error(
+            '[DefaultNetworkRequestService][ensureRefreshed] onAuthFailure callback failed',
+          );
+        }
+        return false;
+      })
+      .finally(() => {
+        this.refreshing = null;
+      });
+
+    return this.refreshing;
+  }
+
+  //-------------------------------------------------------------
+  private canRecover(paths: string[]): boolean {
+    const rec = this.authRecovery;
+    if (!rec?.refreshToken) {
+      return false;
+    }
+
+    const resource = paths?.[0];
+    if (resource && this.noAuthPaths?.includes(resource)) {
+      return false;
+    }
+
+    if (rec.refreshTokenPath && paths?.join('/').includes(rec.refreshTokenPath)) {
+      return false;
+    }
+
+    return true;
   }
 
   //-------------------------------------------------------------
@@ -263,8 +315,7 @@ export class DefaultNetworkRequestService extends BaseService {
             ? [dataFormatted.data]
             : dataFormatted.data;
 
-          const contentRange =
-            (headers?.get('content-range') || headers?.get['Content-Range']) ?? `${_data.length}`;
+          const contentRange = headers?.get(HeaderConsts.CONTENT_RANGE) ?? `${_data.length}`;
           const total = parseInt(contentRange?.split('/').pop(), 10);
 
           return {
@@ -277,8 +328,7 @@ export class DefaultNetworkRequestService extends BaseService {
         // --------------------------------------------------
         const _data = !Array.isArray(data) ? [data] : data;
 
-        const contentRange =
-          (headers?.get('content-range') || headers?.get['Content-Range']) ?? `${_data.length}`;
+        const contentRange = headers?.get(HeaderConsts.CONTENT_RANGE) ?? `${_data.length}`;
         const total = parseInt(contentRange?.split('/').pop(), 10);
 
         return {
@@ -298,6 +348,53 @@ export class DefaultNetworkRequestService extends BaseService {
         };
       }
     }
+  }
+
+  //-------------------------------------------------------------
+  private async parseResponse<ReturnType = AnyType>(opts: {
+    response: Response;
+    type: TRequestType;
+    requestCountData?: TConstValue<typeof RequestCountData>;
+  }): Promise<{
+    data: ReturnType;
+    count?: number;
+    total?: number;
+    filename?: string;
+    contentDisposition?: string;
+  }> {
+    const { response: rs, type, requestCountData } = opts;
+
+    if (rs.status === 204) {
+      return { data: {} as ReturnType };
+    }
+
+    const contentType = (rs.headers?.get(HeaderConsts.CONTENT_TYPE) ?? '').toLowerCase();
+    const contentDisposition = rs.headers?.get(HeaderConsts.CONTENT_DISPOSITION) ?? '';
+
+    const isAttachment = HeaderConsts.ATTACHMENT_CONTENT_DISPOSITION_RE.test(contentDisposition);
+    const isTextual = contentType !== '' && HeaderConsts.TEXTUAL_CONTENT_TYPE_RE.test(contentType);
+
+    if (isAttachment || !isTextual) {
+      const blob = await rs.blob();
+      const filename = parseFilenameFromContentDisposition(contentDisposition);
+
+      return {
+        data: blob as ReturnType,
+        ...(filename ? { filename } : {}),
+        ...(contentDisposition ? { contentDisposition } : {}),
+      };
+    }
+
+    const jsonRs = await rs.json();
+
+    return this.convertResponse<ReturnType>({
+      type,
+      requestCountData,
+      response: {
+        headers: rs.headers ?? {},
+        data: jsonRs as ReturnType,
+      },
+    });
   }
 
   //-------------------------------------------------------------
@@ -334,16 +431,35 @@ export class DefaultNetworkRequestService extends BaseService {
       });
     }
 
-    const url = this.networkRequest.getRequestUrl({ baseUrl: this.baseUrl, paths });
+    const url = this.networkRequest.getRequestUrl({ baseUrl, paths });
 
-    const rs = await this.networkRequest.getNetworkService().send({
-      url,
-      method,
-      params: query,
-      body: method === RequestMethods.GET ? undefined : body,
-      headers,
-      configs: {},
-    });
+    const sendOnce = (sendHeaders?: HeadersInit) => {
+      return this.networkRequest.getNetworkService().send({
+        url,
+        method,
+        params: query,
+        body: method === RequestMethods.GET ? undefined : body,
+        headers: sendHeaders,
+        configs: {},
+      });
+    };
+
+    let rs = await sendOnce(headers);
+
+    if (rs.status === 401 && this.canRecover(paths)) {
+      const isRefreshed = await this.ensureRefreshed();
+
+      if (isRefreshed) {
+        const authHeader = this.getRequestAuthorizationHeader();
+        const retryHeaders = {
+          ...(headers as Record<string, AnyType>),
+          [HeaderConsts.AUTHORIZATION]: authHeader.token,
+          [HeaderConsts.X_AUTH_PROVIDER]: authHeader.provider,
+        };
+
+        rs = await sendOnce(retryHeaders);
+      }
+    }
 
     const status = rs.status;
 
@@ -352,45 +468,6 @@ export class DefaultNetworkRequestService extends BaseService {
       throw getError(jsonRs?.error || jsonRs);
     }
 
-    if (status === 204) {
-      return { data: {} as ReturnType };
-    }
-
-    const contentType = (
-      rs.headers?.get('content-type') ??
-      rs.headers?.get('Content-Type') ??
-      ''
-    ).toLowerCase();
-    const contentDisposition =
-      rs.headers?.get('content-disposition') ?? rs.headers?.get('Content-Disposition') ?? '';
-
-    const TEXTUAL_CONTENT_TYPE_RE =
-      /^(application\/(json|.*\+json|xml|.*\+xml|x-www-form-urlencoded|javascript|graphql)|text\/)/i;
-    const isAttachment = /^attachment/i.test(contentDisposition);
-    const isTextual = contentType !== '' && TEXTUAL_CONTENT_TYPE_RE.test(contentType);
-
-    if (isAttachment || !isTextual) {
-      const blob = await rs.blob();
-      const filename = parseFilenameFromContentDisposition(contentDisposition);
-
-      return {
-        data: blob as ReturnType,
-        ...(filename ? { filename } : {}),
-        ...(contentDisposition ? { contentDisposition } : {}),
-      };
-    }
-
-    const jsonRs = await rs.json();
-
-    const result = this.convertResponse<ReturnType>({
-      type,
-      requestCountData,
-      response: {
-        headers: rs.headers ?? {},
-        data: jsonRs as ReturnType,
-      },
-    });
-
-    return result;
+    return this.parseResponse<ReturnType>({ response: rs, type, requestCountData });
   }
 }
