@@ -8,6 +8,7 @@ export * from './use-copy-to-clipboard';
 export * from './use-debounce';
 export * from './use-injectable';
 export * from './use-notify-error';
+export * from './use-refresh-token';
 export * from './use-sizer';
 export * from './use-translate';
 export * from './use-window-dimensions';
