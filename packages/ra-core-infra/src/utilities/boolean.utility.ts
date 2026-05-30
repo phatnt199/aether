@@ -30,3 +30,16 @@ export const isValidDate = (value: any) => {
   const date = new Date(value);
   return date instanceof Date && !isNaN(date.valueOf());
 };
+
+export const isEditableTarget = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return (
+    target.isContentEditable ||
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.tagName === 'SELECT'
+  );
+};
