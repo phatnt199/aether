@@ -1,6 +1,11 @@
-import { Container, TClass } from '@venizia/ignis-inversion';
+import { Container, type TClass } from '@venizia/ignis-inversion';
 
-import { CoreBindings, IApplicationInfo, ICoreRaApplication, ValueOrPromise } from '@/common';
+import {
+  CoreBindings,
+  type IApplicationInfo,
+  type ICoreRaApplication,
+  type ValueOrPromise,
+} from '@/common';
 
 // --------------------------------------------------------------------------------
 export abstract class AbstractRaApplication extends Container implements ICoreRaApplication {

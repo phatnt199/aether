@@ -1,11 +1,12 @@
-import { AnyObject } from '@/common/types';
-import { getError } from '@/utilities';
 import isEmpty from 'lodash/isEmpty';
-import { IFetchable, IRequestOptions } from './fetcher';
-import { AxiosFetcher, IAxiosRequestOptions } from './fetcher/axios-fetcher';
-import { NodeFetcher } from './fetcher/node-fetcher';
-import { TFetcherResponse, TFetcherVariant } from './types';
+
+import { type AnyObject } from '@/common/types';
+import { getError } from '@/utilities';
 import { BaseHelper } from '../base.helper';
+import { type IFetchable, type IRequestOptions } from './fetcher';
+import { AxiosFetcher, type IAxiosRequestOptions } from './fetcher/axios-fetcher';
+import { NodeFetcher } from './fetcher/node-fetcher';
+import type { TFetcherResponse, TFetcherVariant } from './types';
 
 // -----------------------------------------------------------------------------
 export interface IFetcherRequestOptions<T extends TFetcherVariant> {

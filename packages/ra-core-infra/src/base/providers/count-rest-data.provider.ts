@@ -1,6 +1,12 @@
-import { RaRecord } from 'ra-core';
+import { type RaRecord } from 'ra-core';
 
-import { AnyType, RequestCountData, RequestTypes, TRequestMethod, TRequestType } from '@/common';
+import {
+  type AnyType,
+  RequestCountData,
+  RequestTypes,
+  type TRequestMethod,
+  type TRequestType,
+} from '@/common';
 import { DefaultRestDataProvider } from './default-rest-data.provider';
 
 export class CountRestDataProvider<

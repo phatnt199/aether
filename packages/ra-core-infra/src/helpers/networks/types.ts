@@ -1,4 +1,4 @@
-import { AxiosInstance, AxiosResponse } from 'axios';
+import { type AxiosInstance, type AxiosResponse } from 'axios';
 
 export type TFetcherVariant = 'node-fetch' | 'axios';
 export type TFetcherResponse<T extends TFetcherVariant> = T extends 'node-fetch'

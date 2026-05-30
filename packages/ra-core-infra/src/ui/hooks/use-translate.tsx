@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useI18nProvider } from 'ra-core';
 
-import { AnyType, englishMessages, TFullPaths } from '@/common';
+import { type AnyType, englishMessages, type TFullPaths } from '@/common';
 
 export interface IUseTranslateKeysOverrides {}
 

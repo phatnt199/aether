@@ -1,29 +1,29 @@
-import { Filter, Where } from '@loopback/filter';
-import { TClass } from '@venizia/ignis-inversion';
+import { type Filter, type Where } from '@loopback/filter';
+import { type TClass } from '@venizia/ignis-inversion';
 import {
-  CreateParams,
-  CreateResult,
-  DeleteManyParams,
-  DeleteManyResult,
-  DeleteParams,
-  DeleteResult,
-  GetListParams,
-  GetListResult,
-  GetManyParams,
-  GetManyReferenceParams,
-  GetManyReferenceResult,
-  GetManyResult,
-  GetOneParams,
-  GetOneResult,
-  Identifier,
-  Locale,
-  QueryFunctionContext,
-  RaRecord,
-  UpdateManyParams,
-  UpdateManyResult,
-  UpdateParams,
-  UpdateResult,
-  UserIdentity,
+  type CreateParams,
+  type CreateResult,
+  type DeleteManyParams,
+  type DeleteManyResult,
+  type DeleteParams,
+  type DeleteResult,
+  type GetListParams,
+  type GetListResult,
+  type GetManyParams,
+  type GetManyReferenceParams,
+  type GetManyReferenceResult,
+  type GetManyResult,
+  type GetOneParams,
+  type GetOneResult,
+  type Identifier,
+  type Locale,
+  type QueryFunctionContext,
+  type RaRecord,
+  type UpdateManyParams,
+  type UpdateManyResult,
+  type UpdateParams,
+  type UpdateResult,
+  type UserIdentity,
 } from 'ra-core';
 
 import { DefaultNetworkRequestService } from '@/base';
@@ -192,6 +192,7 @@ export interface IReactAdminAuthProvider {
 
 export interface IAuthProvider extends IReactAdminAuthProvider {
   getRoles: (params?: AnyType) => Promise<Set<string>>;
+  refreshToken: () => Promise<AnyType>;
 }
 
 // ----------------------------------------------------------------------

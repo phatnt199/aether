@@ -1,4 +1,4 @@
-import { IdType, LocalStorageKeys } from '@/common';
+import { type IdType, LocalStorageKeys } from '@/common';
 import { BaseService } from './base.service';
 
 export class DefaultAuthService extends BaseService {

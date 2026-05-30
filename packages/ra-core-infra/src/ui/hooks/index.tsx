@@ -6,7 +6,6 @@ export * from './use-before-unload';
 export * from './use-confirm';
 export * from './use-copy-to-clipboard';
 export * from './use-debounce';
-export * from './use-document-title';
 export * from './use-injectable';
 export * from './use-logout';
 export * from './use-notify-error';

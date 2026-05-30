@@ -3,11 +3,11 @@ import { removeDoubleSlashes } from 'ra-core';
 
 import { DefaultAuthService } from '@/base/services';
 import {
-  AnyType,
+  type AnyType,
   CoreBindings,
-  IAuthProvider,
-  IAuthProviderOptions,
-  IDataProvider,
+  type IAuthProvider,
+  type IAuthProviderOptions,
+  type IDataProvider,
   RequestMethods,
 } from '@/common';
 import { BaseProvider } from './base.provider';
@@ -137,6 +137,13 @@ export class DefaultAuthProvider<
   }
 
   // -------------------------------------------------------------
+  // REFRESH_TOKEN
+  // -------------------------------------------------------------
+  refreshToken(): Promise<AnyType> {
+    return Promise.resolve();
+  }
+
+  // -------------------------------------------------------------
   override value(_container: Container): IAuthProvider {
     return {
       login: (params: AnyType) => this.login(params),
@@ -146,6 +153,7 @@ export class DefaultAuthProvider<
       getIdentity: (params: AnyType) => this.getIdentity(params),
       getPermissions: (params: AnyType) => this.getPermissions(params),
       getRoles: (params: AnyType) => this.getRoles(params),
+      refreshToken: () => this.refreshToken(),
     };
   }
 }

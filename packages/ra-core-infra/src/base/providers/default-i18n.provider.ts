@@ -1,8 +1,8 @@
 import { Container, inject } from '@venizia/ignis-inversion';
-import { I18nProvider } from 'ra-core';
+import { type I18nProvider } from 'ra-core';
 import polyglotI18nProvider from 'ra-i18n-polyglot';
 
-import { CoreBindings, englishMessages, II18nProviderOptions } from '@/common';
+import { CoreBindings, englishMessages, type II18nProviderOptions } from '@/common';
 import { BaseProvider } from './base.provider';
 
 const [language] = (navigator?.language || 'en-US').split('-');

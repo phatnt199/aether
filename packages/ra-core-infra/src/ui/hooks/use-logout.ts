@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
 import { removeDoubleSlashes, useAuthProvider, useBasename } from 'ra-core';
-import { Path, useLocation, useNavigate } from 'react-router-dom';
+import { type Path, useLocation, useNavigate } from 'react-router-dom';
 
 const defaultAuthParams = {
   loginUrl: '/login',

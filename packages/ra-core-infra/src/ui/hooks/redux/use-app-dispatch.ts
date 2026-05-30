@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Dispatch, UnknownAction } from '@reduxjs/toolkit';
+import { type Dispatch, type UnknownAction } from '@reduxjs/toolkit';
 import { useDispatch } from 'react-redux';
 
 export const createAppDispatch = <

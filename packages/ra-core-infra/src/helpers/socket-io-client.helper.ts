@@ -1,6 +1,6 @@
-import { io, Socket, SocketOptions } from 'socket.io-client';
+import { io, Socket, type SocketOptions } from 'socket.io-client';
 
-import { AnyType } from '@/common/types';
+import { type AnyType } from '@/common/types';
 import { getError } from '@/utilities/error.utility';
 import { BaseHelper } from './base.helper';
 

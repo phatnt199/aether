@@ -1,4 +1,4 @@
-import { TFetcherResponse, TFetcherVariant, TFetcherWorker } from '../types';
+import type { TFetcherResponse, TFetcherVariant, TFetcherWorker } from '../types';
 
 const HTTP = 'http';
 const HTTPS = 'https';

@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Container } from '@venizia/ignis-inversion';
 
-import { CoreBindings, ValueOf } from '@/common';
+import { CoreBindings, type ValueOf } from '@/common';
 import { getError } from '@/utilities';
 import { ApplicationContext } from '../context';
 

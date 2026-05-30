@@ -1,6 +1,12 @@
-import { Filter, Where } from '@loopback/filter';
+import { type Filter, type Where } from '@loopback/filter';
 
-import { EntityRelationType, ICrudService, IDataProvider, IdType, RequestMethods } from '@/common';
+import {
+  type EntityRelationType,
+  type ICrudService,
+  type IDataProvider,
+  type IdType,
+  RequestMethods,
+} from '@/common';
 import { BaseService } from './base.service';
 
 export interface ICrudServiceOptions {

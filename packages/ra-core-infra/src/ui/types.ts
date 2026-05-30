@@ -1,7 +1,7 @@
-import { Store } from '@reduxjs/toolkit';
-import { Container } from '@venizia/ignis-inversion';
-import { CoreAdminProps, ResourceProps } from 'ra-core';
-import { RouteProps } from 'react-router-dom';
+import { type Store } from '@reduxjs/toolkit';
+import { type Container } from '@venizia/ignis-inversion';
+import { type CoreAdminProps, type ResourceProps } from 'ra-core';
+import { type RouteProps } from 'react-router-dom';
 
 // -------------------------------------------------------------
 export interface IApplication extends Omit<CoreAdminProps, 'children'> {

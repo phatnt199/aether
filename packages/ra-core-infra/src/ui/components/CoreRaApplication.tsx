@@ -1,15 +1,15 @@
 import React from 'react';
 
-import { Store } from '@reduxjs/toolkit';
+import { type Store } from '@reduxjs/toolkit';
 import { Container } from '@venizia/ignis-inversion';
-import { CoreAdmin, CustomRoutes, I18nProvider, Resource } from 'ra-core';
+import { CoreAdmin, CustomRoutes, type I18nProvider, Resource } from 'ra-core';
 import { Provider as ReduxProvider } from 'react-redux';
 import { Route } from 'react-router-dom';
 
-import { CoreBindings, IAuthProvider, IDataProvider } from '@/common';
+import { CoreBindings, type IAuthProvider, type IDataProvider } from '@/common';
 import { Logger } from '@/helpers';
 import { ApplicationContext } from '../context';
-import { IApplication } from '../types';
+import { type IApplication } from '../types';
 
 const Wrapper: React.FC<{
   applicationName?: string;

@@ -1,7 +1,8 @@
-import { AnyObject } from '@/common';
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
+
+import { type AnyObject } from '@/common';
 import { stringify } from '@/utilities/url.utility';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { AbstractNetworkFetchableHelper, IRequestOptions } from './base-fetcher';
+import { AbstractNetworkFetchableHelper, type IRequestOptions } from './base-fetcher';
 
 export interface IAxiosRequestOptions extends AxiosRequestConfig, IRequestOptions {
   url: string;
