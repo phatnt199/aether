@@ -150,6 +150,16 @@ export class DefaultNetworkRequestService extends BaseService {
   }
 
   //-------------------------------------------------------------
+  setAuthRecovery(authRecovery: Partial<IAuthRecoveryOptions>) {
+    this.authRecovery = { ...this.authRecovery, ...authRecovery };
+  }
+
+  //-------------------------------------------------------------
+  getAuthRecovery() {
+    return this.authRecovery;
+  }
+
+  //-------------------------------------------------------------
   setHeaders(headers: HeadersInit) {
     this.headers = merge(this.headers, headers);
   }

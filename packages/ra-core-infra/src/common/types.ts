@@ -208,8 +208,8 @@ export interface IAuthProviderOptions {
 
 // ----------------------------------------------------------------------
 export interface IAuthRecoveryOptions {
-  refreshToken?: () => Promise<void>;
-  onAuthFailure?: () => void | Promise<void>;
+  refreshToken?: () => Promise<unknown>;
+  onAuthFailure?: () => ValueOrPromise<unknown>;
   refreshTokenPath?: string;
 }
 
