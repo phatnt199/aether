@@ -36,7 +36,7 @@ export class DefaultAuthProvider<
           resource: (this.authProviderOptions.paths?.signIn ?? '/auth/login') as TResource,
           params: { method: RequestMethods.POST, body: params },
         })
-        .then(rs => {
+        .then((rs) => {
           const { userId, token } = rs.data;
           this.authService.saveAuth({ token, userId, username: params.username });
           resolve({
@@ -46,7 +46,7 @@ export class DefaultAuthProvider<
             ),
           });
         })
-        .catch(error => {
+        .catch((error) => {
           reject(error);
         });
     });
@@ -56,7 +56,7 @@ export class DefaultAuthProvider<
   // LOGOUT
   // -------------------------------------------------------------
   logout(_params: AnyType) {
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       this.authService.cleanUp();
       resolve();
     });

@@ -20,7 +20,7 @@ export const createAppDispatch = <
     // --------------------------------------------------
     const multipleDispatch = React.useCallback(
       (...actions: DispatchActionType[]) => {
-        actions.forEach(action => {
+        actions.forEach((action) => {
           if (action) {
             dispatch(action);
           }

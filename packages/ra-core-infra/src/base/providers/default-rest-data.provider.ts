@@ -499,8 +499,8 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
 
     const rs = Promise.all(
       ids
-        .map(id => [resource, `${id}`])
-        .map(paths => {
+        .map((id) => [resource, `${id}`])
+        .map((paths) => {
           return this.networkService.doRequest<RecordType['id']>({
             requestCountData: RequestCountData.DATA_ONLY,
             type: RequestTypes.DELETE_MANY,
@@ -509,9 +509,9 @@ export class DefaultRestDataProvider<TResource extends string = string> extends 
             ...request,
           });
         }),
-    ).then(responses => {
+    ).then((responses) => {
       return {
-        data: responses.map(response => response.data),
+        data: responses.map((response) => response.data),
       };
     });
 

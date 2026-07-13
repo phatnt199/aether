@@ -32,8 +32,7 @@ const Wrapper: React.FC<{
         container,
         registry: container,
         logger: Logger.getInstance({ scope: applicationName, enableDebug }),
-      }}
-    >
+      }}>
       <ReduxProvider store={reduxStore}>
         <React.Suspense fallback={suspense}>{children}</React.Suspense>
       </ReduxProvider>
@@ -76,15 +75,14 @@ export const CoreRaApplication: React.FC<IApplication> = (props: IApplication) =
       container={container}
       reduxStore={reduxStore}
       suspense={suspense}
-      enableDebug={enableDebug}
-    >
+      enableDebug={enableDebug}>
       <CoreAdmin {...adminProps}>
-        {resources.map(resource => {
+        {resources.map((resource) => {
           return <Resource key={resource.name} {...resource} />;
         })}
 
         <CustomRoutes>
-          {routes?.map(resource => {
+          {routes?.map((resource) => {
             return <Route key={resource.id ?? resource.path} {...resource} />;
           })}
         </CustomRoutes>

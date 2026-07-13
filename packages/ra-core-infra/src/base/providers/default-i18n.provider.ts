@@ -26,7 +26,7 @@ export class DefaultI18nProvider extends BaseProvider<I18nProvider> {
     const initialLocale = listLocales.includes(language) ? language : 'en';
 
     return polyglotI18nProvider(
-      locale => {
+      (locale) => {
         return i18nSources?.[locale] ?? englishMessages;
       },
       initialLocale,

@@ -1,11 +1,14 @@
 const config = {
+  arrowParens: 'always',
+  bracketSameLine: true,
   bracketSpacing: true,
-  singleQuote: true,
+  jsxSingleQuote: false,
   printWidth: 100,
+  semi: true,
+  singleQuote: true,
   tabWidth: 2,
   trailingComma: 'all',
-  arrowParens: 'avoid',
-  semi: true,
+  useTabs: false,
 };
 
 export default config;

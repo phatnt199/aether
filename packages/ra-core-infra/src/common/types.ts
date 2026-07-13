@@ -171,8 +171,9 @@ export interface IReactAdminDataProvider<TResource extends string = string> {
   ) => Promise<DeleteManyResult<RecordType>>;
 }
 
-export interface IDataProvider<TResource extends string = string>
-  extends IReactAdminDataProvider<TResource> {
+export interface IDataProvider<
+  TResource extends string = string,
+> extends IReactAdminDataProvider<TResource> {
   send: <ReturnType = AnyType>(opts: {
     resource: TResource;
     params: ISendParams;
@@ -236,8 +237,9 @@ export interface II18nProviderOptions {
 export interface IService {}
 
 // ----------------------------------------------------------------------
-export interface ICrudService<E extends { id: IdType; [extra: string | symbol]: any } = any>
-  extends IService {
+export interface ICrudService<
+  E extends { id: IdType; [extra: string | symbol]: any } = any,
+> extends IService {
   find(filter: Filter<E>): Promise<Array<E & EntityRelationType>>;
   findById(id: IdType, filter: Filter<E>): Promise<E & EntityRelationType>;
   findOne(filter: Filter<E>): Promise<(E & EntityRelationType) | null>;

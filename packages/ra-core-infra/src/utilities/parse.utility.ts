@@ -113,12 +113,7 @@ export const toStringDecimal = (input: any, digit = 2, options = { localeFormat:
     return 0;
   }
 
-  let number = 0;
-  if (isInt(input)) {
-    number = int(input);
-  } else {
-    number = float(input, digit);
-  }
+  const number = isInt(input) ? int(input) : float(input, digit);
 
   if (!shouldFormatWithLocale) {
     return number.toFixed(digit);

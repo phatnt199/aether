@@ -45,7 +45,7 @@ export class DefaultAuthService extends BaseService {
   }
 
   cleanUp() {
-    Object.keys(localStorage).forEach(key => {
+    Object.keys(localStorage).forEach((key) => {
       if (!key.startsWith('@app/auth/') && !key.startsWith('@app/oauth2/')) {
         return;
       }

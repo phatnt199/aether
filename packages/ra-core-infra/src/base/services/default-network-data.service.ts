@@ -256,14 +256,14 @@ export class DefaultNetworkRequestService extends BaseService {
           }
 
           if (val instanceof FileList) {
-            Array.from(val).forEach(item => {
+            Array.from(val).forEach((item) => {
               formData.append(key, item, item.name);
             });
             continue;
           }
 
           if (Array.isArray(val)) {
-            val.forEach(item => {
+            val.forEach((item) => {
               formData.append(key, item, item.name);
             });
             continue;

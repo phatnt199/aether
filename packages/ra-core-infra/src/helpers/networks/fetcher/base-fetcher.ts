@@ -30,8 +30,7 @@ export abstract class AbstractNetworkFetchableHelper<
   V extends TFetcherVariant,
   RQ extends IRequestOptions,
   RS extends TFetcherResponse<V>,
-> implements IFetchable<V, RQ, RS>
-{
+> implements IFetchable<V, RQ, RS> {
   protected name: string;
   protected variant: V;
   protected worker: TFetcherWorker<V>;

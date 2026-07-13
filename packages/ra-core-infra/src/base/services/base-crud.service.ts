@@ -40,7 +40,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             query: { filter },
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs.data);
         })
         .catch(reject);
@@ -57,7 +57,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             query: { filter },
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);
@@ -74,7 +74,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             query: { filter },
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);
@@ -91,7 +91,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             query: { where },
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);
@@ -108,7 +108,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             body: data,
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);
@@ -126,7 +126,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             body: data,
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);
@@ -143,7 +143,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             body: data,
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);
@@ -160,7 +160,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             body: data,
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);
@@ -176,7 +176,7 @@ export class BaseCrudService<E extends { id: IdType; [extra: string | symbol]: a
             method: RequestMethods.DELETE,
           },
         })
-        .then(rs => {
+        .then((rs) => {
           resolve(rs?.data);
         })
         .catch(reject);

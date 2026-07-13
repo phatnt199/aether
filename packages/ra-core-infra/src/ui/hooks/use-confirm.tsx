@@ -17,7 +17,7 @@ export const useConfirm = (): IUseConfirmReturn => {
 
   //--------------------------------------------------
   const confirm = React.useCallback((opts: { message: string }) => {
-    return new Promise<boolean>(_resolve => {
+    return new Promise<boolean>((_resolve) => {
       setResolve(() => {
         return (value: boolean) => {
           return _resolve(value);

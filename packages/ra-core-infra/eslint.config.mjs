@@ -1,7 +1,7 @@
-import confs from '@minimaltech/eslint-react';
+import defaultConfigs from '@minimaltech/eslint-react';
 
 const configs = [
-  ...confs,
+  ...defaultConfigs,
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
@@ -16,6 +16,10 @@ const configs = [
   {
     files: ['**/locales/*.ts'],
     rules: { '@typescript-eslint/naming-convention': ['off'] },
+  },
+  {
+    files: ['**/index.{ts,tsx}'],
+    rules: { 'react-refresh/only-export-components': 'off' },
   },
 ];
 
