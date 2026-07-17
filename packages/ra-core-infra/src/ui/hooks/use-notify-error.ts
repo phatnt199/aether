@@ -16,9 +16,9 @@ export const useNotifyError = () => {
         type?: NotificationType;
       },
     ) => {
-      notify(error?.messageCode, {
+      notify(error.normalized?.code, {
         type: 'error',
-        messageArgs: error?.extra?.messageArgs,
+        messageArgs: error.normalized?.args,
         ...options,
       });
     },
