@@ -1,5 +1,5 @@
 import { type AnyType } from '@/common';
-import { getClientError, getError } from '@/utilities';
+import { getClientError } from '@/utilities';
 import { BaseApiService } from '../services';
 
 export function api() {
@@ -17,8 +17,7 @@ export function api() {
           this.resource,
           JSON.stringify(error),
         );
-        const clientError = getClientError(error);
-        throw getError(clientError);
+        throw getClientError(error);
       }
     };
 

@@ -1,7 +1,7 @@
+import { getError } from '@venizia/ignis-inversion';
 import isEmpty from 'lodash/isEmpty';
 
 import { type AnyObject } from '@/common/types';
-import { getError } from '@/utilities';
 import { BaseHelper } from '../base.helper';
 import { type IFetchable, type IRequestOptions } from './fetcher';
 import { AxiosFetcher, type IAxiosRequestOptions } from './fetcher/axios-fetcher';

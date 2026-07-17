@@ -1,3 +1,4 @@
+import { getError } from '@venizia/ignis-inversion';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
 
@@ -19,7 +20,6 @@ import {
   type TRequestType,
 } from '@/common';
 import { NodeFetchNetworkRequest } from '@/helpers';
-import { getError } from '@/utilities';
 import { BaseService } from './base.service';
 
 const parseFilenameFromContentDisposition = (header: string): string | undefined => {

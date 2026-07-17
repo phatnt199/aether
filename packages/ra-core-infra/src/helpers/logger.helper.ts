@@ -1,4 +1,4 @@
-import { getError } from '@/utilities';
+import { getError } from '@venizia/ignis-inversion';
 
 const applicationLogger = console;
 

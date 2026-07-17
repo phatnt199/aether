@@ -1,7 +1,7 @@
+import { getError } from '@venizia/ignis-inversion';
 import { io, Socket, type SocketOptions } from 'socket.io-client';
 
 import { type AnyType } from '@/common/types';
-import { getError } from '@/utilities/error.utility';
 import { BaseHelper } from './base.helper';
 
 interface IOptions extends SocketOptions {

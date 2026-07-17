@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { Container } from '@venizia/ignis-inversion';
+import { Container, getError } from '@venizia/ignis-inversion';
 
 import { CoreBindings, type ValueOf } from '@/common';
-import { getError } from '@/utilities';
 import { ApplicationContext } from '../context';
 
 export interface IUseInjectableKeysOverrides {}

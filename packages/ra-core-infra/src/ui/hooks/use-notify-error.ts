@@ -1,9 +1,8 @@
 import React from 'react';
 
-import { useNotify } from 'ra-core';
+import { type ApplicationError } from '@venizia/ignis-inversion';
 import type { NotificationOptions, NotificationType } from 'ra-core';
-
-import { ApplicationError } from '@/utilities/error.utility';
+import { useNotify } from 'ra-core';
 
 export const useNotifyError = () => {
   // --------------------------------------------------

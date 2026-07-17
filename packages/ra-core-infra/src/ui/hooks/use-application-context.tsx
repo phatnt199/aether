@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { getError } from '@/utilities';
+import { getError } from '@venizia/ignis-inversion';
+
 import { ApplicationContext } from '../context';
 
 export const useApplicationContext = () => {

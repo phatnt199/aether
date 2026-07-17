@@ -1,4 +1,4 @@
-import { Container, inject } from '@venizia/ignis-inversion';
+import { Container, getError, inject } from '@venizia/ignis-inversion';
 import omit from 'lodash/omit';
 import {
   type CreateParams,
@@ -40,7 +40,6 @@ import {
   type TRequestMethod,
   type TRequestType,
 } from '@/common';
-import { getError } from '@/utilities';
 import { BaseProvider } from './base.provider';
 
 export class DefaultRestDataProvider<TResource extends string = string> extends BaseProvider<

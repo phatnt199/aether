@@ -220,7 +220,7 @@
       },
       "peerDependencies": {
         "@loopback/filter": "^6.0.2",
-        "@venizia/ignis-inversion": "^0.1.0",
+        "@venizia/ignis-inversion": "^0.1.1-0",
         "axios": "^1.13.2",
         "ra-core": ">=5.15.0",
         "react": ">=18.0",
@@ -1141,7 +1141,7 @@
 
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.46.4", "", { "dependencies": { "@typescript-eslint/types": "8.46.4", "eslint-visitor-keys": "^4.2.1" } }, "sha512-/++5CYLQqsO9HFGLI7APrxBJYo+5OCMpViuhV8q5/Qa3o5mMrF//eQHks+PXcsAVaLdn817fMuS7zqoXNNZGaw=="],
 
-    "@venizia/ignis-inversion": ["@venizia/ignis-inversion@0.1.0", "", { "dependencies": { "lodash": "^4.18.1", "reflect-metadata": "^0.2.2", "zod": "^4.3.6" } }, "sha512-IAG06TZn+ePNySTOaAofditDrKhN5b38p/HyCU9CZfKuc3yMhfI3zrhWFlJv1aDckDrEpGSXrX5b7vl2N7dhig=="],
+    "@venizia/ignis-inversion": ["@venizia/ignis-inversion@0.1.1-0", "", { "dependencies": { "lodash": "^4.18.1", "reflect-metadata": "^0.2.2", "zod": "^4.3.6" } }, "sha512-qZ//EGaQFzHYhmwEpsirykmhiG47Bpx6Wg5CO3+VYbAdQqCtJ+BURfqS05QrOHnYfACFt9ZOPCX7LAxVCk2dvQ=="],
 
     "@vercel/oidc": ["@vercel/oidc@3.0.3", "", {}, "sha512-yNEQvPcVrK9sIe637+I0jD6leluPxzwJKx/Haw6F4H77CdDsszUn5V3o96LPziXkSNE2B83+Z3mjqGKBK/R6Gg=="],
 

@@ -106,7 +106,7 @@
   },
   "peerDependencies": {
     "@loopback/filter": "^6.0.2",
-    "@venizia/ignis-inversion": "^0.1.0",
+    "@venizia/ignis-inversion": "^0.1.1-0",
     "axios": "^1.13.2",
     "ra-core": ">=5.15.0",
     "react": ">=18.0",
