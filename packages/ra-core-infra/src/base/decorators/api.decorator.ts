@@ -1,5 +1,4 @@
 import { type AnyType } from '@/common';
-import { getClientError } from '@/utilities';
 import { BaseApiService } from '../services';
 
 export function api() {
@@ -11,13 +10,9 @@ export function api() {
         const result = await Reflect.apply(originalMethod, this, args);
         return result;
       } catch (error) {
-        this.logger.error(
-          '[%s] resource: %s | error: %o',
-          propertyKey,
-          this.resource,
-          JSON.stringify(error),
-        );
-        throw getClientError(error);
+        this.logger.error('[%s] resource: %s | error: %o', propertyKey, this.resource, error);
+
+        throw error;
       }
     };
 

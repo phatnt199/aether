@@ -475,7 +475,7 @@ export class DefaultNetworkRequestService extends BaseService {
 
     if (status < 200 || status >= 300) {
       const jsonRs = await rs.json();
-      throw getError(jsonRs?.error || jsonRs);
+      throw jsonRs?.error || jsonRs;
     }
 
     return this.parseResponse<ReturnType>({ response: rs, type, requestCountData });
