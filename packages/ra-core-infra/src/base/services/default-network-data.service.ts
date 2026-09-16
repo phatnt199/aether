@@ -22,6 +22,7 @@ import {
   type TRequestType,
 } from '@/common';
 import { NodeFetchNetworkRequest } from '@/helpers';
+import { isDefined } from '@/utilities';
 import { BaseService } from './base.service';
 
 const parseFilenameFromContentDisposition = (header: string): string | undefined => {
@@ -49,6 +50,21 @@ const parseFilenameFromContentDisposition = (header: string): string | undefined
   }
 
   return undefined;
+};
+
+const appendFormDataValue = (opts: { formData: FormData; key: string; value: unknown }) => {
+  const { formData, key, value } = opts;
+
+  if (!isDefined(value)) {
+    return;
+  }
+
+  if (value instanceof Blob) {
+    formData.append(key, value, (value as File).name);
+    return;
+  }
+
+  formData.append(key, String(value));
 };
 
 const normalizeNoAuthPathRegex = (input?: TNoAuthPathRegex): RegExp[] => {
@@ -342,27 +358,16 @@ export class DefaultNetworkRequestService extends BaseService {
         const formData = new FormData();
 
         for (const key in body) {
-          const val = body[key] as File | File[] | FileList | undefined;
-          if (!val) {
-            continue;
-          }
+          const val = body[key];
 
-          if (val instanceof FileList) {
-            Array.from(val).forEach((item) => {
-              formData.append(key, item, item.name);
+          if (Array.isArray(val) || (typeof FileList !== 'undefined' && val instanceof FileList)) {
+            Array.from(val as ArrayLike<unknown>).forEach((item) => {
+              appendFormDataValue({ formData, key, value: item });
             });
             continue;
           }
 
-          if (Array.isArray(val)) {
-            val.forEach((item) => {
-              formData.append(key, item, item.name);
-            });
-            continue;
-          }
-
-          formData.append(key, val, val.name);
-          continue;
+          appendFormDataValue({ formData, key, value: val });
         }
 
         rs.body = formData;
